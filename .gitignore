@@ -1,0 +1,127 @@
+# .DS_Store files
+*.DS_Store
+
+# Build directory
+build/
+docs/
+
+# Binary directories
+bin/
+
+# INI files for unit tests
+/test/unit/init/*
+
+# Result files for model test
+test/model/res/*
+
+# Eclipse files
+.cproject
+.project
+.pydevproject
+/.settings/*
+
+# Prerequisites
+*.d
+
+# Compiled object files
+*.slo
+*.lo
+*.o
+*.obj
+
+# Precompiled headers
+*.gch
+*.pch
+
+# Compiled dynamic libraries
+*.so
+*.dylib
+*.dll
+
+# Fortran module files
+*.mod
+*.smod
+
+# Compiled static libraries
+*.lai
+*.la
+*.a
+*.lib
+
+# Executables
+*.exe
+*.out
+*.app
+
+# Boost libraries
+/ext/boost_1_71_0/
+/ext/igraph_0.9.8/
+/ext/boost_1_71_0.zip
+
+# Unzipped BIOGRID network.
+/data/BIOGRID/BIOGRID-ORGANISM-Homo_sapiens-3.5.182.tab2.txt
+/data/BIOGRID/__MACOSX/
+
+# unzipped GRNs
+/data/GRN/*.csv
+
+#dbSNP
+/data/dbSNP/no_pseudogenes/snps_restruc_full.csv
+/data/dbSNP/no_pseudogenes/snps_cleaned_part1.csv
+/data/dbSNP/no_pseudogenes/snps_cleaned_part2.csv
+
+/data/dbSNP/inc_pseudogenes/snps_restruc_full_inc_pseudo.csv.zip
+/data/dbSNP/inc_pseudogenes/snps_restruc_full_inc_pseudo.csv
+/data/dbSNP/inc_pseudogenes/snps_cleaned_part1.csv
+/data/dbSNP/inc_pseudogenes/snps_cleaned_part2.csv
+/data/dbSNP/inc_pseudogenes/snps_cleaned_part3.csv
+
+/data/BOOST/
+/data/EpiGEN/
+/data/MACOED/
+/data/BOOST.zip
+/data/EpiGen.zip
+/data/MACOED.zip
+
+#input_module
+/data/PositionBasedInputModule/gene_balanced_tree/*.csv
+/data/PositionBasedInputModule/snp_balanced_tree/*.csv
+/data/PositionBasedInputModule/snp_hashmaps/*.csv
+
+#cmake
+/cmake-build-*
+/.idea/
+
+.vscode
+
+#load
+/data/LOAD/
+/data/CAD_control/*
+/data/HT_control/*
+/data/T2D_control/*
+
+#other datasets
+/data/BD_*
+
+#ext
+/ext/boost_1_71_0/tools/build/src/engine/*
+/ext/plink/*
+!/ext/plink/plink-1.07-x86_64.zip
+!/ext/plink/plink_linux_x86_64_20230116.zip
+
+#CMAKE LIST, because of Markus incompatible PC
+# CMakeLists.txt
+
+/venv/
+/ext/boost_1_71_0/tools/build/src/engine/b2
+/ext/boost_1_71_0/tools/build/src/engine/bjam
+
+.Rhistory
+
+
+.INSTALLED
+.RES_EXTRACTED
+.env
+
+docker/data
+__pycache__

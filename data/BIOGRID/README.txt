@@ -1,0 +1,1 @@
+Format specification: https://wiki.thebiogrid.org/doku.php/biogrid_tab_version_2.0
