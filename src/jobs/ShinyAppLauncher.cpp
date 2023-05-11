@@ -31,6 +31,7 @@ namespace epi {
                           "docker run --rm -v \"$dataset:$dataset_internal:Z\" \\\n"
                           "    -v \"$results:$results_internal:Z\" \\\n"
                           "    --user $user_id:$group_id \\\n"
+                          "    --workdir /app \\\n"
                           "    --network host \\\n"
                           "    ghcr.io/biomedbigdata/genepiseeker_dev:master Rscript app.R \\\n"
                           "    --results $results_internal \\\n"
