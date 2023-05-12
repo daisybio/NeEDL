@@ -24,7 +24,7 @@ for i, arg in enumerate(arguments):
                 print(f'Error: output directory {output_directory} does not exist!')
                 exit(-1)
 
-            arguments[i + 1] = '/mnt/out'
+            arguments[i + 1] = '/mnt/out/'
 
         break
 
@@ -39,9 +39,9 @@ for i, arg in enumerate(arguments):
             # can be multiple files (plink) so always mount the whole directory
             path = os.path.abspath(arguments[i + 1])
             filename = ""
-            if (os.path.isdir(path)):
-                path = str(Path(path).parent.resolve())
+            if not os.path.isdir(path):
                 filename = os.path.basename(path)
+                path = str(Path(path).parent.resolve())
             if not os.path.exists(path):
                 print(f'Error: path {path} at argument {arg} does not exist!')
                 exit(-1)

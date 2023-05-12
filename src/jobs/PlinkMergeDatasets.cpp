@@ -37,7 +37,56 @@ namespace epi {
                 output_path
         });
 
-        remove_plink_temp_files(output_path, { ".log", ".hh", ".mergelist", ".nosex" });
+
+        // merge failed because multiple alleles exist for some positions --> exclude them
+        if (boost::filesystem::exists(output_path + "-merge.missnp")) {
+            std::ofstream mergelist2(output_path + ".mergelist2");
+            std::vector<std::string> intermediate_paths;
+
+            for (size_t i = 0; i < input_paths.size(); ++i) {
+                // filter out the failing SNPs from every input dataset
+                std::string intermediate_path = output_path + "_exclude_failed_" + std::to_string(i);
+                run_plink_command(ext_path, {
+                        "--threads",
+                        std::to_string(num_threads),
+                        "--bfile",
+                        input_paths[i],
+                        "--noweb",
+                        "--exclude",
+                        output_path + "-merge.missnp",
+                        "--make-bed",
+                        "--out",
+                        intermediate_path
+                });
+
+                mergelist2 << intermediate_path << '\n';
+
+                intermediate_paths.push_back(intermediate_path);
+            }
+            mergelist2.close();
+
+            // repeat merging
+            run_plink_command(ext_path, {
+                    "--threads",
+                    std::to_string(num_threads),
+                    "--merge-list",
+                    output_path + ".mergelist2",
+                    "--noweb",
+                    "--allow-no-sex",
+                    "--make-bed",
+                    "--out",
+                    output_path
+            });
+
+            // delete intermediate files
+            for (auto & intermediate_path : intermediate_paths) {
+                remove_plink_temp_files(intermediate_path, { ".log", ".hh", ".nosex", ".bim", ".bed", ".fam" });
+
+            }
+        }
+
+
+        remove_plink_temp_files(output_path, { ".log", ".hh", ".mergelist", ".mergelist2", ".nosex", "-merge.missnp" });
 
         logger.stop();
     }
