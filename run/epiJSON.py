@@ -2,6 +2,7 @@
 
 import sys
 import os
+from pathlib import Path
 
 # settings
 #image = "needl_release:latest"
@@ -35,12 +36,17 @@ normal_path_attribs = ['--input-file', '--disease-snps']
 for i, arg in enumerate(arguments):
     if arg in normal_path_attribs:
         if len(arguments) > i + 1:
+            # can be multiple files (plink) so always mount the whole directory
             path = os.path.abspath(arguments[i + 1])
+            filename = ""
+            if (os.path.isdir(path)):
+                path = str(Path(path).parent.resolve())
+                filename = os.path.basename(path)
             if not os.path.exists(path):
                 print(f'Error: path {path} at argument {arg} does not exist!')
                 exit(-1)
 
-            arguments[i + 1] = '/mnt/in_' + str(len(input_paths))
+            arguments[i + 1] = '/mnt/in_' + str(len(input_paths)) + '/' + filename
             input_paths.append(path)
 
 
