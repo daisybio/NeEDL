@@ -20,11 +20,11 @@ curl https://raw.githubusercontent.com/biomedbigdata/NeEDL/main/run/NeEDL.py | p
 ```
 ```bash
 # run epiJSON
-curl https://raw.githubusercontent.com/biomedbigdata/NeEDL/main/run/epiJSON.py - <parameters...>
+curl https://raw.githubusercontent.com/biomedbigdata/NeEDL/main/run/epiJSON.py | python3 - <parameters...>
 ```
 ```bash
 # run calculate_scores
-curl https://raw.githubusercontent.com/biomedbigdata/NeEDL/main/run/calculate_scores.py - <parameters...>
+curl https://raw.githubusercontent.com/biomedbigdata/NeEDL/main/run/calculate_scores.py | python3 - <parameters...>
 ```
 
 *todo in einzelne Boxen*
