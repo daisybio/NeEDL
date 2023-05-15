@@ -4,8 +4,7 @@ import sys
 import os
 
 # settings
-#image = "needl_release:latest"
-image = "ghcr.io/biomedbigdata/needl:main"
+image = "bigdatainbiomedicine/needl:latest"
 command = '/NeEDL/test/model/bin/convert_to_binary'
 
 # app arguments

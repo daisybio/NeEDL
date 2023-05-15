@@ -5,8 +5,7 @@ import os
 from pathlib import Path
 
 # settings
-#image = "needl_release:latest"
-image = "ghcr.io/biomedbigdata/needl:main"
+image = "bigdatainbiomedicine/needl:latest"
 command = '/NeEDL/test/model/bin/epiJSON'
 
 # app arguments

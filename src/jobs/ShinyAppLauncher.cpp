@@ -33,7 +33,7 @@ namespace epi {
                           "    --user $user_id:$group_id \\\n"
                           "    --workdir /app \\\n"
                           "    --network host \\\n"
-                          "    ghcr.io/biomedbigdata/genepiseeker_dev:master Rscript app.R \\\n"
+                          "    bigdatainbiomedicine/needl:latest Rscript app.R \\\n"
                           "    --results $results_internal \\\n"
                           "    --dataset $dataset_internal \\\n"
                           "    --dbSNP $dbsnp_internal \\\n"
