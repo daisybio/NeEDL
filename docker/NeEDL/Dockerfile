@@ -20,7 +20,7 @@ RUN R -e "install.packages(c( \
     'plotly', 'patchwork', 'visNetwork', 'igraph', 'roxygen2', 'argparse'), \
     repos='http://cran.rstudio.com/')"
 
-COPY validation_report/r_studio/scripts/designed_app /app
+COPY shinyapp /app
 
 WORKDIR /app
 # ---- end of stage 1
