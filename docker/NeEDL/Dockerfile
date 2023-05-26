@@ -1,5 +1,32 @@
-# ----- container for compiling everything
-FROM bigdatainbiomedicine/needl-shiny:main AS build
+# ---- stage 1: build R shiny app
+FROM rocker/r2u:22.04 as needl_shiny_app
+
+RUN apt-get update && apt-get install -y \
+    libssl-dev \
+    libcurl4-openssl-dev \
+    libxml2-dev \
+    libudunits2-dev \
+    libgdal-dev \
+    libgeos-dev \
+    libproj-dev \
+    && rm -rf /var/lib/apt/lists/*
+
+RUN R -e "install.packages(c( \
+    'shiny', 'shinyjs', 'shinydashboard', 'shinydashboardPlus', \
+    'shinyWidgets', 'shinycssloaders', 'shinyFeedback', 'shinyalert', \
+    'bslib', 'rclipboard', 'sortable', 'htmltools', 'httr', \
+    'data.table', 'DT', 'tidyr', 'dplyr', 'stringr', 'magrittr', \
+    'rjson', 'tidyjson', 'jsonlite', 'RSQLite', 'ggplot2', 'gghighlight', \
+    'plotly', 'patchwork', 'visNetwork', 'igraph', 'roxygen2', 'argparse'), \
+    repos='http://cran.rstudio.com/')"
+
+COPY validation_report/r_studio/scripts/designed_app /app
+
+WORKDIR /app
+# ---- end of stage 1
+
+# ---- stage 2: use R shiny container and build all NeEDL related binaries
+FROM needl_shiny_app AS build
 WORKDIR /NeEDL
 
 ENV DEBIAN_FRONTEND=noninteractive
@@ -26,9 +53,11 @@ RUN python3.10 install.py --clean && \
     python3.10 install.py --target convert_to_binary && \
     python3.10 install.py --target epiJSON
 
+# ---- end of stage 2
 
-# ----- slim production container
-FROM bigdatainbiomedicine/needl-shiny:main AS release
+
+# ---- stage 3: use shiny app stage and add all previously compiled binaries
+FROM needl_shiny_app AS release
 WORKDIR /NeEDL
 
 LABEL org.opencontainers.image.source=https://github.com/biomedbigdata/NeEDL
@@ -50,3 +79,4 @@ RUN ln -s /NeEDL/test/model/bin/NeEDL /usr/local/bin/NeEDL && \
     ln -s /NeEDL/test/model/bin/calculate_scores /usr/local/bin/calculate_scores && \
     ln -s /NeEDL/test/model/bin/convert_to_binary /usr/local/bin/convert_to_binary && \
     ln -s /NeEDL/test/model/bin/convert_to_json /usr/local/bin/epiJSON
+# ---- end of stage 3
