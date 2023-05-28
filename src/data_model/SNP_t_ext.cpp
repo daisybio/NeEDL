@@ -30,7 +30,7 @@ namespace epi {
 
     double SNPSet::calculate_score(options::EpistasisScore score) {
         // check if score was already calculated
-        auto model_index = uint_fast8_t(score);
+        auto model_index = uint_fast32_t(score);
         if ((scores_calculated & (1 << model_index)) == 0) {
             // need to calculate score
             if (scores == nullptr) scores = std::make_shared<std::vector<double>>(NUM_EPISTASIS_SCORES);

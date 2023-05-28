@@ -139,7 +139,7 @@ namespace epi {
         std::shared_ptr<std::vector<SNP_t>> snps = nullptr;
         std::shared_ptr<std::map<std::string,std::string>> attributes = nullptr;
         std::shared_ptr<std::vector<double>> scores = nullptr;
-        uint_fast16_t scores_calculated = 0;
+        uint_fast32_t scores_calculated = 0;
     };
 
     class SNPSetHash {
