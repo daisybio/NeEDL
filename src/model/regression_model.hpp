@@ -58,74 +58,110 @@ namespace epi {
  * | <tt>\--learning-rate  @<convertible to double greater 0@></tt> | the learning rate employed by the block gradient descent | 0.1 | n.a. |
  * | <tt>\--epsilon @<convertible to double greater 0@></tt> | the convergence threshold employed by the block gradient descent | 0.01 | n.a. |
  */
-template<class PhenoType>
-class RegressionModel : public EpistasisModel<PhenoType> {
+    template<class PhenoType>
+    class RegressionModel : public EpistasisModel<PhenoType> {
 
-public:
+    public:
 
-	RegressionModel(Instance<PhenoType> * instance);
+        RegressionModel(Instance<PhenoType> * instance);
 
-    const std::string & get_score();
+        const std::string & get_score();
 
-	virtual ~RegressionModel();
+        void cov_activate();
 
-private:
+        void cov_deactivate();
 
-	std::string score_;
+        virtual ~RegressionModel();
 
-	double learning_rate_;
+        const Eigen::MatrixXd &get_interaction_model_();
 
-	double epsilon_;
+    private:
 
-	double max_itrs_;
+        std::string score_;
 
-	std::vector<SNP> snp_set_;
+        bool cov_model_;
 
-	Eigen::MatrixXd interaction_model_;
+        bool mixed_ancestry_; // still to include
 
-	virtual options::ModelSense model_sense_() const final;
+        bool incl_cov_;
 
-	virtual bool is_predictive_() const final;
+        double learning_rate_;
 
-	virtual double evaluate_(const std::vector<SNP> & snp_set, bool prepare_prediction) final;
+        double epsilon_;
 
-	virtual PhenoType predict_(Ind ind) const final;
+        double max_itrs_;
 
-	virtual bool parse_option_(const std::string & option, const std::string & arg) final;
+        std::vector<SNP> snp_set_;
 
-	virtual void set_default_options_() final;
+        Eigen::MatrixXd interaction_model_;
 
-	virtual std::string valid_options_() const final;
+        virtual options::ModelSense model_sense_() const final;
 
-	virtual void save_(const std::string & filename) const final;
+        virtual bool is_predictive_() const final;
 
-	virtual void load_(const std::string & filename) final;
+        virtual double evaluate_(const std::vector<SNP> & snp_set, bool prepare_prediction) final;
 
-	void construct_feature_matrix_(const std::vector<SNP> & snp_set, bool construct_interaction_features, Eigen::MatrixXd & feature_matrix) const;
+        virtual PhenoType predict_(Ind ind) const final;
 
-	void construct_features_(const std::vector<SNP> & snp_set, Ind ind, bool construct_interaction_features, Eigen::MatrixXd & feature_matrix) const;
+        virtual bool parse_option_(const std::string & option, const std::string & arg) final;
 
-	void fit_model_(const Eigen::MatrixXd & feature_matrix, Eigen::MatrixXd & model, Eigen::MatrixXd & hypothesis, double & sigma) const;
+        virtual void set_default_options_() final;
 
-	void fit_linear_model_(const Eigen::MatrixXd & feature_matrix, Eigen::MatrixXd & model, Eigen::MatrixXd & hypothesis) const;
+        virtual std::string valid_options_() const final;
 
-	void compute_linear_model_sigma_(const Eigen::MatrixXd & hypothesis, double & sigma) const;
+        virtual void save_(const std::string & filename) const final;
 
-	void fit_logistic_model_(const Eigen::MatrixXd & feature_matrix, Eigen::MatrixXd & model, Eigen::MatrixXd & hypothesis) const;
+        virtual void load_(const std::string & filename) final;
 
-	void fit_multinomial_model_(const Eigen::MatrixXd & feature_matrix, Eigen::MatrixXd & model, Eigen::MatrixXd & hypothesis) const;
+        void construct_feature_matrix_(const std::vector<SNP> & snp_set, bool construct_interaction_features, bool construct_cov_features, Eigen::MatrixXd & feature_matrix) const;
 
-	double likelihood_(Ind ind, const Eigen::MatrixXd & hypothesis, double sigma) const;
+        /*
+        void construct_features_(const std::vector<SNP> &snp_set, Ind ind, bool construct_interaction_features,
+                                 bool construct_cov_features, bool construct_mixed_ancestry_features,
+                                 Eigen::MatrixXd &features) const;
 
-	bool gain_score_() const;
+        void construct_feature_matrix_(const std::vector<SNP> &snp_set, bool construct_interaction_features,
+                                       bool construct_cov_features, bool construct_mixed_ancestry_features,
+                                       Eigen::MatrixXd &feature_matrix) const;
 
-	std::size_t degrees_of_freedom_per_feature_() const;
+        */
 
-	std::string meta_info_() const;
+        void construct_features_(const std::vector<SNP> & snp_set, Ind ind, bool construct_interaction_features, bool construct_cov_features, Eigen::MatrixXd & feature_matrix) const;
 
-	void check_loaded_model_() const;
+        void fit_model_(const Eigen::MatrixXd & feature_matrix, Eigen::MatrixXd & model, Eigen::MatrixXd & hypothesis, double & sigma) const;
 
-};
+        void fit_linear_model_(const Eigen::MatrixXd & feature_matrix, Eigen::MatrixXd & model, Eigen::MatrixXd & hypothesis) const;
+
+        void compute_linear_model_sigma_(const Eigen::MatrixXd & hypothesis, double & sigma) const;
+
+        void fit_logistic_model_(const Eigen::MatrixXd & feature_matrix, Eigen::MatrixXd & model, Eigen::MatrixXd & hypothesis) const;
+
+        void fit_multinomial_model_(const Eigen::MatrixXd & feature_matrix, Eigen::MatrixXd & model, Eigen::MatrixXd & hypothesis) const;
+
+        double likelihood_(Ind ind, const Eigen::MatrixXd & hypothesis, double sigma) const;
+
+        bool gain_score_() const;
+
+        std::size_t degrees_of_freedom_per_feature_() const;
+
+        std::string meta_info_() const;
+
+        // void check_loaded_model_() const;
+        void check_loaded_model_(bool cov_model) const;
+
+        bool cov_score_() const;
+
+        bool get_cov_status() const;
+
+        double
+        comp_llh_or_cov(Eigen::MatrixXd hypothesis1, double sigma1, Eigen::MatrixXd hypothesis2, double sigma2) const;
+
+        bool get_mixed_ancestry_status() const;
+
+        void mixed_ancestry_activate();
+
+        void mixed_ancestry_deactivate();
+    };
 
 }
 

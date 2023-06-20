@@ -50,57 +50,67 @@ namespace epi {
  * | <tt>\--score LLH\|NLL\|AIC\|BIC</tt> | the returned score | @p NLL | @p LHH ~ likelihood, @p NLL ~ negative log-likelihood, @p AIC ~ Aikake information criterion, @p BIC ~ Bayesian information criterion |
  * | <tt>\--min-cell-size  @<convertible to int greater 0@></tt> | the minimal size a cell of the penetrance table must have to compute local distributions | 10 for quantitative phenotypes, 10 * number of categories for categorical phenotypes | for cells with fewer entries, the global distribution is used |
  */
-template<class PhenoType>
-class PenetranceModel : public EpistasisModel<PhenoType> {
+    template<class PhenoType>
+    class PenetranceModel : public EpistasisModel<PhenoType> {
 
-public:
+    public:
 
-	PenetranceModel(Instance<PhenoType> * instance);
+        PenetranceModel(Instance<PhenoType> * instance);
 
-    const std::string & get_score();
+        const std::string & get_score();
 
-	virtual ~PenetranceModel();
+        void cov_activate();
 
-private:
+        void cov_deactivate();
 
-	std::size_t min_cell_size_;
+        virtual ~PenetranceModel();
 
-	std::string score_;
+    private:
 
-	std::vector<double> global_distribution_;
+        std::size_t min_cell_size_;
 
-	std::vector<SNP> snp_set_;
+        std::string score_;
 
-	std::vector<std::vector<double>> maximum_likelihood_distributions_;
+        bool incl_cov_;
 
-	virtual options::ModelSense model_sense_() const final;
+        Eigen::MatrixXd beta_;
 
-	virtual bool is_predictive_() const final;
+        std::vector<double> global_distribution_;
 
-	virtual double evaluate_(const std::vector<SNP> & snp_set, bool prepare_prediction) final;
+        std::vector<SNP> snp_set_;
 
-	virtual PhenoType predict_(Ind ind) const final;
+        std::vector<std::vector<double>> maximum_likelihood_distributions_;
 
-	virtual void initialize_() final;
+        virtual options::ModelSense model_sense_() const final;
 
-	virtual bool parse_option_(const std::string & option, const std::string & arg) final;
+        virtual bool is_predictive_() const final;
 
-	virtual void set_default_options_() final;
+        virtual double evaluate_(const std::vector<SNP> & snp_set, bool prepare_prediction) final;
 
-	virtual std::string valid_options_() const final;
+        virtual PhenoType predict_(Ind ind) const final;
 
-	virtual void save_(const std::string & filename) const final;
+        virtual void initialize_() final;
 
-	virtual void load_(const std::string & filename) final;
+        virtual bool parse_option_(const std::string & option, const std::string & arg) final;
 
-	std::vector<double> maximum_likelihood_distribution_(const std::vector<PhenoType> & phenotypes) const;
+        virtual void set_default_options_() final;
 
-	double likelihood_(PhenoType phenotype, const std::vector<double> & distribution) const;
+        virtual std::string valid_options_() const final;
 
-	std::string meta_info_() const;
+        virtual void save_(const std::string & filename) const final;
 
-	void check_loaded_model_() const;
-};
+        virtual void load_(const std::string & filename) final;
+
+        std::vector<double> maximum_likelihood_distribution_(const std::vector<PhenoType> & phenotypes) const;
+
+        double likelihood_(PhenoType phenotype, const std::vector<double> & distribution) const;
+
+        std::string meta_info_() const;
+
+        void check_loaded_model_() const;
+
+        bool get_cov_status() const;
+    };
 
 }
 
