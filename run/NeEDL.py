@@ -89,5 +89,5 @@ external_command += f"{image} {command} --data-directory /NeEDL/data/ {argument_
 
 print(external_command)
 
-# os.system("docker image pull " + image)
+os.system("docker image pull " + image)
 os.system(external_command)

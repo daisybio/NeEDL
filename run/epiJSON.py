@@ -72,5 +72,5 @@ external_command += f"{image} {command} --ext-directory /NeEDL/ext/ --data-direc
 
 print(external_command)
 
-# os.system("docker image pull " + image)
+os.system("docker image pull " + image)
 os.system(external_command)

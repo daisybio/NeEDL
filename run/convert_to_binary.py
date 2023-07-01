@@ -59,5 +59,5 @@ external_command += f"{image} {command} {argument_string}"
 
 print(external_command)
 
-# os.system("docker image pull " + image)
+os.system("docker image pull " + image)
 os.system(external_command)
