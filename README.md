@@ -27,7 +27,6 @@ curl https://raw.githubusercontent.com/biomedbigdata/NeEDL/main/run/epiJSON.py |
 curl https://raw.githubusercontent.com/biomedbigdata/NeEDL/main/run/calculate_scores.py | python3 - <parameters...>
 ```
 
-*todo in einzelne Boxen*
 
 Parameters that can be used with the tools are explained below. Please note the "` - `" before the first parameter. It is necessary to pipe the code of the Python script correctly.
 
@@ -35,9 +34,6 @@ Example command to check that everything works:
 ```bash
 curl https://raw.githubusercontent.com/biomedbigdata/NeEDL/main/run/NeEDL.py | python3 - --help
 ```
-
-
-*todo: update mechanism for the container*
 
 
 ## Parameters for NeEDL
@@ -116,11 +112,69 @@ For this default case which most users probably want to use one has to set the f
 
 NeEDL is very versatile and can be used with custom data as well. You can select your data for labeling and interactions:
 
-*tba*
+#### Custom SNP annotation data
+Custom SNP annotation data needs to be provided in CSV format. Two columns need to be present, one that contains the SNP identifiers (usually RS-IDs) and another that contains the labels. In both columns, multiple entries can be provided within one row to reduce the size of the file (please set the separator characters accordingly, see below):
+Example:
+```
+SNP             gene
+rs123           ABC1
+rs123           DEF2
+rs456           ABC1
+rs456           DEF2
+rs789           XYZ9
+```
+
+```
+SNP             gene
+rs123,rs456     ABC1,DEF2
+rs789           XYZ9
+```
+
+```bash
+--snp-annotate "<path>|<has_header>|<snp_col>|<annotation_col>|<csv_separator>|<snp_separator>|<annotation_separator>"
+```
+- `<path>`: path to the CSV file (either relative to the current working directory or an absolute path)
+- `<has_header>`: either `yes` or `no` depending on whether the CSV file has a header line
+- `<snp_col1>`: Descriptor of the column containing the SNP identifiers. Can be a zero-based index or, if the CSV file has a header line, it can also be the name of the column
+- `<annotation_col>`: Descriptor of the column containing the gene annotations. Can be a zero-based index or, if the CSV file has a header line, it can also be the name of the column
+- `<separator_csv>`: character which separates the columns in the CSV file, e.g., `,` or `\t` (in most terminals one might need to use `\\t` instead of `\t` to escape the backslash properly)
+- `<separator_col1>`: character which separates multiple entries in the SNP identifier column, if every row contains exactly one entry please set it to `-1`
+- `<separator_col2>`: character which separates multiple entries in the annotation column, if every row contains exactly one entry please set it to `-1`
 
 Multiple commands for SNP annotation can be set in a single run to use labels from different sources.
 
-NeEDL also supports using multiple network files in one run. If so, the local search is performed for each network individually and the results are aggregated afterward with the help of an additional local search run. The multiple networks approach is not fully evaluated yet.
+#### Custom gene-gene/protein-protein interaction data
+The interaction data needs to be provided in CSV format. Two columns need to be present which contain the SNP labels which interact and thus connect within the gene-gene interaction network. It can be considered an edge list of that network. NeEDL allows using multiple labels per cell of the CSV file to store information more densely.
+Example:
+The following two files produce induce the same network if the separator characters are set correctly (see the usage of the argument below):
+```
+gene1       gene2
+ABC1        DEF1
+ABC1        DEF2
+ABC2        DEF1
+ABC2        DEF2
+XYZ1        XYZ2
+```
+```
+gene1       gene2
+ABC1,ABC2   DEF1,DEF2
+XYZ1        XYZ2
+```
+
+To select a custom source for labeling the SNPs please use the following argument which contains 8 sub-argument separated by the character "`|`":
+```bash
+--network "<network_name>|<path>|<has_header>|<col1>|<col2>|<separator_csv>|<separator_col1>|<separator_col2>"
+```
+- `<network_name>`: a unique name for the network, only characters that are valid in a filename are allowed
+- `<path>`: path to the CSV file (either relative to the current working directory or an absolute path)
+- `<has_header>`: either `yes` or `no` depending on whether the CSV file has a header line
+- `<col1>`: Descriptor of the first column. Can be a zero-based index or, if the csv file has a header line, it can also be the name of the column
+- `<col2>`: Descriptor of the second column. Can be a zero-based index or, if the CSV file has a header line, it can also be the name of the column
+- `<separator_csv>`: character which separates the columns in the CSV file, e.g., `,` or `\t` (in most terminals one might need to use `\\t` instead of `\t` to escape the backslash properly)
+- `<separator_col1>`: character which separates multiple entries in the first column, if every row contains exactly one entry please set it to `-1`
+- `<separator_col2>`: character which separates multiple entries in the second column, if every row contains exactly one entry please set it to `-1`
+
+NeEDL supports using multiple network files in one run. If so, the local search is performed for each network individually and the results are aggregated afterward with the help of an additional local search run. The multiple networks approach is not fully evaluated yet.
 
 ### Selecting a seeding routine
 NeEDL supports different seeding routines for the local search which come with different advantages and disadvantages. In our publication, we used RANDOM_CONNECTED seeding for all our tests. It is generally a good choice. However, the user has to decide how many seeds should be generated which influences the quality of the results. If you do not know how many seeds to use we suggest trying out the COMMUNITY_WISE seeding as it decides how many seeds should be used based on the network size and architecture.
@@ -205,7 +259,7 @@ The QUANTUM_COMPUTING seeding support three different hardware types. Options ar
 ```
 
 ### Local search
-One can influence how the local search that NeEDL applies to the SSI network behaves. The most important setting is the statistical score that should be used for optimization. We recommend to use the score ```PENETRANCE_NLL``` for optimization.
+One can influence how the local search that NeEDL applies to the SSI network behaves. The most important setting is the statistical score that should be used for optimization. We recommend using the score ```PENETRANCE_NLL``` for optimization.
 ```bash
 # select score for optimization
 --ms-model PENETRANCE_NLL
@@ -225,9 +279,7 @@ One can influence how the local search that NeEDL applies to the SSI network beh
 
 ```
 
-*todo: explain additional parameters*
-
-## Documentation of the output files of NeEDl
+## Documentation of the output files of NeEDL
 
 *tba*
 
