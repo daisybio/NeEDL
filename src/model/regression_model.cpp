@@ -10,7 +10,7 @@ namespace epi {
     RegressionModel<QuantitativePhenoType>::
     predict_(Ind ind) const {
         Eigen::MatrixXd interaction_features;
-        construct_features_(snp_set_, ind, true, interaction_features);
+        construct_features_(snp_set_, ind, true, this->get_cov_status(), interaction_features);
         return (interaction_features * interaction_model_)(0, 0);
     }
 
@@ -19,7 +19,7 @@ namespace epi {
     RegressionModel<CategoricalPhenoType>::
     predict_(Ind ind) const {
         Eigen::MatrixXd interaction_features;
-        construct_features_(snp_set_, ind, true, interaction_features);
+        construct_features_(snp_set_, ind, true, this->get_cov_status(), interaction_features);
         if (this->instance_->num_categories() == 2) {
             if (1.0 / (1.0 + std::exp(-(interaction_features * interaction_model_)(0, 0))) < 0.5) {
                 return 0;
@@ -65,10 +65,10 @@ namespace epi {
             hypothesis = feature_matrix * model;
             loss = 0;
             for (Ind ind{0}; ind < num_inds; ind++) {
-                error = hypothesis(ind, 0) - this->instance_->phenotype(ind);
+                error = hypothesis(ind, 0) - this->instance_->phenotype(ind); // calculate error using SSR
                 loss += error * error;
             }
-            if (loss_old - loss < epsilon_) {
+            if (loss_old - loss < epsilon_) { // konvergence
                 break;
             }
             gradient = Eigen::VectorXd::Zero(num_features);
@@ -232,7 +232,7 @@ namespace epi {
     template<>
     void
     RegressionModel<QuantitativePhenoType>::
-    check_loaded_model_() const {
+    check_loaded_model_(bool cov_model) const {
         std::size_t num_features{snp_set_.size() + 1 + (snp_set_.size() * (snp_set_.size() - 1)) / 2};
         if (static_cast<std::size_t>(interaction_model_.rows()) != snp_set_.size() + 1 + (snp_set_.size() * (snp_set_.size() - 1)) / 2) {
             throw Error(std::string("Wrong number of features in loaded model for SNP set of size ") + std::to_string(snp_set_.size()) + ". Expected: " + std::to_string(num_features) + ". Actual: " + std::to_string(interaction_model_.rows()) + ".");
@@ -246,7 +246,7 @@ namespace epi {
     template<>
     void
     RegressionModel<CategoricalPhenoType>::
-    check_loaded_model_() const {
+    check_loaded_model_(bool cov_model) const {
         std::size_t num_features{snp_set_.size() + 1 + (snp_set_.size() * (snp_set_.size() - 1)) / 2};
         if (static_cast<std::size_t>(interaction_model_.rows()) != snp_set_.size() + 1 + (snp_set_.size() * (snp_set_.size() - 1)) / 2) {
             throw Error(std::string("Wrong number of features in loaded model for SNP set of size ") + std::to_string(snp_set_.size()) + ". Expected: " + std::to_string(num_features) + ". Actual: " + std::to_string(interaction_model_.rows()) + ".");
@@ -260,5 +260,4 @@ namespace epi {
             throw Error(std::string("Wrong number of parameters per feature. Expected: ") + std::to_string(this->instance_->num_categories()) + ". Actual: " + std::to_string(interaction_model_.cols()) + ".");
         }
     }
-
 }

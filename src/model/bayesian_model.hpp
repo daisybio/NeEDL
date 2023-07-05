@@ -49,42 +49,50 @@ namespace epi {
  * | ------------------------------ | ------------------ | -------- | ---------------- |
  * | <tt>\--num-bins @<convertible to int greater equal 2@></tt> | the number of bins used for discretizing quantitative phenotypes | @p 100 | has no effect unless @p PhenoType equals epi::QuantitativePhenoType |
  */
-template<class PhenoType>
-class BayesianModel : public EpistasisModel<PhenoType> {
+    template<class PhenoType>
+    class BayesianModel : public EpistasisModel<PhenoType> {
 
-public:
+    public:
 
-	BayesianModel(Instance<PhenoType> * instance);
+        BayesianModel(Instance<PhenoType> * instance);
 
-	virtual ~BayesianModel();
+        void cov_activate();
 
-private:
+        void cov_deactivate();
 
-	double mu_;
+        virtual ~BayesianModel();
 
-	double sigma_;
+    private:
 
-	std::size_t num_bins_;
+        double mu_;
 
-	virtual void initialize_() final;
+        double sigma_;
 
-	virtual options::ModelSense model_sense_() const final;
+        bool incl_cov_;
 
-	virtual bool is_predictive_() const final;
+        std::size_t num_bins_;
 
-	virtual double evaluate_(const std::vector<SNP> & snp_set, bool prepare_prediction) final;
+        virtual void initialize_() final;
 
-	virtual bool parse_option_(const std::string & option, const std::string & arg) final;
+        virtual options::ModelSense model_sense_() const final;
 
-	virtual void set_default_options_() final;
+        virtual bool is_predictive_() const final;
 
-	virtual std::string valid_options_() const final;
+        virtual double evaluate_(const std::vector<SNP> & snp_set, bool prepare_prediction) final;
 
-	void initialize_binned_phenotypes_(std::vector<CategoricalPhenoType> & binned_phenotypes) const;
+        virtual bool parse_option_(const std::string & option, const std::string & arg) final;
 
-	double log_factorial_(std::size_t n);
+        virtual void set_default_options_() final;
 
-};
+        virtual std::string valid_options_() const final;
+
+        void initialize_binned_phenotypes_(std::vector<CategoricalPhenoType> & binned_phenotypes,
+                                           const Eigen::MatrixXd &residuals) const;
+
+        double log_factorial_(std::size_t n);
+
+        bool get_cov_status() const;
+    };
 
 }
 

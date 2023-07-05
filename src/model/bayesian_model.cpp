@@ -33,10 +33,12 @@ namespace epi {
     template<>
     void
     BayesianModel<QuantitativePhenoType>::
-    initialize_binned_phenotypes_(std::vector<CategoricalPhenoType> & binned_phenotypes) const {
+    initialize_binned_phenotypes_(std::vector<CategoricalPhenoType> & binned_phenotypes, const Eigen::MatrixXd &residuals) const {
         CategoricalPhenoType bin;
         for (Ind ind{0}; ind < this->instance_->num_inds(); ind++) {
-            bin = static_cast<CategoricalPhenoType>(std::floor(misc::normal_cdf(this->instance_->phenotype(ind), mu_, sigma_) * static_cast<double>(num_bins_)));
+            // bin = static_cast<CategoricalPhenoType>(std::floor(misc::normal_cdf(this->instance_->phenotype(ind), mu_, sigma_) * static_cast<double>(num_bins_)));
+            // bin = static_cast<CategoricalPhenoType>(std::floor(misc::normal_cdf(residuals(ind, 0), mu_, sigma_) * static_cast<double>(num_bins_)));
+            bin = static_cast<CategoricalPhenoType>(std::floor(misc::normal_cdf((this->get_cov_status() ? residuals(ind, 0) : this->instance_->phenotype(ind)), mu_, sigma_) * static_cast<double>(num_bins_)));
             if (bin == num_bins_) {
                 bin--;
             }
@@ -47,9 +49,10 @@ namespace epi {
     template<>
     void
     BayesianModel<CategoricalPhenoType>::
-    initialize_binned_phenotypes_(std::vector<CategoricalPhenoType> & binned_phenotypes) const {
+    initialize_binned_phenotypes_(std::vector<CategoricalPhenoType> & binned_phenotypes, const Eigen::MatrixXd &residuals) const {
         for (Ind ind{0}; ind < this->instance_->num_inds(); ind++) {
-            binned_phenotypes.emplace_back(this->instance_->phenotype(ind));
+            binned_phenotypes.emplace_back((this->get_cov_status() ? static_cast<CategoricalPhenoType>(std::round(residuals(ind, 0))) : this->instance_->phenotype(ind)));
+            // binned_phenotypes.emplace_back(static_cast<CategoricalPhenoType>(std::round(residuals(ind, 0))));
         }
     }
 

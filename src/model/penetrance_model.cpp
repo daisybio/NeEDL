@@ -11,6 +11,7 @@ namespace epi {
             EpistasisModel<QuantitativePhenoType>(instance),
             min_cell_size_{10},
             score_("NLL"),
+            incl_cov_(false),
             global_distribution_(),
             snp_set_(),
             maximum_likelihood_distributions_() {}
@@ -21,6 +22,7 @@ namespace epi {
             EpistasisModel<CategoricalPhenoType>(instance),
             min_cell_size_{10 * this->instance_->num_categories()},
             score_("NLL"),
+            incl_cov_(false),
             global_distribution_(),
             snp_set_(),
             maximum_likelihood_distributions_() {}
@@ -29,7 +31,18 @@ namespace epi {
     QuantitativePhenoType
     PenetranceModel<QuantitativePhenoType>::
     predict_(Ind ind) const {
-        return maximum_likelihood_distributions_.at(this->instance_->genotype_at_snp_set(snp_set_, ind)).at(0);
+        // get residual based on genotype
+        QuantitativePhenoType predicted_residual = maximum_likelihood_distributions_.at(this->instance_->genotype_at_snp_set(snp_set_, ind)).at(0);
+
+        if (this->get_cov_status()){
+            // account for covariates
+            Eigen::MatrixXd ind_covariates(1, this->instance_->num_covs()+1);
+            ind_covariates << 1, this->instance_->get_covariates().row(ind);
+            double predicted_pheno_adjusted = (ind_covariates * beta_)(0, 0) + predicted_residual;
+            return static_cast<QuantitativePhenoType>(predicted_pheno_adjusted);
+        }
+
+        return predicted_residual;
     }
 
     template<>
@@ -46,6 +59,20 @@ namespace epi {
             }
             current_phenotype++;
         }
+
+        if (this->get_cov_status()) {
+            // account for covariates
+            Eigen::MatrixXd ind_covariates(1, this->instance_->num_covs()+1);
+            ind_covariates << 1, this->instance_->get_covariates().row(ind);
+            double predicted_residual = static_cast<double>(predicted_phenotype);
+            double predicted_pheno_adjusted = (ind_covariates * beta_)(0, 0) + predicted_residual;
+
+            // round adj phenotype to integer
+            CategoricalPhenoType final_predicted_phenotype = static_cast<CategoricalPhenoType>(std::round(predicted_pheno_adjusted));
+
+            return final_predicted_phenotype;
+        }
+
         return predicted_phenotype;
     }
 
@@ -159,5 +186,4 @@ namespace epi {
             throw Error(std::string("Wrong number of parameters per genotype in loaded model. Expected: ") + std::to_string(this->instance_->num_categories())+ ". Actual: " + std::to_string(maximum_likelihood_distributions_.back().size()) + ".");
         }
     }
-
 }

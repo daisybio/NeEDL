@@ -43,45 +43,56 @@ namespace epi {
  *
  * Does not support any options.
  */
-template<class PhenoType>
-class VarianceModel : public EpistasisModel<PhenoType> {
+    template<class PhenoType>
+    class VarianceModel : public EpistasisModel<PhenoType> {
 
-public:
+    public:
 
-	VarianceModel(Instance<PhenoType> * instance);
+        VarianceModel(Instance<PhenoType> *instance);
 
-	virtual ~VarianceModel();
+        void cov_activate();
 
-private:
+        void cov_deactivate();
 
-	double global_mean_;
+        virtual ~VarianceModel();
 
-	std::vector<std::size_t> num_inds_in_categories_;
+    private:
 
-	std::size_t num_non_empty_categories_;
+        double global_mean_;
 
-	virtual void initialize_() final;
+        bool incl_cov_;
 
-	virtual options::ModelSense model_sense_() const final;
+        std::vector<std::size_t> num_inds_in_categories_;
 
-	virtual bool is_predictive_() const final;
+        std::size_t num_non_empty_categories_;
 
-	virtual double evaluate_(const std::vector<SNP> & snp_set, bool prepare_prediction) final;
+        virtual void initialize_() final;
 
-	void compute_test_statistic_(const std::vector<std::vector<PhenoType>> & penetrance_table, double & test_statistic, std::size_t & num_groups) const;
+        virtual options::ModelSense model_sense_() const final;
 
-	double p_value_(double test_statistic, std::size_t num_groups) const;
+        virtual bool is_predictive_() const final;
 
-};
+        virtual double evaluate_(const std::vector<SNP> &snp_set, bool prepare_prediction) final;
+
+        void
+        compute_test_statistic_(const std::vector<std::vector<PhenoType>> &penetrance_table, double &test_statistic,
+                                std::size_t &num_groups) const;
+
+        double p_value_(double test_statistic, std::size_t num_groups) const;
+
+        bool get_cov_status() const;
+
+    };
 
 }
 
 #include "variance_model.ipp"
 
 #ifdef HEADER_ONLY
-#include "variance_model.cpp"
-#endif
 
+#include "variance_model.cpp"
+
+#endif
 
 
 #endif /* SRC_MODEL_VARIANCE_MODEL_HPP_ */
