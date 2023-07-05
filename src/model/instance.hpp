@@ -186,6 +186,8 @@ namespace epi {
          */
         void inds_with_genotype_at_snp_set(const std::vector<SNP> & snp_set, std::size_t genotype_id, std::vector<Ind> & inds) const;
 
+        void inds_with_nonzero_genotype_at_snp_set(const std::vector<SNP> & snp_set, std::vector<Ind> & inds) const;
+
         /*!
          * @brief Counts the individuals with a given genotype at a given SNP set.
          * @param[in] snp_set The reference SNP set.
@@ -211,6 +213,7 @@ namespace epi {
          */
         PhenoType phenotype(Ind ind) const;
 
+        std::vector<PhenoType> all_phenotypes() const;
 
         /*!
          * @brief Provides read-only access to the genotypes of all individuals at a given SNP.

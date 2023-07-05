@@ -243,6 +243,25 @@ namespace epi {
     }
 
     template<class PhenoType>
+    void
+    Instance<PhenoType>::inds_with_nonzero_genotype_at_snp_set(const std::vector<SNP> &snp_set, std::vector<Ind> & inds) const {
+        inds.clear();
+
+        for (Ind ind{0}; ind < num_inds_; ind++) {
+            bool match{true};
+            for (std::size_t pos{0}; pos < snp_set.size(); pos++) {
+                if (genotype_at_snp(snp_set.at(pos), ind) == 0) {
+                    match = false;
+                    break;
+                }
+            }
+            if (match) {
+                inds.emplace_back(ind);
+            }
+        }
+    }
+
+    template<class PhenoType>
     std::size_t
     Instance<PhenoType>::
     num_inds_with_genotype_at_snp_set(const std::vector<SNP> & snp_set, const std::vector<GenoType> & genotype) const {
@@ -276,6 +295,11 @@ namespace epi {
     Instance<PhenoType>::
     phenotype(Ind ind) const {
         return phenotypes_.at(ind);
+    }
+
+    template<class PhenoType>
+    std::vector<PhenoType> Instance<PhenoType>::all_phenotypes() const {
+        return { phenotypes_.begin(), phenotypes_.end() };
     }
 
     template<class PhenoType>
