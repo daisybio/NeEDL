@@ -19,8 +19,7 @@ env:
   LATEST_TAG: latest
 
 jobs:
-  build:
-
+  docker:
     runs-on: ubuntu-latest
 
     steps:
@@ -37,8 +36,6 @@ jobs:
           context: .
           file: docker/NeEDL/Dockerfile
           tags: ${{ env.IMAGE_NAME }}:${{ env.TEST_TAG }}
-          cache-from: type=gha
-          cache-to: type=gha,mode=max
           
       - name: Test
         run: ./test/e2e/test_container.sh ${{ env.IMAGE_NAME }}:${{ env.TEST_TAG }}
