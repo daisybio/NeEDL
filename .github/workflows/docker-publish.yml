@@ -68,6 +68,6 @@ jobs:
         with:
           username: ${{ secrets.DOCKER_USERNAME }}
           password: ${{ secrets.DOCKER_PASSWORD }}
-          repository: ${{ env.IMAGE_NAME }}:${{ env.LATEST_TAG }}
+          repository: ${{ env.IMAGE_NAME }}
           readme: "./README.md"
 
