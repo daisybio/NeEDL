@@ -545,10 +545,9 @@ int main(int argc, char** argv) {
 
     // Parse the options.
     try {
-        (app).parse((argc), (argv));
+        app.parse((argc), (argv));
     } catch(const CLI::ParseError &e) {
-        (app).exit(e);
-        exit(1);
+        return app.exit(e);
     }
 
     try {
