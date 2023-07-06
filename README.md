@@ -1,3 +1,40 @@
+<!-- TOC -->
+
+- [Tools provided in this repository](#tools-provided-in-this-repository)
+- [License and Citing](#license-and-citing)
+- [Usage Docker container](#usage-docker-container)
+    - [Parameters for NeEDL](#parameters-for-needl)
+        - [Quick Start / Example](#quick-start--example)
+        - [Basic Setup](#basic-setup)
+        - [Select your dataset](#select-your-dataset)
+        - [Creation of the SSI network](#creation-of-the-ssi-network)
+            - [Custom SNP annotation data](#custom-snp-annotation-data)
+            - [Custom gene-gene/protein-protein interaction data](#custom-gene-geneprotein-protein-interaction-data)
+        - [Selecting a seeding routine](#selecting-a-seeding-routine)
+            - [RANDOM_CONNECTED seeding](#random_connected-seeding)
+            - [COMMUNITY_WISE seeding](#community_wise-seeding)
+            - [QUANTUM_COMPUTING seeding](#quantum_computing-seeding)
+        - [Local search](#local-search)
+    - [Documentation of the output files of NeEDL](#documentation-of-the-output-files-of-needl)
+    - [Advanced features of NeEDL](#advanced-features-of-needl)
+        - [Additional analysis](#additional-analysis)
+        - [Additional filters](#additional-filters)
+        - [Multi-network approach](#multi-network-approach)
+        - [Shuffle network](#shuffle-network)
+    - [Parameters for epiJSON](#parameters-for-epijson)
+        - [Quick Start](#quick-start)
+        - [General parameters](#general-parameters)
+        - [Selecting the input](#selecting-the-input)
+        - [Filter selection](#filter-selection)
+        - [Output files](#output-files)
+    - [Parameters for calculate_scores](#parameters-for-calculate_scores)
+- [Usage via repository](#usage-via-repository)
+    - [Dependencies](#dependencies)
+    - [Building the tools](#building-the-tools)
+    - [Additional parameters](#additional-parameters)
+
+<!-- /TOC -->
+
 # Tools provided in this repository
 - NeEDL: Tool for fast network-based epistasis detection using local search
 - epiJSON: Tool for converting various input and output formats which also can apply commonly used filtering steps. Needed to create the input files for NeEDL
@@ -37,6 +74,7 @@ curl https://raw.githubusercontent.com/biomedbigdata/NeEDL/main/run/NeEDL.py | p
 
 
 ## Parameters for NeEDL
+
 ### Quick Start / Example
 To run NeEDL the default way that we also used during our publication use the following arguments:
 ```bash
@@ -81,8 +119,9 @@ Please replace `<...>` with your value of choice.
 # If you do not want this to happen due to memory reasons, please use this flag to deactivate saving the network to disk.
 --disable-save-network
 
-# Activates a joint-degree analysis. It creates an additional file containing information about the node degrees of connected SNPs in the SNP-SNP-interaction network. This flag is usually not necessary if one does not want to further investigate the network created by NeEDL.
---do-joint-degree-analysis
+
+# By default, GenEpiSeeker calculates all available statistical scores for the final results and stores them in the result file. This step can be time consuming. If this flag is set, only the score used in the local search step will be calculated for the results (see parameter --ms-model).
+--no-additional-scores
 ```
 
 ### Select your dataset
@@ -174,7 +213,7 @@ To select a custom source for labeling the SNPs please use the following argumen
 - `<separator_col1>`: character which separates multiple entries in the first column, if every row contains exactly one entry please set it to `-1`
 - `<separator_col2>`: character which separates multiple entries in the second column, if every row contains exactly one entry please set it to `-1`
 
-NeEDL supports using multiple network files in one run. If so, the local search is performed for each network individually and the results are aggregated afterward with the help of an additional local search run. The multiple networks approach is not fully evaluated yet.
+NeEDL supports using multiple network files in one run. If so, the local search is performed for each network individually and the results are aggregated afterward with the help of an additional local search run. The multiple networks approach is not fully evaluated yet. Please consider the section *Advanced/Multi-network approach* before using multiple networks.
 
 ### Selecting a seeding routine
 NeEDL supports different seeding routines for the local search which come with different advantages and disadvantages. In our publication, we used RANDOM_CONNECTED seeding for all our tests. It is generally a good choice. However, the user has to decide how many seeds should be generated which influences the quality of the results. If you do not know how many seeds to use we suggest trying out the COMMUNITY_WISE seeding as it decides how many seeds should be used based on the network size and architecture.
@@ -189,6 +228,7 @@ Random connected seeding selects pairs of SNPs that are connected in the SSI net
 # select the number of start seeds to use for the local search. This value has a nearly linear impact on the runtime of NeEDL.
 --ms-rc-start-seeds 5000
 ```
+
 #### COMMUNITY_WISE seeding
 Performs community detection on the SSI network producing clusters/communities with a given maximum size. For each cluster, several start seed candidates are selected randomly. Afterward, the actual start seeds are picked from these candidates. The algorithm then makes sure that at least one seed from every cluster is used and that the top $n\%$ of all seed candidates w.r.t. their statistical score is selected.
 
@@ -266,7 +306,7 @@ One can influence how the local search that NeEDL applies to the SSI network beh
 
 # optionally select a time limit for search
 --ms-per-seed-time-limit 10m   # default is no limit
---ms-per-search-time-limit 3d  # default is no limit
+--ms-search-time-limit 3d  # default is no limit
 
 # The arguments below usually are not necessary to be set. The change the behaviour of the local search and simulated annealing.
 --ms-max-rounds 300
@@ -276,12 +316,88 @@ One can influence how the local search that NeEDL applies to the SSI network beh
 --ms-cooling-factor 1.0
 --ms-annealing-start-prob 0.8
 --ms-annealing-end-prob 0.01
-
 ```
 
-## Documentation of the output files of NeEDL
+NeEDL supports various statistical scores that can be used for `--ms-model`. Please refer to Blumenthal et al. (doi: [10.1093/bioinformatics/btaa990](https://doi.org/10.1093/bioinformatics/btaa990)) for details about the provided models. All scores work with `CATEGORICAL` and `QUANTITATIVE` phenotypes. Here is a full list of scores NeEDL supports for optimization:
+- `BAYESIAN`: K2 score
+- `BAYESIAN_COV`: K2 score, includes covariates
+- `VARIANCE`: $P$-value of the $\chi^2$ test
+- `VARIANCE_COV`: $P$-value of the $\chi^2$ test, includes covariates
+- `PENETRANCE_NLL`: negative log-likelihood of the maximum-likelihood model
+- `PENETRANCE_LLH`: likelihood of the maximum-likelihood model
+- `PENETRANCE_AIC`: Aikake information criterion of the maximum-likelihood model
+- `PENETRANCE_BIC`: Bayesian information criterion of the maximum-likelihood model
+- `PENETRANCE_COV_NLL`: negative log-likelihood of the maximum-likelihood model, includes covariates
+- `PENETRANCE_COV_LLH`: likelihood of the maximum-likelihood model, includes covariates
+- `PENETRANCE_COV_AIC`: Aikake information criterion of the maximum-likelihood model, includes covariates
+- `PENETRANCE_COV_BIC`: Bayesian information criterion of the maximum-likelihood model, includes covariates
+- `REGRESSION_NLL`: negative log-likelihood of the quadratic-regression model
+- `REGRESSION_LLH`: likelihood of the quadratic-regression model
+- `REGRESSION_AIC`: Akaike information criterion of the quadratic-regression model
+- `REGRESSION_BIC`: Bayesian information criterion of the quadratic-regression model
+- `REGRESSION_NLL_GAIN`: negative log-likelihood gain of the quadratic-regression model
+- `REGRESSION_LLH_GAIN`: likelihood gain of the quadratic-regression model
+- `REGRESSION_AIC_GAIN`: Akaike information criterion gain of the quadratic-regression model
+- `REGRESSION_BIC_GAIN`: Bayesian information criterion gain of the quadratic-regression model
+- `REGRESSION_COV_NLL`: negative log-likelihood of the quadratic-regression model, includes covariates
+- `REGRESSION_COV_LLH`: likelihood of the quadratic-regression model, includes covariates
+- `REGRESSION_COV_AIC`: Akaike information criterion of the quadratic-regression model, includes covariates
+- `REGRESSION_COV_BIC`: Bayesian information criterion of the quadratic-regression model, includes covariates
+- `REGRESSION_CLG_Q_LC`: **TODO**
+- `REGRESSION_CLG_Q_QC`: **TODO**
+- `REGRESSION_CLG_L_LC`: **TODO**
 
-*tba*
+**IMPORTANT: Please make sure you selected a score that has `COV` in its name if you want to use covariates. Specifying a covariate file is not enough.**
+
+Options for the annealing type are `SIMULATED_ANNEALING`, `RANDOM_ANNEALING`, `HYPERBOLIC_TAN_ANNEALING`.
+
+## Documentation of the output files of NeEDL
+NeEDL creates a new subdirectory within the output directory for every run.
+*todo*
+
+name of created dir?
+which files always created?
+which files are optional? based on which parameters/conditions?
+
+## Advanced features of NeEDL
+
+### Additional analysis
+```bash
+# Activates a joint-degree analysis. It creates an additional file containing information about the node degrees of connected SNPs in the SNP-SNP-interaction network. This flag is usually not necessary if one does not want to further investigate the network created by NeEDL.
+--do-joint-degree-analysis
+
+# NeEDL always prints general information about the created SSI-network in the logfile. If this flag is set, additional metrics are be calculated that are more computationally expensive. This flag should not be used on large networks.
+--calculate-advanced-network-statistcs
+```
+
+### Additional filters
+The maximum marginal association (MMA) filter sorts out SNPs that individually are already strongly associated with the phenotype. The $P$-value of the $\chi^2$ test is used in this filter. It is activated by setting a filter threshold. The $P$-values can also be corrected with Benjamini-Hochberg before applying the filter.
+```bash
+# Select a filter cutoff for the MMA filter. The filter excludes all SNPs with a lower $P$-value than the cutoff.
+--mma-filter <cutoff-value>
+
+# optionally do Benjamini-Hochberg correction before the filtering step:
+--mma-use-BH-correction
+```
+
+### Multi-network approach
+NeEDL supports using multiple network files in one run. If so, the local search is performed for each network individually and the results are aggregated afterward with the help of an additional local search run. The multiple networks approach is not fully evaluated yet. Please consider the section *Advanced/Multi-network approach* before using multiple networks.
+
+*tbc*
+
+### Shuffle network
+NeEDL optionally can shuffle the created SSI network. This option is useful to test how much the prior biological knowledge improves the quality of the results. This feature is not relevant for users who just want to do epistasis detection.
+
+```bash
+--network-shuffle-method <METHOD>
+```
+
+NeEDL supports four different shuffle methods:
+- `TOPOLOGY_PRESERVING_WITH_SNP_DEGREE`: This method keeps the network structure and shuffles the node labels (= SNPs). Only the SNPs with the same degree are exchanged to keep the original degree of every SNP in the network.
+- `TOPOLOGY_PRESERVING_WITHOUT_SNP_DEGREE`: This method keeps the network structure and shuffles the node labels (= SNPs). Only the SNPs with the same degree are exchanged to keep the original degree of every SNP in the network.
+- `EXPECTED_DEGREE_KEEP_DEGREE_DISTRIBUTION`: This method creates a new network structure so that the degree distribution of the SNPs in the new network is approximately the same as the degree distribution in the original network.
+- `EXPECTED_DEGREE_KEEP_INDIVIDUAL_DEGREE`: This method creates a new network structure so that every SNP gets a degree in the new network that is as close as possible to its degree in the original network.
+
 
 ## Parameters for epiJSON
 epiJSON is a wrapper around plink that can convert several plink-readable input files and apply several filters typically used for GWAS. It can also create the JSON_EPIGEN files that NeEDL requires as input. The following input and output formats are supported:
