@@ -35,8 +35,8 @@ library(magrittr)
 
 # json handling related packages 
 library(rjson)
-library(tidyjson) # TODO: relevant?
-library(jsonlite) # TODO: relevant?
+library(tidyjson) 
+library(jsonlite) 
 
 
 # database releated packages 
@@ -45,7 +45,7 @@ library(RSQLite) # for interpreting the sqlite format for the networks
 
 # plotting related packages
 library(ggplot2)
-library(gghighlight) # TODO: relevant?
+library(gghighlight) 
 library(plotly)
 library(patchwork)
 
