@@ -615,8 +615,9 @@ The following external dependencies are distributed with NeEDL and do not have t
 - [Catch (version 2.13.9)](https://github.com/catchorg/Catch2)
 - [CLI11 (version 1.9.0)](https://github.com/CLIUtils/CLI11)
 - [Eigen (version 3.3.7)](http://eigen.tuxfamily.org/)
+- [igraph (version 0.9.8)](https://igraph.org/)
+- [RapidJSON (version 1.1.0)](https://rapidjson.org/)
 
-*TODO: check dependencies*
 
 ## Building the tools
 
