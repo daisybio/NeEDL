@@ -128,7 +128,7 @@ Please replace `<...>` with your value of choice.
 --disable-save-network
 
 
-# By default, GenEpiSeeker calculates all available statistical scores for the final results and stores them in the result file. This step can be time consuming. If this flag is set, only the score used in the local search step will be calculated for the results (see parameter --ms-model).
+# By default, NeEDL calculates all available statistical scores for the final results and stores them in the result file. This step can be time consuming. If this flag is set, only the score used in the local search step will be calculated for the results (see parameter --ms-model).
 --no-additional-scores
 ```
 
@@ -603,13 +603,13 @@ We do not recommend building the tools in this project yourself as our docker co
 
 ## Dependencies
 
-Before using GenEpiSeeker, you have to install the following external dependencies:
+Before using NeEDL, you have to install the following external dependencies:
 
-- [CMake](https://cmake.org/) version 2.6 or higher (for compilation). Installation instructions can be found [here](https://cmake.org/install/). 
+- [CMake](https://cmake.org/) version 2.7 or higher (for compilation). Installation instructions can be found [here](https://cmake.org/install/). 
 - [Doxygen](http://www.stack.nl/~dimitri/doxygen/) (for creating the documentation). Installation instructions can be found [here](https://www.stack.nl/~dimitri/doxygen/manual/install.html).
 - [OpenMP](http://www.openmp.org/) compatible C++ compiler. Under Linux, OpenMP is supported by default. Under macOS, please install [libomp](https://formulae.brew.sh/formula/libomp) using [Homebrew](https://brew.sh/).  After having installed Homebrew, open a shell and execute `brew install libomp`.
 
-The following external dependencies are distributed with GenEpiSeeker and do not have to be installed separately:
+The following external dependencies are distributed with NeEDL and do not have to be installed separately:
 
 - [Boost (version 1.71.0)](https://www.boost.org/).
 - [Catch (version 2.13.9)](https://github.com/catchorg/Catch2)

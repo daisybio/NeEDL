@@ -2,20 +2,20 @@
  *                                                                             *
  *   Copyright (C) 2020 by David B. Blumenthal                                 *
  *                                                                             *
- *   This file is part of GenEpiSeeker.                                        *
+ *   This file is part of NeEDL.                                        *
  *                                                                             *
- *   GenEpiSeeker is free software: you can redistribute it and/or modify it   *
+ *   NeEDL is free software: you can redistribute it and/or modify it   *
  *   under the terms of the GNU General Public License as published by         *
  *   the Free Software Foundation, either version 3 of the License, or         *
  *   (at your option) any later version.                                       *
  *                                                                             *
- *   GenEpiSeeker is distributed in the hope that it will be useful,           *
+ *   NeEDL is distributed in the hope that it will be useful,           *
  *   but WITHOUT ANY WARRANTY; without even the implied warranty of            *
  *   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the              *
  *   GNU General Public License for more details.                              *
  *                                                                             *
  *   You should have received a copy of the GNU General Public License         *
- *   along with GenEpiSeeker. If not, see <http://www.gnu.org/licenses/>.      *
+ *   along with NeEDL. If not, see <http://www.gnu.org/licenses/>.      *
  *                                                                             *
  ******************************************************************************/
 
@@ -85,7 +85,7 @@
 #include "Logger.hpp"
 
 /*!
- * @brief Global namespace for GenEpiSeeker.
+ * @brief Global namespace for NeEDL.
  */
 namespace epi {
 
@@ -114,12 +114,12 @@ namespace epi {
     typedef std::uint_fast8_t GenoType;
 
 /*!
- * @brief Use this type if you want to use GenEpiSeeker for quantitative phenotypes.
+ * @brief Use this type if you want to use NeEDL for quantitative phenotypes.
  */
     typedef double QuantitativePhenoType;
 
 /*!
- * @brief Use this type if you want to use GenEpiSeeker for categorical phenotypes.
+ * @brief Use this type if you want to use NeEDL for categorical phenotypes.
  */
     typedef std::uint_fast8_t CategoricalPhenoType;
 
@@ -149,7 +149,7 @@ namespace epi {
 
 // Error class.
 /*!
- * @brief Exceptions thrown by GenEpiSeeker are of this type.
+ * @brief Exceptions thrown by NeEDL are of this type.
  */
     struct Error : public std::runtime_error {
         /*!

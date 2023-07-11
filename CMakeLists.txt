@@ -2,20 +2,20 @@
 #                                                                             #
 #   Copyright (C) 2020 by David B. Blumenthal                                 #
 #                                                                             #
-#   This file is part of GenEpiSeeker.                                        #
+#   This file is part of NeEDL.                                        #
 #                                                                             #
-#   GenEpiSeeker is free software: you can redistribute it and/or modify it   #
+#   NeEDL is free software: you can redistribute it and/or modify it   #
 #   under the terms of the GNU General Public License as published by         #
 #   the Free Software Foundation, either version 3 of the License, or         #
 #   (at your option) any later version.                                       #
 #                                                                             #
-#   GenEpiSeeker is distributed in the hope that it will be useful,           #
+#   NeEDL is distributed in the hope that it will be useful,           #
 #   but WITHOUT ANY WARRANTY; without even the implied warranty of            #
 #   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the              #
 #   GNU General Public License for more details.                              #
 #                                                                             #
 #   You should have received a copy of the GNU General Public License         #
-#   along with GenEpiSeeker. If not, see <http://www.gnu.org/licenses/>.      #
+#   along with NeEDL. If not, see <http://www.gnu.org/licenses/>.      #
 #                                                                             #
 ###############################################################################
 
@@ -25,10 +25,10 @@ project(NeEDL)
 
 # Determine build type.
 if(NOT CMAKE_BUILD_TYPE)
-  message(STATUS "Building GenEpiSeeker with build type 'Release', as none was specified.")
+  message(STATUS "Building NeEDL with build type 'Release', as none was specified.")
   set(CMAKE_BUILD_TYPE "Release" CACHE STRING "Release or Debug build type")
 else()
-  message(STATUS "Building GenEpiSeeker with build type '${CMAKE_BUILD_TYPE}'.")
+  message(STATUS "Building NeEDL with build type '${CMAKE_BUILD_TYPE}'.")
 endif()
 
 # Find doxygen.

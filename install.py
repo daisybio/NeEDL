@@ -3,26 +3,26 @@
 #                                                                             #
 #   Copyright (C) 2020 by David B. Blumenthal                                 #
 #                                                                             #
-#   This file is part of GenEpiSeeker.                                        #
+#   This file is part of NeEDL.                                        #
 #                                                                             #
-#   GenEpiSeeker is free software: you can redistribute it and/or modify it   #
+#   NeEDL is free software: you can redistribute it and/or modify it   #
 #   under the terms of the GNU General Public License as published by         #
 #   the Free Software Foundation, either version 3 of the License, or         #
 #   (at your option) any later version.                                       #
 #                                                                             #
-#   GenEpiSeeker is distributed in the hope that it will be useful,           #
+#   NeEDL is distributed in the hope that it will be useful,           #
 #   but WITHOUT ANY WARRANTY; without even the implied warranty of            #
 #   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the              #
 #   GNU General Public License for more details.                              #
 #                                                                             #
 #   You should have received a copy of the GNU General Public License         #
-#   along with GenEpiSeeker. If not, see <http://www.gnu.org/licenses/>.      #
+#   along with NeEDL. If not, see <http://www.gnu.org/licenses/>.      #
 #                                                                             #
 #/////////////////////////////////////////////////////////////////////////////#
 
 ##
 # @file install.py
-# @brief Installs GenEpiSeeker and its dependencies.
+# @brief Installs NeEDL and its dependencies.
 #
 # @details 
 # Usage: 
@@ -32,7 +32,7 @@
 #
 # For more information, execute `$ python install.py --help`.
 
-'''Installs GenEpiSeeker and its dependencies.'''
+'''Installs NeEDL and its dependencies.'''
 
 import subprocess
 import argparse
@@ -189,9 +189,9 @@ print("                       NeEDL                      ")
 print("                Installation Script               ")
 print("**************************************************")
 
-parser = argparse.ArgumentParser(description="Compiles GenEpiSeeker and its dependencies.", epilog="If called without arguments, only the dependencies are installed.")
+parser = argparse.ArgumentParser(description="Compiles NeEDL and its dependencies.", epilog="If called without arguments, only the dependencies are installed.")
 targets = ["NeEDL", "epiJSON",  "create_JSON_PLINK", "create_JSON_PLINK_bigfiles", "create_LD_matrix", "calculate_scores", "convert_to_binary", "docs", "unit", "instance", "variance_model", "penetrance_model", "regression_model", "bayesian_model", "compare_models", "realtime_scores"]
-parser.add_argument("--all-targets", help="build all genepiseeker targets", action='store_true')
+parser.add_argument("--all-targets", help="build all NeEDL targets", action='store_true')
 parser.add_argument("--target", help="build selected target", metavar="NeEDL|epiJSON|create_JSON_PLINK|create_JSON_PLINK_bigfiles|create_LD_matrix|calculate_scores|convert_to_binary|docs|unit|instance|variance_model|penetrance_model|regression_model|bayesian_model|compare_models|realtime_scores", choices=targets)
 parser.add_argument("--debug", help="build in debug mode", action="store_true")
 parser.add_argument("--clean", help="clean build directory, external libs and update makefile before build", action="store_true")
