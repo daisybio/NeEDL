@@ -16,6 +16,14 @@
             - [QUANTUM_COMPUTING seeding](#quantum_computing-seeding)
         - [Local search](#local-search)
     - [Documentation of the output files of NeEDL](#documentation-of-the-output-files-of-needl)
+        - [run.log](#runlog)
+        - [pipeline_config.json](#pipeline_configjson)
+        - [<network>_seeds.csv](#network_seedscsv)
+        - [<network>_results.csv](#network_resultscsv)
+        - [<network>_ind_SNP_scores.csv](#network_ind_snp_scorescsv)
+        - [<network>_search_score_over_time.csv](#network_search_score_over_timecsv)
+        - [<network>_network.sqlite3](#network_networksqlite3)
+        - [<network>_joint_degree.csv](#network_joint_degreecsv)
     - [Advanced features of NeEDL](#advanced-features-of-needl)
         - [Additional analysis](#additional-analysis)
         - [Additional filters](#additional-filters)
@@ -352,12 +360,32 @@ NeEDL supports various statistical scores that can be used for `--ms-model`. Ple
 Options for the annealing type are `SIMULATED_ANNEALING`, `RANDOM_ANNEALING`, `HYPERBOLIC_TAN_ANNEALING`.
 
 ## Documentation of the output files of NeEDL
-NeEDL creates a new subdirectory within the output directory for every run.
-*todo*
+NeEDL creates a new subdirectory within the output directory for every run. The directory consits of the date, time and a random number. This allows the user to start multiple runs of NeEDL with the same output directory in parallel without risking to override any results. 
 
-name of created dir?
-which files always created?
-which files are optional? based on which parameters/conditions?
+### `run.log`
+This text file is always created and holds all information about how the NeEDL pipeline was executed and contains additional data like the network properties and the resource usage of NeEDL.
+
+### `pipeline_config.json`
+This JSON file describes how exactly the pipeline was configured for the run and holds all relevant configuration parameters (required, optional, and internal ones). It can help to integrate the NeEDL results into other workflows.
+
+### `<network>_seeds.csv`
+This CSV file contains the start seeds used for the local search on network `<network>`.
+
+### `<network>_results.csv`
+This CSV file contains the results of the local search on network `<network>`. This usually is the final result of NeEDL (if only a single network is used, see *Advanced/Multi-network approach*).
+
+### `<network>_ind_SNP_scores.csv`
+This CSV file contains the scores and information of all SNPs individually, that are contained in the final result.
+
+### `<network>_search_score_over_time.csv`
+This CSV file documents how the score quality improves during the local search. It tracks the score value of the globally most optimal SNP set NeEDL found so far during the local search. This file shows how quickly NeEDL converged towards the final optimum it found.
+
+### `<network>_network.sqlite3`
+This SQLite3 database file contains the full SNP-SNP-interaction network together with annotation information. This file is only created if the flag `--disable-save-network` is not set. Depending on the size of the input files, this file can get very big (> 2 GB). Please consider before running NeEDL whether you require the SSI network for downstream analysis. Otherwise, disable saving it.
+
+### `<network>_joint_degree.csv`
+This CSV file represents a matrix which counts how often two nodes with a specific degree are contected in the SSI network. This information can give insights into the network architecture. The file will only be created if the flag `--do-joint-degree-analysis` is set (see *Advanced/Additional analysis*)
+
 
 ## Advanced features of NeEDL
 
@@ -380,10 +408,44 @@ The maximum marginal association (MMA) filter sorts out SNPs that individually a
 --mma-use-BH-correction
 ```
 
-### Multi-network approach
-NeEDL supports using multiple network files in one run. If so, the local search is performed for each network individually and the results are aggregated afterward with the help of an additional local search run. The multiple networks approach is not fully evaluated yet. Please consider the section *Advanced/Multi-network approach* before using multiple networks.
+NeEDL can perform linkage disequilibrium checks during local search. Please use the following parameters to activate the LD filtering.
+```bash
+# Activates linkage disequilibrium checking during local search
+--ms-ld-check
 
-*tbc*
+# Path to an LD matrix in CSV format that has the same order of SNPs as the input file
+--ms-ld-matrix <path>
+
+# The LD mode specifies how individual LD values are aggregated. OPTIONS are MEAN, MAX. DEFAULT: MEAN
+--ms-ld-mode MEAN
+
+# If this LD cutoff is not set, monte carlo sampling is performed.
+--ms-ld-cutoff <cutoff>
+
+# If no LD cutoff is set, monte carlo sampling is performed which samples random SNP sets with given min size. DEFAULT: 2
+--ms-ld-mc-min-set 2
+
+# If no LD cutoff is set, monte carlo sampling is performed which samples random SNP sets with given max size. DEFAULT: 10
+--ms-ld-mc-max-set 10
+
+# If no LD cutoff is set, monte carlo sampling is performed. This options specifies how many samples are generated during the monte carlo process DEFAULT: 1000
+--ms-ld-mc-num-samples 1000
+```
+
+### Multi-network approach
+NeEDL supports using multiple network files in one run. If so, the local search is performed for each network individually and the results are aggregated afterward with the help of an additional local search run. The multiple networks approach is not fully evaluated yet.
+
+Multiple networks can be selected by specifying the `--network` parameter more than once. Every network is then processed separately. All parameters in this README that start with `--ms-*` configure how the local search at this stage will perform. Every `--ms-*` parameter can be configured either
+- not at all, if it is an optional parameter and the default should be used for all networks,
+- once, if the value should be used for all networks,
+- or once for each network, to specify a value for each network individually.
+
+After all networks have been processed, NeEDL aggregates the result SNP sets from each network into a new network by connecting SNPs that correspond to the same set in one of the results. This network is then used to perform another local search run to refine and combine the findings from the multiple networks. All parameters that start with `--ms-*` also exist with the prefix `--fs-*` which corresponds to the final search. The `--fs-*` parameters control the final local search. The final local search creates the same output files as the intermediate local search instances but uses the prefix `result_` for all files.
+
+
+![Visualization of multi-network approach](misc/HowToRunNeEDL-Pipeline.svg "Visualization of multi-network approach")
+
+All intermediate results of the multi-network local search runs are also saved into the results folder. Hence, one can also use the multi-network mode to run the local search on multiple networks, without aggregating the results in the end. In that case, one can specify the flag `--disable-final-search` to prevent NeEDL from aggregating and searching again.
 
 ### Shuffle network
 NeEDL optionally can shuffle the created SSI network. This option is useful to test how much the prior biological knowledge improves the quality of the results. This feature is not relevant for users who just want to do epistasis detection.
