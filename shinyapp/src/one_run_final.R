@@ -36,7 +36,7 @@ needl_workflow_img_path <- "assets/NeEDL_complete_overview_incLayers_18diseases.
 ############################
 
 # Parameter information about NeEDL run from pipeline_config.json
-pipeline_config_json <- rjson::fromJSON(file = paste0(out_path, "pipeline_config.json"))
+pipeline_config_json <- jsonlite::fromJSON(paste0(out_path, "pipeline_config.json"), flatten = TRUE)
 pipeline_config_dt <- create_param_from_pipeline_config(pipeline_config_json)
 
 
@@ -60,6 +60,8 @@ seeds_dt <- fread(paste0(out_path, "BIOGRID_seeds.csv"))
 # Candidate SNPs with individual scores BIOGRID_ind_SNP_scores.csv
 snp_scores_dt <- fread(paste0(out_path, "BIOGRID_ind_SNP_scores.csv"))
 snp_scores_dt$RS_IDS <- gsub("rs", "", snp_scores_dt$RS_IDS)
+cols_to_delete <- which(snp_scores_dt[, !duplicated(colnames(snp_scores_dt))] == 0)
+snp_scores_dt[, (cols_to_delete) := NULL]
 
 
 # Candidate SNP sets with rs_ids and scores
@@ -120,7 +122,6 @@ nodes$rs_id <- gsub("rs", "", nodes$rs_id)
 
 # Add scores to nodes
 nodes <- merge(nodes, snp_scores_dt, by.x = "rs_id", by.y = "RS_IDS", all = TRUE)
-
 
 
 ##################################

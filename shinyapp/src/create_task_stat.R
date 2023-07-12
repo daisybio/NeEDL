@@ -77,36 +77,33 @@ create_stats_from_run_log <- function(run_log_path){
 #'
 #' @examples create_param_from_pipeline_config(pipeline_config_json)
 create_param_from_pipeline_config <- function(pipeline_config_json){
-  # Parse job 1 to 4
-  jobs_json <- data.table(pipeline_config_json$jobs %>% spread_all())
   
-  jobs_1_to_4_dt <- rbindlist(lapply(seq(1, dim(jobs_json)[1] - 1), function(job_index){
-    tmp_job <- (unlist(jobs_json[job_index]$..JSON))
-    tmp_job_dt <- data.table(parameter = names(tmp_job), values = tmp_job)
-    tmp_job_dt
-  }))
+  jobs <- data.table(pipeline_config_json %>% bind_rows())
+  jobs <- jobs[, 2:13]
   
+  jobs_long <- t(jobs[1])
   
-  # Parse job 5
-  job_5_json <- data.table(pipeline_config_json$jobs[[5]]$jobs[[1]]$config$jobs %>% spread_all())
+  for(i in 2:nrow(jobs)) {
+    jobs_long <- rbind(jobs_long, t(jobs[i]), fill=TRUE)
+  }
   
-  job_5_dt <- rbindlist(lapply(seq(1, dim(job_5_json)[1]), function(job_index){
-    tmp_job <- (unlist(job_5_json[job_index]$..JSON))
-    tmp_job_dt <- data.table(parameter = names(tmp_job), values = tmp_job)
-    tmp_job_dt
-  }))
+  job_names <- gsub("jobs.", "", rownames(jobs_long)) 
+  jobs_long <- data.table(jobs_long)
+  jobs_long <- cbind(job_names, jobs_long)
+  jobs_long <- jobs_long[!is.na(V1)]
+  jobs_long <- jobs_long[job_names != "fill"]
   
-  
-  # Merge job 1 to 4 with 5
-  all_jobs_dt <- rbind(jobs_1_to_4_dt, job_5_dt)
-  
-  num_jobs <- dim(all_jobs_dt[parameter == "JOB"])[1]
-  
-  all_jobs_dt[parameter == "JOB"]$parameter <- paste0("<strong>","Pipeline step ", seq(1, num_jobs), "/", num_jobs, "</strong>")
+  num_jobs <- dim(jobs_long[job_names == "JOB"])[1]
+  jobs_long[job_names == "JOB"]$job_names <- paste0("<strong>","Pipeline step ", seq(1, num_jobs), "/", num_jobs, "</strong>")
   
   
-  return(all_jobs_dt)
+  return(jobs_long)
 }
+
+
+
+
+
 
 
 

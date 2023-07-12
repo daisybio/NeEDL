@@ -1074,6 +1074,20 @@ ui <- dashboardPage(
                 collapsed = TRUE,
                 
                 uiOutput("gene_gene_box")
+              ), 
+              
+              # Genome browser box
+              box(
+                width = 12, 
+                title = "Genome browser",
+                solidHeader = TRUE, 
+                # background = "red"
+                status = "primary",
+                collapsible = TRUE,
+                collapsed = TRUE,
+                
+                # PlugIn for DrugStone using Genome Browser
+                htmlOutput("genome_browser_frame")
               )
       )
     )
@@ -2371,6 +2385,15 @@ server <- function(input, output, session) {
       paste(c(get_gene_from_snp(input$selected_SNP_bio, dbSNP_dt)), "", sep = "<br/>")
     )
   })
+  
+  
+  output$genome_browser_frame <- renderUI({
+    tags$iframe(src="https://vps-zap841713-2.zap-srv.com/genome-browser?genome=hg38", 
+                height=input$shiny_height, 
+                width=input$shiny_width)
+  })
+  
+  
 
 
   # Protection so app closes correctly without crashing everything
