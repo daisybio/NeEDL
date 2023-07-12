@@ -255,7 +255,7 @@ Performs community detection on the SSI network producing clusters/communities w
 ```
 
 #### QUANTUM_COMPUTING seeding
-This seeding routine derives from the COMMUNITY_WISE seeing. Hence, all parameters starting with `--ms-cw-...` that are explained above are also available here. Instead of picking random start seeds for each community like the COMMUNITY_WISE seeding does, QUANTUM_COMPUTING seeding uses a quantum computing-based algorithm do select the seed candidates. As this algorithm is potentially resource intensive, one can select to only perform it on clusters of a certain size.
+This seeding routine derives from the COMMUNITY_WISE seeing. Hence, all parameters starting with `--ms-cw-...` that are explained above are also available here. Instead of picking random start seeds for each community like the COMMUNITY_WISE seeding does, QUANTUM_COMPUTING seeding uses a quantum computing-based algorithm to select the seed candidates. As this algorithm is potentially resource intensive, one can select to only perform it on clusters of a certain size.
 
 ```bash
 # set the seeding routine
@@ -268,47 +268,48 @@ This seeding routine derives from the COMMUNITY_WISE seeing. Hence, all paramete
 
 
 # Hardware-agnostic hyperparameters
---ms-qc-n-clique 2
---ms-qc-k 3
---ms-qc-nu 3.0
---ms-qc-lambda0 5.0
---ms-qc-lambda1 1.0
---ms-qc-lambda2 1.0
+--ms-qc-n-clique 2      # number of distinct solutions returned for each single instance of the optimization problem
+--ms-qc-k 3             # preferred clique size
+--ms-qc-nu 0.5          # weight of the linear combination between biological and statistical information of SNP interaction
+--ms-qc-lambda0 5.0     # strength of the first term of the QUBO formulation
+--ms-qc-lambda1 1.0     # strength of the second term of the QUBO formulation
+--ms-qc-lambda2 1.0     # strength of the third term of the QUBO formulation (divergence between the distinct solution returned)
 ```
 
 The QUANTUM_COMPUTING seeding support three different hardware types. Options are SIMULATED_ANNEALING, QUANTUM_ANNEALING, and QAOA. Depending on the selected hardware different additional parameters are needed as you can see below:
 
 ```bash
 # for SIMULATED_ANNEALING
---ms-qc-mode SIMULATED_ANNEALING
---ms-qc-sa-num-samples 10
---ms-qc-sa-num-sweeps 1000
---ms-qc-sa-seed 1234
+--ms-qc-mode SIMULATED_ANNEALING    # run optimization with simulated annealing on CPU
+--ms-qc-sa-num-samples 10           # number of samples drawn at the end of the process
+--ms-qc-sa-num-sweeps 1000          # Number of sweep (state updates) in a single execution 
+--ms-qc-sa-seed 1234                # random seed
 
 
 # for QUANTUM_ANNEALING
---ms-qc-mode QUANTUM_ANNEALING
---ms-qc-qa-token "abc"
---ms-qc-qa-num-reads 10
---ms-qc-qa-solver-idx 4
---ms-qc-qa-fw-annealing-ramp-time 1.0
---ms-qc-qa-fw-annealing-pause-time 1.0
---ms-qc-qa-rev-annealing-ramp-time 1.0
---ms-qc-qa-rev-annealing-pause-time 1.0
---ms-qc-qa-rev-annealing-s-target 1.0
+--ms-qc-mode QUANTUM_ANNEALING          # run optimization with quantum annealing on D-Wave quantum device
+--ms-qc-qa-token "abc"                  # D-Wave cloud platform token
+--ms-qc-qa-num-reads 10                 # number of samples drawn at the end of the process
+--ms-qc-qa-solver-idx 4                 # Index of the solver, namely 0 = 'hybrid_binary_quadratic_model_version2', 1 = 'hybrid_discrete_quadratic_model_version1', 2 = 'hybrid_constrained_quadratic_model_version1p', 3 = 'Advantage_system4.1', 4 = 'Advantage_system6.1', 5 = 'DW_2000Q_6', 6 = 'DW_2000Q_VFYC_6'.
+--ms-qc-qa-fw-annealing-ramp-time 1.0   # Ramp time in ms during forward annealing  
+--ms-qc-qa-fw-annealing-pause-time 1.0  # Pause time in ms during forward annealing
+--ms-qc-qa-rev-annealing-ramp-time 1.0  # Ramp time in ms during reverse annealing
+--ms-qc-qa-rev-annealing-pause-time 1.0 # Pause time in ms during reverse annealing
+--ms-qc-qa-rev-annealing-s-target 1.0   # Minimum reverse evolution 
 
 # for QAOA
 --ms-qc-mode QAOA
---ms-qc-qaoa-vendor abc
---ms-qc-qaoa-azure-subscription-id abc
---ms-qc-qaoa-azure-location abc
---ms-qc-qaoa-azure-backend abc
---ms-qc-qaoa-optimizer abc
---ms-qc-qaoa-maxiter 10
---ms-qc-qaoa-reps 5
---ms-qc-qaoa-n-shots 5
---ms-qc-qaoa-is-recursive-qaoa 0
+--ms-qc-qaoa-vendor azure               # Quantum vendor, 'none' or 'ibm' or 'azure'
+--ms-qc-qaoa-azure-subscription-id abc  # For Azure quantum, the subscription id
+--ms-qc-qaoa-azure-location west-europe # For Azure quantum, the location of the Azure account
+--ms-qc-qaoa-azure-backend ionq_xxx     # Name of the quantum device for IBM or Azure quantum machines
+--ms-qc-qaoa-optimizer ADAM             # Optimization technique for QAOA parameters, namely String: 'ADAM', 'COBYLA', 'NELDER_MEAD', or 'SLSQP'
+--ms-qc-qaoa-maxiter 10                 # Number of training epochs
+--ms-qc-qaoa-reps 5                     # Number of repetition of the QAOA algorithm
+--ms-qc-qaoa-n-shots 1024               # Number of samples drawn from the quantum circuit, suggested at least 1024
+--ms-qc-qaoa-is-recursive-qaoa 0        # If set to '1' enable to Recursive version of QAOA, which is much more expensive
 ```
+
 
 ### Local search
 One can influence how the local search that NeEDL applies to the SSI network behaves. The most important setting is the statistical score that should be used for optimization. We recommend using the score ```PENETRANCE_NLL``` for optimization.
