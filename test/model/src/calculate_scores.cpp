@@ -34,7 +34,7 @@ int main(int argc, char **argv) {
                    "The output file containing the calculated scores.")->required();
     std::string snp_sets_input_type;
     app.add_option("--snp-sets-input-type", snp_sets_input_type,
-                   "What format the SNP sets are in. Options are: NeEDL")->required();
+                   "What format the SNP sets are in. Options are: NEEDL, MACOED, LINDEN")->required();
     std::string snp_sets_input_file;
     app.add_option("--snp-sets-input-file", snp_sets_input_file,
                    "Input file containing SNP sets to analyze.")->required();

@@ -36,6 +36,10 @@
         - [Filter selection](#filter-selection)
         - [Output files](#output-files)
     - [Parameters for calculate_scores](#parameters-for-calculate_scores)
+        - [specify GWAS data](#specify-gwas-data)
+        - [specify the SNP set data](#specify-the-snp-set-data)
+        - [specify the output file](#specify-the-output-file)
+        - [additional optional parameters](#additional-optional-parameters)
 - [Usage via repository](#usage-via-repository)
     - [Dependencies](#dependencies)
     - [Building the tools](#building-the-tools)
@@ -137,7 +141,7 @@ Please replace `<...>` with your value of choice.
 # Our default format is JSON_EPIGEN. You can use epiJSON to convert various commonly used file formats into this JSON format.
 --input-format JSON_EPIGEN
 
-# The actual input file path. Either specify a path to a .json file or path to a directory containing only one .json file.
+# The input file path. Either specify a path to a .json file or path to a directory containing only one .json file.
 --input-path <path>
 
 # Phenotype information of the dataset. NeEDL can deal with DICHOTOMOUS, CATEGORICAL and QUANTITATIVE phenotypes. --num-categories is only necessary for CATEGORICAL phenotypes with more than two categories.
@@ -238,7 +242,7 @@ Random connected seeding selects pairs of SNPs that are connected in the SSI net
 ```
 
 #### COMMUNITY_WISE seeding
-Performs community detection on the SSI network producing clusters/communities with a given maximum size. For each cluster, several start seed candidates are selected randomly. Afterward, the actual start seeds are picked from these candidates. The algorithm then makes sure that at least one seed from every cluster is used and that the top $n\%$ of all seed candidates w.r.t. their statistical score is selected.
+Performs community detection on the SSI network producing clusters/communities with a given maximum size. For each cluster, several start seed candidates are selected randomly. Afterward, the start seeds are picked from these candidates. The algorithm then makes sure that at least one seed from every cluster is used and that the top $n\%$ of all seed candidates w.r.t. their statistical score is selected.
 
 ```bash
 # set the seeding routine
@@ -594,8 +598,59 @@ There is the special case where one might want to override the phenotype only fo
 ```
 
 ## Parameters for calculate_scores
+With calculate_scores the user can apply the statistical models mentioned in *Local search* to custom data. The tool reads the GWAS data in JSON_EPIGEN format (can be created with epiJSON from various common file formats) and a list of SNP sets in CSV format. It calculates the requested scores for the sets and outputs everything in the same CSV format that NeEDL uses for its results.
 
-*todo*
+### specify GWAS data
+```bash
+# Our default format is JSON_EPIGEN. You can use epiJSON to convert various commonly used file formats into this JSON format.
+--gwas-input-format JSON_EPIGEN
+
+# The input file path. Either specify a path to a .json file or path to a directory containing only one .json file.
+--input-path <path>
+
+# Phenotype information of the dataset. NeEDL can deal with DICHOTOMOUS, CATEGORICAL and QUANTITATIVE phenotypes. --num-categories is only necessary for CATEGORICAL phenotypes with more than two categories.
+--phenotype CATEGORICAL
+--num-categories 2
+```
+
+### specify the SNP set data
+```bash
+# select which format the input file has. NEEDL format means a tab-separated CSV with at least one column named RS_IDS. This format is intended to read result files created by NeEDL to calculate additional scores afterwards but it can also be used for custom files. MACOED and LINDEN reads the output format of the respective tools.
+--snp-sets-input-type <NEEDL|MACOED|LINDEN>
+
+# path to the file containing the SNP sets
+--snp-set-input-file <path>
+```
+
+### specify the output file
+```bash
+# Select a path for the output file which will be in the NeEDL result format.
+--snp-sets-output-file <path>
+```
+
+### additional optional parameters
+```bash
+# Number of threads to be used for score calculation. Default: 1. 0 means all available
+--num-threads
+
+# Create a random baseline with the same SNP set size distribution as the sets in the input file.
+--create-random-sets
+# define how many such random sets should be sampled
+--num-random-sets 1000
+
+# Specify which scores should be calculated. Same options as for NeEDLs --ms-model parameter. Multiple scores can be selected by specifying --model multiple times. If no model is specified, all available scores will be calculated.
+--model PENETRANCE_NLL
+
+# To rank (=sort) the output file with a score, specify the respective score with the following parameter. If it is not specified no ranking will be performed and the results will be stored in the same order as in the input file.
+--rank-model PENETRANCE_NLL
+
+# calculate_scores can also annotate the SNPs with a SNP-gene mapping like NeEDL does during the generation of the SSI network. These mappings are then stored in the output file. Please refer to the section "Creation of the SSI network" for an explanation of these parameters.
+--snp-annotate-dbSNP
+--snp-annotate "<path>|<has_header>|<snp_col>|<annotation_col>|<csv_separator>|<snp_separator>|<annotation_separator>"
+
+# Generate all k-mers of each SNP set and calculate their scores as well with this option. Either give a single number, e.g., 4, or a range, e.g., 2-4 for the parameter k
+--k-mers <k>
+```
 
 
 # Usage (via repository)
