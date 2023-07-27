@@ -130,3 +130,7 @@ test/model/res/*
 .RES_EXTRACTED
 
 docker/data
+
+
+# ignore test data
+test/e2e
