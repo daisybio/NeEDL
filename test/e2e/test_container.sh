@@ -33,7 +33,7 @@ docker run --user $user_id:$group_id "$1" /NeEDL/test/model/bin/convert_to_binar
 # test NeEDL quick start example with dummy dataset
 docker run --user $user_id:$group_id \
     -v "./test/e2e/dummy_dataset.json:/mnt/in_0:rw,Z" \
-    -v "$out_dir:/mnt/out:rw,Z"
+    -v "$out_dir:/mnt/out:rw,Z" \
     "$1" \
     /NeEDL/test/model/bin/NeEDL \
     --data-directory /NeEDL/data/ \
