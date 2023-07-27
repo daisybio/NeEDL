@@ -236,7 +236,7 @@ namespace epi {
         }
 
         std::vector<std::string> get_all_epistasis_scores() {
-            // return { "PENETRANCE" };
+            /*
             return std::vector<std::string>{"BAYESIAN", "BAYESIAN_COV",
                                             "PENETRANCE_NLL", "PENETRANCE_LLH", "PENETRANCE_AIC", "PENETRANCE_BIC",
                                             "PENETRANCE_COV_NLL", "PENETRANCE_COV_LLH", "PENETRANCE_COV_AIC", "PENETRANCE_COV_BIC",
@@ -245,6 +245,13 @@ namespace epi {
                                             "REGRESSION_NLL-GAIN", "REGRESSION_LLH-GAIN", "REGRESSION_AIC-GAIN", "REGRESSION_BIC-GAIN",
                                             "REGRESSION_CLG_Q_LC", "REGRESSION_CLG_Q_QC", "REGRESSION_CLG_L_LC",
                                             "VARIANCE", "VARIANCE_COV"};
+                                            */
+
+            return std::vector<std::string>{"BAYESIAN",
+                                            "PENETRANCE_NLL", "PENETRANCE_LLH", "PENETRANCE_AIC", "PENETRANCE_BIC",
+                                            "REGRESSION_NLL", "REGRESSION_LLH", "REGRESSION_AIC", "REGRESSION_BIC",
+                                            "REGRESSION_NLL-GAIN", "REGRESSION_LLH-GAIN", "REGRESSION_AIC-GAIN", "REGRESSION_BIC-GAIN",
+                                            "VARIANCE"};
         }
 
         std::string epistasis_score_to_string(EpistasisScore model) {
