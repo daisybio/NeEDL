@@ -16,12 +16,14 @@
             - [QUANTUM_COMPUTING seeding](#quantum_computing-seeding)
         - [Local search](#local-search)
     - [Documentation of the output files of NeEDL](#documentation-of-the-output-files-of-needl)
-        - [run.log](#runlog)
-        - [pipeline_config.json](#pipeline_configjson)
-        - [<network>_seeds.csv](#network_seedscsv)
-        - [<network>_results.csv](#network_resultscsv)
-        - [<network>_ind_SNP_scores.csv](#network_ind_snp_scorescsv)
-        - [<network>_search_score_over_time.csv](#network_search_score_over_timecsv)
+        - [General files](#general-files)
+            - [run.log](#runlog)
+            - [pipeline_config.json](#pipeline_configjson)
+        - [Network files](#network-files)
+            - [<network>_seeds.csv](#network_seedscsv)
+            - [<network>_results.csv](#network_resultscsv)
+            - [<network>_ind_SNP_scores.csv](#network_ind_snp_scorescsv)
+            - [<network>_search_score_over_time.csv](#network_search_score_over_timecsv)
         - [<network>_network.sqlite3](#network_networksqlite3)
         - [<network>_joint_degree.csv](#network_joint_degreecsv)
     - [Advanced features of NeEDL](#advanced-features-of-needl)
@@ -367,30 +369,77 @@ Options for the annealing type are `SIMULATED_ANNEALING`, `RANDOM_ANNEALING`, `H
 ## Documentation of the output files of NeEDL
 NeEDL creates a new subdirectory within the output directory for every run. The directory consits of the date, time and a random number. This allows the user to start multiple runs of NeEDL with the same output directory in parallel without risking to override any results. 
 
-### `run.log`
+### General files
+#### `run.log`
 This text file is always created and holds all information about how the NeEDL pipeline was executed and contains additional data like the network properties and the resource usage of NeEDL.
 
-### `pipeline_config.json`
+#### `pipeline_config.json`
 This JSON file describes how exactly the pipeline was configured for the run and holds all relevant configuration parameters (required, optional, and internal ones). It can help to integrate the NeEDL results into other workflows.
 
-### `<network>_seeds.csv`
+### Network files
+The files below are created once for every specified network. In the default configuration (use with BioGRID or a single custom network) these files only exist once. `<network>` is replaced with the name of the used network (default: BIOGRID).
+
+#### `<network>_seeds.csv`
 This CSV file contains the start seeds used for the local search on network `<network>`.
 
-### `<network>_results.csv`
+The file contains the following columns:
+- `RANK (<score>)`: Rank of the start seed w.r.t. to the statistical score used (low rank is better). NeEDL always uses the score for ranking that is specified for the optimization during the local search (specified via `--ms-model`).
+- `RS_IDS`: `;`-separated list of SNPs in the start seed (rsID from dbSNP)
+- `<score>`: One column for every available statistical score. If `--no-additional-scores` is set, only one column with the score used during optimization in the local search is present.
+- `SEED_ORIGIN`: Seeding routine or decision that generated the start seed.
+- `ANNOTATIONS`: Annotations (default: gene annotations when using `--annotate-dbSNP`) that are associated with at least one of the SNPs in the start seed. 
+
+Optional columns when using categorical or dichotomous phenotypes. All columns below are present once for each category where `<value>` is replaced by the respective value of the category:
+- `NUM_INDIVIDUALS_<value>`: number of individuals with the phenotype `<value>` that have at least one minor allele at all SNPs in the set
+- `FREQ_INDIVIDUALS_<value>`: ratio of individuals with the phenotype `<value>` that have at least one minor allele at all SNPs in the set
+- `INDIVIDUALS_<value>`: List of indices (zero-based) of all individuals with the phenotype `<value>` that have at least one minor allele at all SNPs in the set
+
+#### `<network>_results.csv`
 This CSV file contains the results of the local search on network `<network>`. This usually is the final result of NeEDL (if only a single network is used, see *Advanced/Multi-network approach*).
 
-### `<network>_ind_SNP_scores.csv`
-This CSV file contains the scores and information of all SNPs individually, that are contained in the final result.
+The file contains the following columns:
+- `RANK (<score>)`: Rank of the result SNP set w.r.t. to the statistical score used (low rank is better). NeEDL always uses the score for ranking that is specified for the optimization during the local search (specified via `--ms-model`).
+- `RS_IDS`: `;`-separated list of SNPs in the result SNP set (rsID from dbSNP)
+- `<score>`: One column for every available statistical score. If `--no-additional-scores` is set, only one column with the score used during optimization in the local search is present.
 
-### `<network>_search_score_over_time.csv`
+The local search can potentially find some results multiple times if they are reachable in the network from multiple start seeds. The following parameters give information about the merged results:
+- `NUM_MERGED`: number of results that were merged (because the SNP set is identical)
+- `NUM_ROUNDS_ALL`: Number of rounds of the local search each seed needed to reach the result state (`;`-separated list)
+- `NUM_ROUNDS_DISTINCT`: Same as `NUM_ROUNDS_ALL` but without duplicate values (`;`-separated list)
+- `SEED_ORIGIN_ALL`: Seeding routine or decision that generated the start seed that reached the result SNP set (`;`-separated list)
+- `SEED_ORIGIN_DISTINCT`: Same as `SEED_ORIGIN_ALL` but without duplicate values (`;`-separated list)
+- `STOPPING_REASON_ALL`: Reason for the stopping reason for the local search on the SNP set (`;`-separated list)
+- `STOPPING_REASON_DISTINCT`: Same as `STOPPING_REASON_ALL` but without duplicate values (`;`-separated list)
+
+
+- `ANNOTATIONS`: Annotations (default: gene annotations when using `--annotate-dbSNP`) that are associated with at least one of the SNPs in the result SNP set. 
+
+Optional columns when using categorical or dichotomous phenotypes. All columns below are present once for each category where `<value>` is replaced by the respective value of the category:
+- `NUM_INDIVIDUALS_<value>`: number of individuals with the phenotype `<value>` that have at least one minor allele at all SNPs in the set
+- `FREQ_INDIVIDUALS_<value>`: ratio of individuals with the phenotype `<value>` that have at least one minor allele at all SNPs in the set
+- `INDIVIDUALS_<value>`: List of indices (zero-based) of all individuals with the phenotype `<value>` that have at least one minor allele at all SNPs in the set
+
+#### `<network>_ind_SNP_scores.csv`
+This CSV file contains information about all SNPs that are present in at least one result SNP set. It has the same columns as the `<network>_seeds.csv` file except the `SEED_ORIGIN` column. Every SNP is treated as a SNP set with size 1.
+
+#### `<network>_search_score_over_time.csv`
 This CSV file documents how the score quality improves during the local search. It tracks the score value of the globally most optimal SNP set NeEDL found so far during the local search. This file shows how quickly NeEDL converged towards the final optimum it found.
+
+The file consists of two columns:
+- `time (ms)`: elapsed time since the start of the local search step, when this score was first reported
+- `score`: Current lowest score at the specific time point of the local search. The score always is the same as used for optimization in the local search (specified via `--ms-model`).
+
 
 ### `<network>_network.sqlite3`
 This SQLite3 database file contains the full SNP-SNP-interaction network together with annotation information. This file is only created if the flag `--disable-save-network` is not set. Depending on the size of the input files, this file can get very big (> 2 GB). Please consider before running NeEDL whether you require the SSI network for downstream analysis. Otherwise, disable saving it.
 
+The database file has the following tables:
+![Network Database Structure](misc/network_sqlite_diagram.png "Network Database Structure")
+
 ### `<network>_joint_degree.csv`
 This CSV file represents a matrix which counts how often two nodes with a specific degree are contected in the SSI network. This information can give insights into the network architecture. The file will only be created if the flag `--do-joint-degree-analysis` is set (see *Advanced/Additional analysis*)
 
+The file has a header containing a ascending list of node degrees in the SSI network and one column `TOTAL`. Without the header row and the `TOTAL` column, the file can be considered a matrix that counts how often two nodes with a specific degree are connected. The value at position $i,j$ in that matrix depicts how often a node with degree at the $i$-th cell in the header row is connected to a node with degree at the $j$-th cell in the header row. The `TOTAL` column depicts how many nodes have the respective degree.
 
 ## Advanced features of NeEDL
 
