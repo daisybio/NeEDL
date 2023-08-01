@@ -64,7 +64,7 @@ The project is distributed under the [GNU General Public License](https://www.gn
 
 In order to use our docker container, it is required to have docker installed. The user also needs permission to create and run docker containers (p.r.n., ask your system administrator). Additionally, a Python 3 installation and the command-line tool `curl` are necessary. To make all tools in this repository available in your current terminal session, please first source our installer script. This step needs to be done each time a new terminal session is started. It will only create some lightweight aliases, the actual download will take place only if you actually use one of the tools.
 ```bash
-# install all tools in this repository for the current session
+# install all tools in this repository for the current terminal session
 source <(curl -s https://raw.githubusercontent.com/biomedbigdata/NeEDL/main/run/bash_install.sh)
 ```
 
@@ -83,7 +83,7 @@ calculate_scores <parameters...>
 ```
 
 
-Parameters that can be used with the tools are explained below.
+All parameters that can be used with the tools are explained below.
 
 Example command to check that everything works:
 ```bash
