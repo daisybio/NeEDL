@@ -62,29 +62,34 @@ The project is distributed under the [GNU General Public License](https://www.gn
 
 **The easiest way to use our toolset is via our docker container**. This repo is big and contains much more than a typical user likely needs. Thus, we strongly encourage you to try out the docker container first, which comes with up-to-date versions of all of our tools in a smaller size.
 
-In order to use our docker container, it is required to have docker installed. The user also needs permission to create and run docker containers (p.r.n., ask your system administrator). Additionally, a Python 3 installation and the command-line tool `curl` are necessary.
+In order to use our docker container, it is required to have docker installed. The user also needs permission to create and run docker containers (p.r.n., ask your system administrator). Additionally, a Python 3 installation and the command-line tool `curl` are necessary. To make all tools in this repository available in your current terminal session, please first source our installer script. This step needs to be done each time a new terminal session is started. It will only create some lightweight aliases, the actual download will take place only if you actually use one of the tools.
+```bash
+# install all tools in this repository for the current session
+source <(curl -s https://raw.githubusercontent.com/biomedbigdata/NeEDL/main/run/bash_install.sh)
+```
 
-
+After that, you can use our tools in the following way:
 ```bash
 # run NeEDL
-curl https://raw.githubusercontent.com/biomedbigdata/NeEDL/main/run/NeEDL.py | python3 - <parameters...>
+NeEDL <parameters...>
 ```
 ```bash
 # run epiJSON
-curl https://raw.githubusercontent.com/biomedbigdata/NeEDL/main/run/epiJSON.py | python3 - <parameters...>
+epiJSON <parameters...>
 ```
 ```bash
 # run calculate_scores
-curl https://raw.githubusercontent.com/biomedbigdata/NeEDL/main/run/calculate_scores.py | python3 - <parameters...>
+calculate_scores <parameters...>
 ```
 
 
-Parameters that can be used with the tools are explained below. Please note the "` - `" before the first parameter. It is necessary to pipe the code of the Python script correctly.
+Parameters that can be used with the tools are explained below.
 
 Example command to check that everything works:
 ```bash
-curl https://raw.githubusercontent.com/biomedbigdata/NeEDL/main/run/NeEDL.py | python3 - --help
+NeEDL --help
 ```
+This sould print out a long list of command line options if everything worked correctly.
 
 
 ## Parameters for NeEDL
@@ -104,9 +109,9 @@ To run NeEDL the default way that we also used during our publication use the fo
 --ms-model PENETRANCE_NLL
 ```
 
-The full command then looks like this:
+The full command then looks like this (Please follow the install step at the beginning of this readme before using this command):
 ```bash
-curl https://raw.githubusercontent.com/biomedbigdata/NeEDL/main/run/NeEDL.py | python3 - \
+NeEDL \
     --num-threads <num-threads> \
     --output-directory <output-directory> \
     --input-format JSON_EPIGEN \
@@ -527,9 +532,9 @@ epiJSON is a wrapper around plink that can convert several plink-readable input 
 - LINDEN input files (*can only be generated not read by epiJSON*)
 
 ### Quick Start
-Quickly convert your files into the correct format for NeEDL without applying any optional filters:
+Quickly convert your files into the correct format for NeEDL without applying any optional filters (Please follow the install step at the beginning of this readme before using this command):
 ```bash
-curl https://raw.githubusercontent.com/biomedbigdata/NeEDL/main/run/epiJSON.py | python3 - \
+epiJSON \
     --num-threads <num-threads> \
     --output-directory <output-directory> \
     --input-file <path-to-input> \
@@ -567,9 +572,9 @@ For every input file specify these parameters:
 --override-phenotype <value>
 ```
 
-Example for combining separate case and control files:
+Example for combining separate case and control files (Please follow the install step at the beginning of this readme before using this command):
 ```bash
-curl https://raw.githubusercontent.com/biomedbigdata/NeEDL/main/run/epiJSON.py | python3 - \
+epiJSON \
     --num-threads 1 \
     --output-directory combined_dataset \
     \
