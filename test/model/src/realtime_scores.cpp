@@ -118,11 +118,7 @@ int main(int argc, char **argv) {
 
 
     // process models
-    const std::vector<std::string> all_available_models =  { "BAYESIAN",
-                   "PENETRANCE_NLL", "PENETRANCE_LLH", "PENETRANCE_AIC", "PENETRANCE_BIC",
-                   "REGRESSION_NLL", "REGRESSION_LLH", "REGRESSION_AIC", "REGRESSION_BIC",
-                   "REGRESSION_NLL-GAIN", "REGRESSION_LLH-GAIN", "REGRESSION_AIC-GAIN", "REGRESSION_BIC-GAIN",
-                   "VARIANCE" };
+    const std::vector<std::string> all_available_models = epi::options::get_all_epistasis_scores();
     if (models.empty()) {
         // set all available models
         models = { all_available_models.begin(), all_available_models.end() };

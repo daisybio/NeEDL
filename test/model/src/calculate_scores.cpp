@@ -106,11 +106,7 @@ int main(int argc, char **argv) {
 
     if (models.empty()) {
         // set all available models
-        models = { "BAYESIAN",
-                   "PENETRANCE_NLL", "PENETRANCE_LLH", "PENETRANCE_AIC", "PENETRANCE_BIC",
-                   "REGRESSION_NLL", "REGRESSION_LLH", "REGRESSION_AIC", "REGRESSION_BIC",
-                   "REGRESSION_NLL-GAIN", "REGRESSION_LLH-GAIN", "REGRESSION_AIC-GAIN", "REGRESSION_BIC-GAIN",
-                   "VARIANCE" };
+        models = epi::options::get_all_epistasis_scores();
     }
 
     std::vector<std::shared_ptr<epi::Job>> snpAnnotationPipeline;
