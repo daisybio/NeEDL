@@ -340,17 +340,11 @@ One can influence how the local search that NeEDL applies to the SSI network beh
 
 NeEDL supports various statistical scores that can be used for `--ms-model`. Please refer to Blumenthal et al. (doi: [10.1093/bioinformatics/btaa990](https://doi.org/10.1093/bioinformatics/btaa990)) for details about the provided models. All scores work with `CATEGORICAL` and `QUANTITATIVE` phenotypes. Here is a full list of scores NeEDL supports for optimization:
 - `BAYESIAN`: K2 score
-- `BAYESIAN_COV`: K2 score, includes covariates
 - `VARIANCE`: $P$-value of the $\chi^2$ test
-- `VARIANCE_COV`: $P$-value of the $\chi^2$ test, includes covariates
 - `PENETRANCE_NLL`: negative log-likelihood of the maximum-likelihood model
 - `PENETRANCE_LLH`: likelihood of the maximum-likelihood model
 - `PENETRANCE_AIC`: Aikake information criterion of the maximum-likelihood model
 - `PENETRANCE_BIC`: Bayesian information criterion of the maximum-likelihood model
-- `PENETRANCE_COV_NLL`: negative log-likelihood of the maximum-likelihood model, includes covariates
-- `PENETRANCE_COV_LLH`: likelihood of the maximum-likelihood model, includes covariates
-- `PENETRANCE_COV_AIC`: Aikake information criterion of the maximum-likelihood model, includes covariates
-- `PENETRANCE_COV_BIC`: Bayesian information criterion of the maximum-likelihood model, includes covariates
 - `REGRESSION_NLL`: negative log-likelihood of the quadratic-regression model
 - `REGRESSION_LLH`: likelihood of the quadratic-regression model
 - `REGRESSION_AIC`: Akaike information criterion of the quadratic-regression model
@@ -359,15 +353,6 @@ NeEDL supports various statistical scores that can be used for `--ms-model`. Ple
 - `REGRESSION_LLH_GAIN`: likelihood gain of the quadratic-regression model
 - `REGRESSION_AIC_GAIN`: Akaike information criterion gain of the quadratic-regression model
 - `REGRESSION_BIC_GAIN`: Bayesian information criterion gain of the quadratic-regression model
-- `REGRESSION_COV_NLL`: negative log-likelihood of the quadratic-regression model, includes covariates
-- `REGRESSION_COV_LLH`: likelihood of the quadratic-regression model, includes covariates
-- `REGRESSION_COV_AIC`: Akaike information criterion of the quadratic-regression model, includes covariates
-- `REGRESSION_COV_BIC`: Bayesian information criterion of the quadratic-regression model, includes covariates
-- `REGRESSION_CLG_Q_LC`: **TODO**
-- `REGRESSION_CLG_Q_QC`: **TODO**
-- `REGRESSION_CLG_L_LC`: **TODO**
-
-**IMPORTANT: Please make sure you selected a score that has `COV` in its name if you want to use covariates. Specifying a covariate file is not enough.**
 
 Options for the annealing type are `SIMULATED_ANNEALING`, `RANDOM_ANNEALING`, `HYPERBOLIC_TAN_ANNEALING`.
 
