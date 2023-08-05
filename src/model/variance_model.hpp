@@ -82,6 +82,7 @@ namespace epi {
 
         bool get_cov_status() const;
 
+        bool cov_score_() const;
     };
 
 }

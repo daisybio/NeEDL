@@ -211,6 +211,9 @@ namespace epi {
     double
     RegressionModel<PhenoType>::
     evaluate_(const std::vector<SNP> & snp_set, bool prepare_prediction) {
+        if (this->get_cov_status() and not this->instance_->has_cov()){
+            throw epi::Error("No Covariates specified.");
+        }
         // Compute interaction model.
         // for CLG scores: here the second (bigger) model is created, e.g., CLG-L-LC here, LC (linear with covariates)
         Eigen::MatrixXd interaction_features;
@@ -466,7 +469,12 @@ namespace epi {
     void
     RegressionModel<PhenoType>::
     cov_activate() {
-        incl_cov_ = true;
+        if (this->instance_->has_cov() == false){
+            incl_cov_ = false;
+            throw epi::Error("No covariates specified.");
+        } else {
+            incl_cov_ = true;
+        }
     }
 
     template<class PhenoType>

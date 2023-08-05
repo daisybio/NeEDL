@@ -92,6 +92,8 @@ namespace epi {
         double log_factorial_(std::size_t n);
 
         bool get_cov_status() const;
+
+        bool cov_score_() const;
     };
 
 }

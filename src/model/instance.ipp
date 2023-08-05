@@ -92,6 +92,7 @@ namespace epi {
     Instance(std::size_t num_categories):
             rs_ids_(),
             rs_ids_chromosomes_(),
+            has_cov_(false),
             num_categories_{num_categories},
             num_snps_{undefined_uint()},
             num_inds_{undefined_uint()},
@@ -148,6 +149,7 @@ namespace epi {
             default:
                 throw Error("Unsupported input format.");
         }
+        has_cov_ = true;
     }
 
     template<class PhenoType>
@@ -162,6 +164,13 @@ namespace epi {
     Instance<PhenoType>::
     num_inds() const {
         return num_inds_;
+    }
+
+    template<class PhenoType>
+    bool
+    Instance<PhenoType>::
+    has_cov() {
+        return has_cov_;
     }
 
     template<class PhenoType>
