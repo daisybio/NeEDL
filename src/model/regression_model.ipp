@@ -116,12 +116,10 @@ namespace epi {
             return true;
         }
         if (option == "cov") {
-            score_ = arg;
-            if (arg == "COV-ONLY") {
+            try {
+                score_ = arg;
                 this->cov_activate();
-            } else if (arg == "COV-MIXED"){
-
-            } else {
+            } catch (...) {
                 throw Error(std::string("Invalid argument \"") + arg  + "\" for option \"--" + option + "\". Usage: options = \"[--" + option + " COV-ONLY|COV-MIXED] [...]\"");
             }
             return true;
