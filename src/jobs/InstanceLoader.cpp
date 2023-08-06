@@ -8,7 +8,7 @@
 #include "../util/TimeLogger.hpp"
 
 namespace epi {
-    InstanceLoader::InstanceLoader(std::string path_, std::string input_format_, std::string phenotype_, size_t num_categories_) {
+    InstanceLoader::InstanceLoader(std::string path_, std::string input_format_, std::string phenotype_, size_t num_categories_, std::string covariates_file_) {
         std::string ending = ".csv";
         input_format_ = toUpperCase(input_format_);
         inputFormatStr = input_format_;
@@ -47,6 +47,13 @@ namespace epi {
             throw epi::Error("At least 2 categories needed.");
         }
         num_categories = num_categories_;
+
+        // check covariates file if provided
+        if (!covariates_file_.empty()) {
+            FileFinder cov_ff;
+            cov_ff.add_ends_with(".csv");
+            this->covariates_file = find_file_by_ending(covariates_file_, cov_ff);
+        }
     }
 
     void InstanceLoader::run(std::shared_ptr<DataModel> data) {
@@ -56,6 +63,9 @@ namespace epi {
         if (phenotype == options::PhenoType::QUANTITATIVE) {
             auto instance = std::make_shared<Instance<epi::QuantitativePhenoType>>();
             instance->load(inputFormat, path);
+            if (!covariates_file.empty()) {
+                instance->load_cov(options::InputFormat::CSV_COV, covariates_file);
+            }
             auto storage = std::make_shared<SNPStorage_PhenoType<epi::QuantitativePhenoType>>(instance);
             auto snpStorage = std::static_pointer_cast<SNPStorage>(storage);
             data->snpStorage = snpStorage;
@@ -63,6 +73,9 @@ namespace epi {
         } else if (phenotype == options::PhenoType::CATEGORICAL) {
             auto instance = std::make_shared<Instance<epi::CategoricalPhenoType>>(num_categories);
             instance->load(inputFormat, path);
+            if (!covariates_file.empty()) {
+                instance->load_cov(options::InputFormat::CSV_COV, covariates_file);
+            }
             auto storage = std::make_shared<SNPStorage_PhenoType<epi::CategoricalPhenoType>>(instance);
             auto snpStorage = std::static_pointer_cast<SNPStorage>(storage);
             data->snpStorage = snpStorage;

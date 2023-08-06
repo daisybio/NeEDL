@@ -11,7 +11,7 @@ namespace epi {
 
     class InstanceLoader : public Job {
     public:
-        InstanceLoader(std::string path, std::string input_format, std::string phenotype, size_t num_categories = 2);
+        InstanceLoader(std::string path, std::string input_format, std::string phenotype, size_t num_categories = 2, std::string covariates_file = "");
         void run(std::shared_ptr<DataModel> data) override;
         rapidjson::Value getConfig(rapidjson::Document &doc) override;
         const std::string getInputFilePath() const;
@@ -22,6 +22,7 @@ namespace epi {
         std::string phenotypeStr;
         epi::options::PhenoType phenotype;
         size_t num_categories;
+        std::string covariates_file;
     };
 
 } // epi

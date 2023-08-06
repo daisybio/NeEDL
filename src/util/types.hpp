@@ -244,7 +244,7 @@ namespace epi {
         EpistasisModel epistasis_model_from_string(const std::string & model_string);
         EpistasisModel epistasis_model_from_epistasis_score(EpistasisScore score);
         EpistasisScore epistasis_score_from_string(const std::string & score_string);
-        std::vector<std::string> get_all_epistasis_scores();
+        std::vector<std::string> get_all_epistasis_scores(bool include_covariates = false);
         std::string epistasis_model_to_string(EpistasisModel model);
         std::string epistasis_score_to_string(EpistasisScore model);
         bool is_epistasis_model_string(const std::string & model_string);

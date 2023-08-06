@@ -121,48 +121,56 @@ namespace epi {
         // set required options if necessary
         switch(score) {
             case options::EpistasisScore::PENETRANCE_NLL:
+            case options::EpistasisScore::PENETRANCE_COV_NLL:
                 if (penetrance_model_scores[current_thread] != score) {
                     penetrance_models[current_thread]->set_options("--score NLL");
                     penetrance_model_scores[current_thread] = score;
                 }
                 break;
             case options::EpistasisScore::PENETRANCE_LLH:
+            case options::EpistasisScore::PENETRANCE_COV_LLH:
                 if (penetrance_model_scores[current_thread] != score) {
                     penetrance_models[current_thread]->set_options("--score LLH");
                     penetrance_model_scores[current_thread] = score;
                 }
                 break;
             case options::EpistasisScore::PENETRANCE_AIC:
+            case options::EpistasisScore::PENETRANCE_COV_AIC:
                 if (penetrance_model_scores[current_thread] != score) {
                     penetrance_models[current_thread]->set_options("--score AIC");
                     penetrance_model_scores[current_thread] = score;
                 }
                 break;
             case options::EpistasisScore::PENETRANCE_BIC:
+            case options::EpistasisScore::PENETRANCE_COV_BIC:
                 if (penetrance_model_scores[current_thread] != score) {
                     penetrance_models[current_thread]->set_options("--score BIC");
                     penetrance_model_scores[current_thread] = score;
                 }
                 break;
             case options::EpistasisScore::REGRESSION_NLL:
+            case options::EpistasisScore::REGRESSION_COV_NLL:
                 if (regression_model_scores[current_thread] != score) {
                     regression_models[current_thread]->set_options("--score NLL");
                     regression_model_scores[current_thread] = score;
                 }
                 break;
             case options::EpistasisScore::REGRESSION_LLH:
+            case options::EpistasisScore::REGRESSION_COV_LLH:
                 if (regression_model_scores[current_thread] != score) {
                     regression_models[current_thread]->set_options("--score LLH");
                     regression_model_scores[current_thread] = score;
                 }
                 break;
             case options::EpistasisScore::REGRESSION_AIC:
+            case options::EpistasisScore::REGRESSION_COV_AIC:
                 if (regression_model_scores[current_thread] != score) {
                     regression_models[current_thread]->set_options("--score AIC");
                     regression_model_scores[current_thread] = score;
                 }
                 break;
             case options::EpistasisScore::REGRESSION_BIC:
+            case options::EpistasisScore::REGRESSION_COV_BIC:
                 if (regression_model_scores[current_thread] != score) {
                     regression_models[current_thread]->set_options("--score BIC");
                     regression_model_scores[current_thread] = score;
@@ -192,7 +200,69 @@ namespace epi {
                     regression_model_scores[current_thread] = score;
                 }
                 break;
-            default:
+            case options::EpistasisScore::REGRESSION_CLG_L_LC:
+                if (regression_model_scores[current_thread] != score) {
+                    regression_models[current_thread]->set_options("--score CLG-L-LC");
+                    regression_model_scores[current_thread] = score;
+                }
+                break;
+            case options::EpistasisScore::REGRESSION_CLG_Q_LC:
+                if (regression_model_scores[current_thread] != score) {
+                    regression_models[current_thread]->set_options("--score CLG-Q-LC");
+                    regression_model_scores[current_thread] = score;
+                }
+                break;
+            case options::EpistasisScore::REGRESSION_CLG_Q_QC:
+                if (regression_model_scores[current_thread] != score) {
+                    regression_models[current_thread]->set_options("--score CLG-Q-QC");
+                    regression_model_scores[current_thread] = score;
+                }
+                break;
+        }
+
+        switch(score) {
+            case options::EpistasisScore::BAYESIAN_COV:
+                bayesian_models[current_thread]->cov_activate();
+                break;
+            case options::EpistasisScore::VARIANCE_COV:
+                variance_models[current_thread]->cov_activate();
+                break;
+            case options::EpistasisScore::PENETRANCE_COV_NLL:
+            case options::EpistasisScore::PENETRANCE_COV_LLH:
+            case options::EpistasisScore::PENETRANCE_COV_AIC:
+            case options::EpistasisScore::PENETRANCE_COV_BIC:
+                penetrance_models[current_thread]->cov_activate();
+                break;
+            case options::EpistasisScore::REGRESSION_COV_NLL:
+            case options::EpistasisScore::REGRESSION_COV_LLH:
+            case options::EpistasisScore::REGRESSION_COV_AIC:
+            case options::EpistasisScore::REGRESSION_COV_BIC:
+            case options::EpistasisScore::REGRESSION_CLG_L_LC:
+            case options::EpistasisScore::REGRESSION_CLG_Q_LC:
+            case options::EpistasisScore::REGRESSION_CLG_Q_QC:
+                regression_models[current_thread]->cov_activate();
+                break;
+            case options::EpistasisScore::BAYESIAN:
+                bayesian_models[current_thread]->cov_deactivate();
+                break;
+            case options::EpistasisScore::VARIANCE:
+                variance_models[current_thread]->cov_deactivate();
+                break;
+            case options::EpistasisScore::PENETRANCE_NLL:
+            case options::EpistasisScore::PENETRANCE_LLH:
+            case options::EpistasisScore::PENETRANCE_AIC:
+            case options::EpistasisScore::PENETRANCE_BIC:
+                penetrance_models[current_thread]->cov_deactivate();
+                break;
+            case options::EpistasisScore::REGRESSION_NLL:
+            case options::EpistasisScore::REGRESSION_LLH:
+            case options::EpistasisScore::REGRESSION_AIC:
+            case options::EpistasisScore::REGRESSION_BIC:
+            case options::EpistasisScore::REGRESSION_NLL_GAIN:
+            case options::EpistasisScore::REGRESSION_LLH_GAIN:
+            case options::EpistasisScore::REGRESSION_AIC_GAIN:
+            case options::EpistasisScore::REGRESSION_BIC_GAIN:
+                regression_models[current_thread]->cov_deactivate();
                 break;
         }
     }

@@ -31,6 +31,7 @@ public:
                              std::string input_format,
                              std::string input_phenotype,
                              size_t input_num_categories,
+                             std::string covariates_file,
 
                              // network stats
                              bool disable_save_network,
