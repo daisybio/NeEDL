@@ -328,10 +328,14 @@ One can influence how the local search that NeEDL applies to the SSI network beh
 --ms-per-seed-time-limit 10m   # default is no limit
 --ms-search-time-limit 3d  # default is no limit
 
-# The arguments below usually are not necessary to be set. The change the behaviour of the local search and simulated annealing.
+# optionally set a different value for the maximal rounds (=iterations) of the local search
 --ms-max-rounds 300
---ms-min-set 2 
---ms-max-set 10    
+
+# optionally modify the allowed SNP set sizes, default size is between 2 and 10
+--ms-min-set 2
+--ms-max-set 10
+
+# The arguments below usually are not necessary to be set. The change the behaviour of the simulated annealing
 --ms-annealing-type SIMULATED_ANNEALING
 --ms-cooling-factor 1.0
 --ms-annealing-start-prob 0.8
