@@ -337,3 +337,39 @@ TEST_CASE("Categorical Instance 1 - Cov activate/deactivate") {
         }
     }
 }
+
+TEST_CASE("Categorical Instance 1 - No NaN values") {
+    epi::Instance<epi::CategoricalPhenoType> instance(2);
+    REQUIRE_NOTHROW(instance.load(epi::options::InputFormat::JSON_EPIGEN, "../../../data/EpiGEN/dichotomous/2_disease_snps/exponential/1_1_ASW.json"));
+    REQUIRE_NOTHROW(instance.load_cov(epi::options::InputFormat::CSV_COV, "../../../data/COV_TEST/EpiGEN_RND_COV.csv"));
+    epi::RegressionModel<epi::CategoricalPhenoType> model(&instance);
+    REQUIRE_NOTHROW(model.initialize());
+    CHECK(model.is_predictive());
+    CHECK(model.model_sense() == epi::options::ModelSense::MINIMIZE);
+
+    std::vector<std::string> problematic_rs_ids = { "rs11589207", "rs10927631" };
+    std::vector<epi::SNP> problematic_snps(2);
+    // ugly way to find RS-IDs in dataset
+    for (size_t i = 0; i < problematic_rs_ids.size(); ++i) {
+        bool found = false;
+        for (size_t j = 0; j < instance.rs_ids_.size(); ++j) {
+            if (problematic_rs_ids[i] == instance.rs_ids_[j]) {
+                problematic_snps[i] = j;
+                found = true;
+            }
+        }
+        CHECK(found);
+    }
+
+    std::vector<std::string> scores{"CLG-Q-QC", "CLG-L-LC", "CLG-Q-LC", "LLH", "NLL", "AIC", "BIC", "LLH-GAIN", "NLL-GAIN", "AIC-GAIN", "BIC-GAIN"};
+    for(size_t i = 0; i < 3; ++i) {
+        for (const auto &score: scores) {
+            REQUIRE_NOTHROW(model.set_options(std::string("--score " + score)));
+            REQUIRE_NOTHROW(model.cov_activate());
+            double value = model.evaluate(problematic_snps);
+
+            CHECK(!std::isnan(value));
+            std::cout << value << std::endl;
+        }
+    }
+}
