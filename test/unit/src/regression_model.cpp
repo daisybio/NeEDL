@@ -152,7 +152,7 @@ TEST_CASE("Quantitative Instance - Cov Scores") {
     std::vector<std::string> scores{"CLG-L-LC", "CLG-Q-QC", "CLG-Q-LC"};
 
     for (const auto & score : scores) {
-        REQUIRE_NOTHROW(model.set_options(std::string("--max-itrs 5 --cov COV-MIXED --score " + score)));
+        REQUIRE_NOTHROW(model.set_options(std::string("--max-itrs 5 --score " + score)));
         CHECK_THAT(model.evaluate(disease_snp_set), Catch::WithinAbs(model.evaluate(disease_snp_set_shuffled), 0.0001));
 
 
@@ -197,7 +197,7 @@ TEST_CASE("Categorical Instance 1 - Cov Scores") {
 
     std::vector<std::string> scores{"CLG-Q-QC", "CLG-L-LC", "CLG-Q-LC"};
     for (const auto & score : scores) {
-        REQUIRE_NOTHROW(model.set_options(std::string("--max-itrs 5 --cov COV-MIXED --score " + score)));
+        REQUIRE_NOTHROW(model.set_options(std::string("--max-itrs 5 --score " + score)));
         double check1 = model.evaluate(disease_snp_set);
         double check2 = model.evaluate(disease_snp_set_shuffled);
         CHECK_THAT(check1, Catch::WithinAbs(check2, 0.0001));
@@ -237,7 +237,7 @@ TEST_CASE("Categorical Instance 2 - Cov Scores") {
     std::vector<epi::SNP> disease_snp_set_shuffled{1, 0};
     std::vector<std::string> scores{"CLG-Q-QC", "CLG-L-LC", "CLG-Q-LC"};
     for (const auto & score : scores) {
-        REQUIRE_NOTHROW(model.set_options(std::string("--max-itrs 5 --cov COV-MIXED --score " + score)));
+        REQUIRE_NOTHROW(model.set_options(std::string("--max-itrs 5 --score " + score)));
         CHECK_THAT(model.evaluate(disease_snp_set), Catch::WithinAbs(model.evaluate(disease_snp_set_shuffled), 0.0001));
 
         CHECK_NOTHROW(model.evaluate_track_time(disease_snp_set));
@@ -267,7 +267,7 @@ TEST_CASE("Quantitative Instance - Cov activate/deactivate") {
     std::vector<epi::SNP> disease_snp_set_shuffled{30, 4, 43};
     std::vector<std::string> scores{"CLG-Q-QC", "CLG-L-LC", "CLG-Q-LC", "LLH", "NLL", "AIC", "BIC", "LLH-GAIN", "NLL-GAIN", "AIC-GAIN", "BIC-GAIN"};
     for (const auto & score : scores) {
-        REQUIRE_NOTHROW(model.set_options(std::string("--max-itrs 5 --cov COV-MIXED --score " + score)));
+        REQUIRE_NOTHROW(model.set_options(std::string("--max-itrs 5 --score " + score)));
         CHECK_THAT(model.evaluate(disease_snp_set), Catch::WithinAbs(model.evaluate(disease_snp_set_shuffled), 0.0001));
 
 
@@ -311,7 +311,7 @@ TEST_CASE("Categorical Instance 1 - Cov activate/deactivate") {
 
     std::vector<std::string> scores{"CLG-Q-QC", "CLG-L-LC", "CLG-Q-LC", "LLH", "NLL", "AIC", "BIC", "LLH-GAIN", "NLL-GAIN", "AIC-GAIN", "BIC-GAIN"};
     for (const auto & score : scores) {
-        REQUIRE_NOTHROW(model.set_options(std::string("--max-itrs 5 --cov COV-MIXED --score " + score)));
+        REQUIRE_NOTHROW(model.set_options(std::string("--max-itrs 5 --score " + score)));
         double check1 = model.evaluate(disease_snp_set);
         double check2 = model.evaluate(disease_snp_set_shuffled);
         CHECK_THAT(check1, Catch::WithinAbs(check2, 0.0001));

@@ -115,17 +115,6 @@ namespace epi {
             }
             return true;
         }
-        if (option == "cov") {
-            score_ = arg;
-            if (arg == "COV-ONLY") {
-                this->cov_activate();
-            } else if (arg == "COV-MIXED"){
-
-            } else {
-                throw Error(std::string("Invalid argument \"") + arg  + "\" for option \"--" + option + "\". Usage: options = \"[--" + option + " COV-ONLY|COV-MIXED] [...]\"");
-            }
-            return true;
-        }
         return false;
     }
 
@@ -145,7 +134,7 @@ namespace epi {
     std::string
     RegressionModel<PhenoType>::
     valid_options_() const {
-        return "[--score LLH|LLH-GAIN|NLL|NLL-GAIN|AIC|AIC-GAIN|BIC|BIC-GAIN|CLG-L-LC|CLG-Q-QC|CLG-Q-LC] [--max-itrs <convertible to int greater equal 0>] [--learning-rate <convertible to double greater 0>] [--epsilon <convertible to double greater 0>] [--cov COV-ONLY|COV-MIXED]";
+        return "[--score LLH|LLH-GAIN|NLL|NLL-GAIN|AIC|AIC-GAIN|BIC|BIC-GAIN|CLG-L-LC|CLG-Q-QC|CLG-Q-LC] [--max-itrs <convertible to int greater equal 0>] [--learning-rate <convertible to double greater 0>] [--epsilon <convertible to double greater 0>] [--cov]";
     }
 
     template<class PhenoType>
