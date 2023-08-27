@@ -12,6 +12,17 @@ arguments = sys.argv[1:]
 
 print(arguments)
 
+# define a different docker image name, needed for testing
+for i, arg in enumerate(arguments):
+    if arg == '--docker-image-name':
+        if len(arguments) > i + 1:
+            image = arguments[i + 1]
+
+            # remove arguments from list as NeEDL cannot parse them
+            del arguments[i + 1]
+            del arguments[i]
+
+
 # map output path
 output_file = None
 output_directory = None
@@ -78,5 +89,10 @@ external_command += f"{image} {command} --data-directory /NeEDL/data/ {argument_
 
 print(external_command)
 
-os.system("docker image pull " + image)
-os.system(external_command)
+ecode = os.system("docker image pull " + image)
+if ecode != 0:
+    sys.exit(1)
+
+ecode = os.system(external_command)
+if ecode != 0:
+    sys.exit(1)

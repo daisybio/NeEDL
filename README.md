@@ -381,7 +381,7 @@ The file contains the following columns:
 - `RS_IDS`: `;`-separated list of SNPs in the start seed (rsID from dbSNP)
 - `<score>`: One column for every available statistical score. If `--no-additional-scores` is set, only one column with the score used during optimization in the local search is present.
 - `SEED_ORIGIN`: Seeding routine or decision that generated the start seed.
-- `ANNOTATIONS`: Annotations (default: gene annotations when using `--annotate-dbSNP`) that are associated with at least one of the SNPs in the start seed. 
+- `ANNOTATIONS`: Annotations (default: gene annotations when using `--snp-annotate-dbSNP`) that are associated with at least one of the SNPs in the start seed. 
 
 Optional columns when using categorical or dichotomous phenotypes. All columns below are present once for each category where `<value>` is replaced by the respective value of the category:
 - `NUM_INDIVIDUALS_<value>`: number of individuals with the phenotype `<value>` that have at least one minor allele at all SNPs in the set
@@ -406,7 +406,7 @@ The local search can potentially find some results multiple times if they are re
 - `STOPPING_REASON_DISTINCT`: Same as `STOPPING_REASON_ALL` but without duplicate values (`;`-separated list)
 
 
-- `ANNOTATIONS`: Annotations (default: gene annotations when using `--annotate-dbSNP`) that are associated with at least one of the SNPs in the result SNP set. 
+- `ANNOTATIONS`: Annotations (default: gene annotations when using `--snp-annotate-dbSNP`) that are associated with at least one of the SNPs in the result SNP set. 
 
 Optional columns when using categorical or dichotomous phenotypes. All columns below are present once for each category where `<value>` is replaced by the respective value of the category:
 - `NUM_INDIVIDUALS_<value>`: number of individuals with the phenotype `<value>` that have at least one minor allele at all SNPs in the set
