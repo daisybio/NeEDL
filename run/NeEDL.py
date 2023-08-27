@@ -12,6 +12,27 @@ arguments = sys.argv[1:]
 
 print(arguments)
 
+
+# define a different docker image name, needed for testing
+for i, arg in enumerate(arguments):
+    if arg == '--docker-image-name':
+        if len(arguments) > i + 1:
+            image = arguments[i + 1]
+
+            # remove arguments from list as NeEDL cannot parse them
+            del arguments[i + 1]
+            del arguments[i]
+
+
+# disable pulling of docker container
+docker_pull = True
+for i, arg in enumerate(arguments):
+    if arg == '--docker-no-pulling':
+        docker_pull = False
+        del arguments[i]
+
+
+
 # map output path
 output_directory = None
 for i, arg in enumerate(arguments):
@@ -47,13 +68,16 @@ for i, arg in enumerate(arguments):
 for i, arg in enumerate(arguments):
     if arg == '--snp-annotate':
         if len(arguments) > i + 1:
-            splits = arguments[i + 1].split('|', maxsplit = 2)
+            splits = arguments[i + 1].split('|', maxsplit = 1)
             path = os.path.abspath(splits[0])
             if not os.path.exists(path):
                 print(f'Error: path "{path}" at argument "{arg}" does not exist!')
                 exit(-1)
 
             arguments[i + 1] = '/mnt/in_' + str(len(input_paths))
+            if len(splits) == 2:
+                arguments[i + 1] += '|' + splits[1]
+
             input_paths.append(path)
 
 
@@ -61,14 +85,17 @@ for i, arg in enumerate(arguments):
 for i, arg in enumerate(arguments):
     if arg == '--network':
         if len(arguments) > i + 1:
-            splits = arguments[i + 1].split('|', maxsplit = 3)
+            splits = arguments[i + 1].split('|', maxsplit = 2)
             if len(splits) >= 2:
                 path = os.path.abspath(splits[1])
                 if not os.path.exists(path):
                     print(f'Error: path "{path}" at argument "{arg}" does not exist!')
                     exit(-1)
 
-                arguments[i + 1] = '/mnt/in_' + str(len(input_paths))
+                arguments[i + 1] = splits[0] + '|/mnt/in_' + str(len(input_paths))
+                if len(splits) == 3:
+                    arguments[i + 1] += '|' + splits[2]
+
                 input_paths.append(path)
 
 # --data-directory
@@ -89,5 +116,12 @@ external_command += f"{image} {command} --data-directory /NeEDL/data/ {argument_
 
 print(external_command)
 
-os.system("docker image pull " + image)
-os.system(external_command)
+if docker_pull:
+    ecode = os.system("docker image pull " + image)
+    if ecode != 0:
+        sys.exit(1)
+
+ecode = os.system(external_command)
+if ecode != 0:
+    sys.exit(1)
+
