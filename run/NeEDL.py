@@ -24,6 +24,15 @@ for i, arg in enumerate(arguments):
             del arguments[i]
 
 
+# disable pulling of docker container
+docker_pull = True
+for i, arg in enumerate(arguments):
+    if arg == '--docker-no-pulling':
+        docker_pull = False
+        del arguments[i]
+
+
+
 # map output path
 output_directory = None
 for i, arg in enumerate(arguments):
@@ -101,9 +110,10 @@ external_command += f"{image} {command} --data-directory /NeEDL/data/ {argument_
 
 print(external_command)
 
-ecode = os.system("docker image pull " + image)
-if ecode != 0:
-    sys.exit(1)
+if docker_pull:
+    ecode = os.system("docker image pull " + image)
+    if ecode != 0:
+        sys.exit(1)
 
 ecode = os.system(external_command)
 if ecode != 0:

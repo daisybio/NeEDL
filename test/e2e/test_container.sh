@@ -20,10 +20,10 @@ echo "Working directory: $(pwd)"
 # ---- tests
 
 # check if binaries exist and are executable
-python ./run/NeEDL.py --docker-image-name "$1" --help
-python ./run/epiJSON.py --docker-image-name "$1" --help
-python ./run/calculate_scores.py --docker-image-name "$1" --help
-python ./run/convert_to_binary.py --docker-image-name "$1" --help
+python ./run/NeEDL.py --docker-image-name "$1" --docker-no-pulling --help
+python ./run/epiJSON.py --docker-image-name "$1" --docker-no-pulling  --help
+python ./run/calculate_scores.py --docker-image-name "$1" --docker-no-pulling  --help
+python ./run/convert_to_binary.py --docker-image-name "$1" --docker-no-pulling  --help
 
 
 
@@ -33,6 +33,7 @@ dummy_dataset=$(realpath ./data/e2e_tests/dummy_dataset.json)
 # test NeEDL quick start example with dummy dataset
 python ./run/NeEDL.py \
     --docker-image-name "$1" \
+    --docker-no-pulling \
     "--num-threads" "1" \
     "--output-directory" "$out_dir" \
     "--input-format" "JSON_EPIGEN" \
@@ -53,6 +54,7 @@ network_file=$(realpath ./data/e2e_tests/network.csv)
 # Maybe replace with something that actually creates a network from the custom data?
 python ./run/NeEDL.py \
     --docker-image-name "$1" \
+    --docker-no-pulling \
     "--num-threads" "1" \
     "--output-directory" "$out_dir" \
     "--input-format" "JSON_EPIGEN" \
