@@ -125,3 +125,6 @@ test/model/res/*
 
 docker/data
 __pycache__
+
+
+test_out

@@ -70,13 +70,16 @@ for i, arg in enumerate(arguments):
 for i, arg in enumerate(arguments):
     if arg == '--snp-annotate':
         if len(arguments) > i + 1:
-            splits = arguments[i + 1].split('|', maxsplit = 2)
+            splits = arguments[i + 1].split('|', maxsplit = 1)
             path = os.path.abspath(splits[0])
             if not os.path.exists(path):
                 print(f'Error: path "{path}" at argument "{arg}" does not exist!')
                 exit(-1)
 
             arguments[i + 1] = '/mnt/in_' + str(len(input_paths))
+            if len(splits) == 2:
+                arguments[i + 1] += '|' + splits[1]
+
             input_paths.append(path)
 
 # --data-directory
