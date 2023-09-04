@@ -527,7 +527,7 @@ epiJSON \
     --num-threads <num-threads> \
     --output-directory <output-directory> \
     --input-file <path-to-input> \
-    --input-format <BIM_BED_FAM|PED_MAP|TPED_TFAM|VCF|BCF2> \
+    --input-format <BIM_BED_FAM|PED_MAP|TPED_TFAM|VCF|BCF2|JSON> \
     --phenotype <DICHOTOMOUS|CATEGORICAL|QUANTIATIVE> \
     --make-json
 ```
