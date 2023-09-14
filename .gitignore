@@ -120,6 +120,7 @@ test/model/res/*
 
 
 .INSTALLED
+.uWebSockets_INSTALLED
 .RES_EXTRACTED
 .env
 

@@ -100,6 +100,15 @@ def build_external_libraries(args, dependencies):
         f = open("ext/igraph_0.9.8/.INSTALLED", "w")
         f.close()
 
+    # uWebSockets
+    if os.path.isfile("ext/.uWebSockets_INSTALLED") and not args.clean:
+        print("-- uWebSocket library already built.")
+    else:
+        print("-- Building uWebSockets library")
+        subprocess.call('git submodule update --init --recursive; cd ext/uWebSockets/uSockets;make boringssl;cd boringssl;BORINGSSL=$PWD;cd ../lsquic;cmake -DBORINGSSL_DIR=$BORINGSSL .;make;cd ..;WITH_LTO=1 WITH_QUIC=1 WITH_BORINGSSL=1 make', shell=True)
+        f = open("ext/.uWebSockets_INSTALLED", "w")
+        f.close()
+
 def extract_all_zips_in_folder(folder):
     print("extracting files in " + folder)
 
