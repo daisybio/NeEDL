@@ -32,7 +32,9 @@ WORKDIR /NeEDL
 ENV DEBIAN_FRONTEND=noninteractive
 
 # install build dependencies
-RUN apt-get update -y && apt-get install -y build-essential git cmake autoconf libtool pkg-config python3.10 python3.10-dev gcc g++ sqlite3 libsqlite3-dev python3.10-distutils unzip
+RUN apt-get update -y && \
+    apt-get install -y build-essential git cmake autoconf libtool pkg-config python3.10 python3.10-dev gcc g++ sqlite3 libsqlite3-dev python3.10-distutils unzip wget && \
+    wget -c https://dl.google.com/go/go1.21.1.linux-amd64.tar.gz -O - | sudo tar -xz -C /usr/local
 
 # copy necessary NeEDL repo files
 COPY ext ./ext
