@@ -105,7 +105,10 @@ def build_external_libraries(args, dependencies):
         print("-- uWebSocket library already built.")
     else:
         print("-- Building uWebSockets library")
-        subprocess.call('git submodule update --init --recursive; cd ext/uWebSockets/uSockets;make boringssl;cd boringssl;BORINGSSL=$PWD;cd ../lsquic;cmake -DBORINGSSL_DIR=$BORINGSSL .;make;cd ..;WITH_LTO=1 WITH_QUIC=1 WITH_BORINGSSL=1 make', shell=True)
+        if not args.no_submodule_extraction:
+            subprocess.call('git submodule update --init --recursive')
+        
+        subprocess.call('cd ext/uWebSockets/uSockets;make boringssl;cd boringssl;BORINGSSL=$PWD;cd ../lsquic;cmake -DBORINGSSL_DIR=$BORINGSSL .;make;cd ..;WITH_LTO=1 WITH_QUIC=1 WITH_BORINGSSL=1 make', shell=True)
         f = open("ext/.uWebSockets_INSTALLED", "w")
         f.close()
 
@@ -134,7 +137,7 @@ def extract_all_zips_in_folder(folder):
         for entry in files:
             if entry.name.endswith(".zip"):
                 print("Extracting " + entry.name)
-                subprocess.call('unzip -q -d "' + escaped_folder + '" "' + escaped_folder + entry.name.replace('"', '\\"') + '"', shell=True)
+                subprocess.call('unzip -qo -d "' + escaped_folder + '" "' + escaped_folder + entry.name.replace('"', '\\"') + '"', shell=True)
 
 def extract_resources(args):
     if (os.path.isfile(".RES_EXTRACTED") and not args.clean) or args.no_data_unpacking:
@@ -209,6 +212,7 @@ parser.add_argument("--python3", help="path to the python3 executable that shoul
 parser.add_argument("--gcc", help="one can select the path to gcc manually if the automatically selected compiler is not correct.", default=None)
 parser.add_argument("--gxx", help="one can select the path to g++ manually if the automatically selected compiler is not correct.", default=None)
 parser.add_argument("--extract-datasets", help="Also extracts simulated datasets. These might be necessary for the unit tests.", action="store_true")
+parser.add_argument("--no-submodule-extraction", help="When set the script does not recursively download submodules. This is used for building the docker container.", action="store_true")
 args = parser.parse_args()
 
 
