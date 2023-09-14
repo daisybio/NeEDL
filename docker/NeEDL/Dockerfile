@@ -51,7 +51,8 @@ RUN python3.10 install.py --clean && \
     python3.10 install.py --target NeEDL && \
     python3.10 install.py --target calculate_scores && \
     python3.10 install.py --target convert_to_binary && \
-    python3.10 install.py --target epiJSON
+    python3.10 install.py --target epiJSON && \
+    python3.10 install.py --target realtime_scores
 
 # ---- end of stage 2
 
@@ -78,5 +79,7 @@ COPY --from=build /NeEDL/ext/plink/plink_linux_x86_64_20230116/ /NeEDL/ext/plink
 RUN ln -s /NeEDL/test/model/bin/NeEDL /usr/local/bin/NeEDL && \
     ln -s /NeEDL/test/model/bin/calculate_scores /usr/local/bin/calculate_scores && \
     ln -s /NeEDL/test/model/bin/convert_to_binary /usr/local/bin/convert_to_binary && \
-    ln -s /NeEDL/test/model/bin/convert_to_json /usr/local/bin/epiJSON
+    ln -s /NeEDL/test/model/bin/epiJSON /usr/local/bin/epiJSON && \
+    ln -s /NeEDL/test/model/bin/realtime_scores /usr/local/bin/realtime_scores
+
 # ---- end of stage 3

@@ -25,6 +25,12 @@ python ./run/epiJSON.py --docker-image-name "$1" --docker-no-pulling  --help
 python ./run/calculate_scores.py --docker-image-name "$1" --docker-no-pulling  --help
 python ./run/convert_to_binary.py --docker-image-name "$1" --docker-no-pulling  --help
 
+# realtime_scores is a special case --> no python launcher script exists for it
+# run containers as current user
+user_id=$(id -u)
+group_id=$(id -g)
+docker run --user $user_id:$group_id "$1" /NeEDL/test/model/bin/realtime_scores --help
+
 
 
 # select small dummy dataset

@@ -134,7 +134,7 @@ def extract_all_zips_in_folder(folder):
         for entry in files:
             if entry.name.endswith(".zip"):
                 print("Extracting " + entry.name)
-                subprocess.call('unzip -n -d "' + escaped_folder + '" "' + escaped_folder + entry.name.replace('"', '\\"') + '"', shell=True)
+                subprocess.call('unzip -q -d "' + escaped_folder + '" "' + escaped_folder + entry.name.replace('"', '\\"') + '"', shell=True)
 
 def extract_resources(args):
     if (os.path.isfile(".RES_EXTRACTED") and not args.clean) or args.no_data_unpacking:
