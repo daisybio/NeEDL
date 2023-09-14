@@ -47,7 +47,7 @@ COPY data/dbSNP/inc_pseudogenes /NeEDL/data/dbSNP/inc_pseudogenes
 COPY data/BIOGRID /NeEDL/data/BIOGRID
 
 # initialize everything needed for the build and build all targets
-RUN python3.10 install.py --clean && \ 
+RUN python3.10 install.py --clean --no-submodule-extraction && \ 
     python3.10 install.py --target NeEDL && \
     python3.10 install.py --target calculate_scores && \
     python3.10 install.py --target convert_to_binary && \
