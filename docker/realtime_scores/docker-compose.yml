@@ -1,4 +1,5 @@
 version: '3'
+name: needl_realtime_scores_api
 
 services:
   realtime_scores:
