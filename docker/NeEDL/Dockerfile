@@ -33,8 +33,11 @@ ENV DEBIAN_FRONTEND=noninteractive
 
 # install build dependencies
 RUN apt-get update -y && \
-    apt-get install -y build-essential git cmake autoconf libtool pkg-config python3.10 python3.10-dev gcc g++ sqlite3 libsqlite3-dev python3.10-distutils unzip curl libevent-dev && \
+    apt-get install -y build-essential git cmake autoconf libtool pkg-config python3.10 python3.10-dev gcc g++ sqlite3 libsqlite3-dev python3.10-distutils unzip curl libevent-dev libboost-all-dev && \
     curl https://dl.google.com/go/go1.21.1.linux-amd64.tar.gz | tar -xz -C /usr/local
+
+ENV PATH /usr/local/go/bin:$PATH
+
 
 # copy necessary NeEDL repo files
 COPY ext ./ext
@@ -49,12 +52,12 @@ COPY data/dbSNP/inc_pseudogenes /NeEDL/data/dbSNP/inc_pseudogenes
 COPY data/BIOGRID /NeEDL/data/BIOGRID
 
 # initialize everything needed for the build and build all targets
-RUN python3.10 install.py --clean --no-submodule-extraction && \ 
-    python3.10 install.py --target NeEDL && \
-    python3.10 install.py --target calculate_scores && \
-    python3.10 install.py --target convert_to_binary && \
-    python3.10 install.py --target epiJSON && \
-    python3.10 install.py --target realtime_scores
+RUN python3.10 install.py --clean --no-submodule-extraction --system-boost && \ 
+    python3.10 install.py --target NeEDL --system-boost && \
+    python3.10 install.py --target calculate_scores --system-boost && \
+    python3.10 install.py --target convert_to_binary --system-boost && \
+    python3.10 install.py --target epiJSON --system-boost && \
+    python3.10 install.py --target realtime_scores --system-boost
 
 # ---- end of stage 2
 
@@ -68,10 +71,10 @@ LABEL org.opencontainers.image.source=https://github.com/biomedbigdata/NeEDL
 ENV DEBIAN_FRONTEND=noninteractive
 
 # install production dependencies
-RUN apt-get update -y && apt-get install -y python3.10 python3.10-dev sqlite3 g++ gcc
+RUN apt-get update -y && apt-get install -y python3.10 python3.10-dev sqlite3 g++ gcc libboost-all-dev
 
 # copy everything important over to the new container
-COPY --from=build /NeEDL/ext/boost_1_71_0/stage /NeEDL/ext/boost_1_71_0/stage
+# COPY --from=build /NeEDL/ext/boost_1_71_0/stage /NeEDL/ext/boost_1_71_0/stage
 COPY --from=build /NeEDL/test/model/bin/* /NeEDL/test/model/bin/
 COPY --from=build /NeEDL/data/dbSNP/inc_pseudogenes/snps_restruc_full_inc_pseudo.csv /NeEDL/data/dbSNP/inc_pseudogenes/snps_restruc_full_inc_pseudo.csv
 COPY --from=build /NeEDL/data/BIOGRID/BIOGRID-ORGANISM-Homo_sapiens-3.5.182.tab2.txt /NeEDL/data/BIOGRID/BIOGRID-ORGANISM-Homo_sapiens-current.tab2.txt

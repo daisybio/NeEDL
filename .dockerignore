@@ -23,6 +23,7 @@ docs/
 
 # Binary directories
 **/bin
+!/ext/uWebSockets/uSockets/lsquic/bin
 
 # INI files for unit tests
 /test/unit/init/*
@@ -108,7 +109,7 @@ test/model/res/*
 /cmake-build-*
 /.idea/
 
-CMakeCache.txt
+**/CMakeCache.txt
 
 #load
 # /data/LOAD/

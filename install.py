@@ -53,6 +53,10 @@ def build_targets(args, all_targets, dependencies):
     if (not os.path.isfile("build/Makefile")):
         print("-- Running CMake.")
         commands = "cd build; rm -rf *; cmake .. -DCMAKE_BUILD_TYPE=" + ("Debug" if args.debug else "Release")
+
+        if args.system_boost:
+            commands += f' -DUSE_INCLUDED_BOOST=0'
+
         commands += f' -DPython_EXECUTABLE="{dependencies["python3"]}"'
         commands += f' -DCMAKE_C_COMPILER="{dependencies["gcc"]}" -DCMAKE_CXX_COMPILER="{dependencies["g++"]}"'
         if platform.system() == "Darwin":
@@ -75,7 +79,9 @@ def build_targets(args, all_targets, dependencies):
 
 def build_external_libraries(args, dependencies):
     # boost
-    if os.path.isfile("ext/boost_1_71_0/.INSTALLED") and not args.clean:
+    if args.system_boost:
+        print("-- Boost libraries: system installation is used --> build of boost is skipped")
+    elif os.path.isfile("ext/boost_1_71_0/.INSTALLED") and not args.clean:
         print("-- Boost libraries already built.")
     else:
         print("-- Building Boost libraries.")
@@ -213,6 +219,7 @@ parser.add_argument("--gcc", help="one can select the path to gcc manually if th
 parser.add_argument("--gxx", help="one can select the path to g++ manually if the automatically selected compiler is not correct.", default=None)
 parser.add_argument("--extract-datasets", help="Also extracts simulated datasets. These might be necessary for the unit tests.", action="store_true")
 parser.add_argument("--no-submodule-extraction", help="When set the script does not recursively download submodules. This is used for building the docker container.", action="store_true")
+parser.add_argument("--system-boost", help="Use the system boost installation instead of the one in this repository", action="store_true")
 args = parser.parse_args()
 
 

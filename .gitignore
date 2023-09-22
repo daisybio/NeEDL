@@ -119,9 +119,9 @@ test/model/res/*
 .Rhistory
 
 
-.INSTALLED
-.uWebSockets_INSTALLED
-.RES_EXTRACTED
+**/.INSTALLED
+**/.uWebSockets_INSTALLED
+**/.RES_EXTRACTED
 .env
 
 docker/data

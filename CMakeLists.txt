@@ -19,9 +19,11 @@
 #                                                                             #
 ###############################################################################
 
-cmake_minimum_required(VERSION 3.2)
+cmake_minimum_required(VERSION 3.8)
 set(CMAKE_VERBOSE_MAKEFILE ON)
 project(NeEDL)
+
+include(CMakePrintHelpers)
 
 # Determine build type.
 if(NOT CMAKE_BUILD_TYPE)
@@ -29,6 +31,22 @@ if(NOT CMAKE_BUILD_TYPE)
   set(CMAKE_BUILD_TYPE "Release" CACHE STRING "Release or Debug build type")
 else()
   message(STATUS "Building NeEDL with build type '${CMAKE_BUILD_TYPE}'.")
+endif()
+
+set(USE_INCLUDED_BOOST "1" CACHE BOOL "Use the boost version shipped with this repository")
+cmake_print_variables(USE_INCLUDED_BOOST)
+if (USE_INCLUDED_BOOST)
+  message("-- boost version: vendored")
+  set(BOOST_INCLUDE ${CMAKE_SOURCE_DIR}/ext/boost_1_71_0)
+  set(BOOST_LINK_DIR ${CMAKE_SOURCE_DIR}/ext/boost_1_71_0/stage/lib)
+else()
+  message("-- boost version: system")
+  set(Boost_USE_STATIC_LIBS OFF) 
+  set(Boost_USE_MULTITHREADED ON)  
+  set(Boost_USE_STATIC_RUNTIME OFF) 
+  find_package(Boost 1.71.0 REQUIRED COMPONENTS filesystem graph)
+
+  set(BOOST_INCLUDE ${Boost_INCLUDE_DIRS})
 endif()
 
 # Find doxygen.
@@ -43,7 +61,6 @@ find_package(Python COMPONENTS Interpreter Development)
 find_package(SQLite3 REQUIRED)
 
 # debug stuff
-include(CMakePrintHelpers)
 cmake_print_variables(CMAKE_C_COMPILER)
 cmake_print_variables(CMAKE_C_COMPILER_VERSION)
 cmake_print_variables(CMAKE_CXX_COMPILER)
@@ -67,15 +84,14 @@ endif()
 set(CMAKE_MACOSX_RPATH ON)
 
 # Add include and link directories.
-set(BOOST_ROOT ${CMAKE_SOURCE_DIR}/ext/boost_1_71_0)
 set(EIGEN_ROOT ${CMAKE_SOURCE_DIR}/ext/eigen_3_3_7)
 set(CLI11_ROOT ${CMAKE_SOURCE_DIR}/ext/cli11_1_9_0)
 set(CATCH_ROOT ${CMAKE_SOURCE_DIR}/ext/catch_2_13_9)
 set(IGRAPH_ROOT ${CMAKE_SOURCE_DIR}/ext/igraph_0.9.8)
 set(PYBIND11_HOME ${CMAKE_SOURCE_DIR}/ext/pybind11)
 
-include_directories(SYSTEM ${SQLite3_INCLUDE_DIRS} ${BOOST_ROOT} ${EIGEN_ROOT} ${CLI11_ROOT} ${CATCH_ROOT} ${IGRAPH_ROOT}/include ${IGRAPH_ROOT}/build/include ${PYBIND11_HOME}/include ${SQLite3_INCLUDE_DIRS} ${Python_INCLUDE_DIRS} /usr/lib/llvm-10/include)
-link_directories(${BOOST_ROOT}/stage/lib /usr/lib/llvm-10/lib ${IGRAPH_ROOT}/build/src ${Python_LIBRARY_DIRS} ${SQLite3_LIBRARIES})
+include_directories(SYSTEM ${SQLite3_INCLUDE_DIRS} ${BOOST_INCLUDE} ${EIGEN_ROOT} ${CLI11_ROOT} ${CATCH_ROOT} ${IGRAPH_ROOT}/include ${IGRAPH_ROOT}/build/include ${PYBIND11_HOME}/include ${SQLite3_INCLUDE_DIRS} ${Python_INCLUDE_DIRS} /usr/lib/llvm-10/include)
+link_directories(${BOOST_LINK_DIR} /usr/lib/llvm-10/lib ${IGRAPH_ROOT}/build/src ${Python_LIBRARY_DIRS} ${SQLite3_LIBRARIES})
 if(APPLE)
   include_directories(SYSTEM ${OMP_ROOT}/include)
   link_directories(${OMP_ROOT}/lib)
