@@ -21,4 +21,8 @@ namespace epi {
 
 } // epi
 
+#ifdef HEADER_ONLY
+#include "ShinyAppLauncher.cpp"
+#endif
+
 #endif //GENEPISEEKER_SHINYAPPLAUNCHER_HPP

@@ -2,12 +2,9 @@ version: '3'
 
 services:
   realtime_scores:
+    image: bigdatainbiomedicine/needl
     restart: always
-    command: ./test/model/bin/realtime_scores --input-dir /datasets --num-threads $NUM_THREADS --bind-addr 0.0.0.0 --bind-port 3000
-    build:
-      context: ../../
-      dockerfile: docker/realtime_scores/Dockerfile
-      # target: base
+    command: /NeEDL/test/model/bin/realtime_scores --input-dir /datasets --num-threads $NUM_THREADS --bind-addr 0.0.0.0 --bind-port 3000
     volumes:
       - ${DATASET_DIR}:/datasets:Z
     user: ${REALTIME_SCORES_USER}

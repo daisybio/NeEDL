@@ -39,4 +39,9 @@ void simulated_annealing_ising(
         uint64_t seed,
         sa_return* ret);
 
+
+#ifdef HEADER_ONLY
+#include "../src/cpu_sa_wrapper.cpp"
+#endif
+
 #endif
