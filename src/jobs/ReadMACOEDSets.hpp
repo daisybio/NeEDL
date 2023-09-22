@@ -11,11 +11,12 @@ namespace epi {
 
     class ReadMACOEDSets : public Job {
     public:
-        ReadMACOEDSets(const std::string& path);
+        ReadMACOEDSets(const std::string& path, bool ignore_unknown_snps = false);
         void run(std::shared_ptr<DataModel> data) override;
         rapidjson::Value getConfig(rapidjson::Document &doc) override;
     private:
         std::string path;
+        bool ignore_unknown_snps;
     };
 
 } // epi

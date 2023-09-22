@@ -30,6 +30,7 @@ public:
             std::string rank_model,
             std::string out_path,
             std::vector<std::shared_ptr<epi::Job>> snp_annotation_pipeline,
+            bool shuffle_phenotypes,
             int num_threads = 0,
             bool random_sets = false,
             size_t num_random_sets = 1000,
