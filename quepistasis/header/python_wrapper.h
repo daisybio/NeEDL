@@ -209,4 +209,9 @@ public:
         int clique_size, int shots, const char* save_path);
 };
 
+
+#ifdef HEADER_ONLY
+#include "../src/python_wrapper.cpp"
+#endif
+
 #endif

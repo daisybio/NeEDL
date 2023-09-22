@@ -244,4 +244,9 @@ public:
 
 };
 
+
+#ifdef HEADER_ONLY
+#include "../src/snps_optimization.cpp"
+#endif
+
 #endif

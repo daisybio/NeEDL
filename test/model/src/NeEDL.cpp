@@ -2,15 +2,14 @@
 // Created by juli on 25.05.22.
 //
 
+#ifdef CMAKE_RELEASE
+    #define HEADER_ONLY
+#endif
 
 #include <CLI11.hpp>
 #include <omp.h>
 
 #include "../../src/pipelines/NeEDLPipeline.hpp"
-#include "../../src/util/helper_functions.hpp"
-#include "../../../src/jobs/SeedingRandomConnected.hpp"
-#include "../../../src/jobs/SeedingCommunityWise.hpp"
-#include "../../../src/jobs/SeedingQuantumComputing.hpp"
 
 
 

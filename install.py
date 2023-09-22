@@ -53,6 +53,10 @@ def build_targets(args, all_targets, dependencies):
     if (not os.path.isfile("build/Makefile")):
         print("-- Running CMake.")
         commands = "cd build; rm -rf *; cmake .. -DCMAKE_BUILD_TYPE=" + ("Debug" if args.debug else "Release")
+
+        if args.system_boost:
+            commands += f' -DUSE_INCLUDED_BOOST=0'
+
         commands += f' -DPython_EXECUTABLE="{dependencies["python3"]}"'
         commands += f' -DCMAKE_C_COMPILER="{dependencies["gcc"]}" -DCMAKE_CXX_COMPILER="{dependencies["g++"]}"'
         if platform.system() == "Darwin":
@@ -75,7 +79,9 @@ def build_targets(args, all_targets, dependencies):
 
 def build_external_libraries(args, dependencies):
     # boost
-    if os.path.isfile("ext/boost_1_71_0/.INSTALLED") and not args.clean:
+    if args.system_boost:
+        print("-- Boost libraries: system installation is used --> build of boost is skipped")
+    elif os.path.isfile("ext/boost_1_71_0/.INSTALLED") and not args.clean:
         print("-- Boost libraries already built.")
     else:
         print("-- Building Boost libraries.")
@@ -98,6 +104,18 @@ def build_external_libraries(args, dependencies):
         commands = f'cd ext/igraph_0.9.8; rm -rf build; mkdir -p build; cd build; cmake .. -DIGRAPH_OPENMP_SUPPORT=on -DIGRAPH_ENABLE_LTO=on -DIGRAPH_ENABLE_TLS=on -DCMAKE_C_COMPILER="{dependencies["gcc"]}" -DCMAKE_CXX_COMPILER="{dependencies["g++"]}"; cmake --build .'
         subprocess.call(commands, shell=True)
         f = open("ext/igraph_0.9.8/.INSTALLED", "w")
+        f.close()
+
+    # uWebSockets
+    if os.path.isfile("ext/.uWebSockets_INSTALLED") and not args.clean:
+        print("-- uWebSocket library already built.")
+    else:
+        print("-- Building uWebSockets library")
+        if not args.no_submodule_extraction:
+            subprocess.call('git submodule update --init --recursive')
+        
+        subprocess.call('cd ext/uWebSockets/uSockets;make boringssl;cd boringssl;BORINGSSL=$PWD;cd ../lsquic;cmake -DBORINGSSL_DIR=$BORINGSSL .;make;cd ..;WITH_LTO=1 WITH_QUIC=1 WITH_BORINGSSL=1 make', shell=True)
+        f = open("ext/.uWebSockets_INSTALLED", "w")
         f.close()
 
 def extract_all_zips_in_folder(folder):
@@ -125,7 +143,7 @@ def extract_all_zips_in_folder(folder):
         for entry in files:
             if entry.name.endswith(".zip"):
                 print("Extracting " + entry.name)
-                subprocess.call('unzip -n -d "' + escaped_folder + '" "' + escaped_folder + entry.name.replace('"', '\\"') + '"', shell=True)
+                subprocess.call('unzip -qo -d "' + escaped_folder + '" "' + escaped_folder + entry.name.replace('"', '\\"') + '"', shell=True)
 
 def extract_resources(args):
     if (os.path.isfile(".RES_EXTRACTED") and not args.clean) or args.no_data_unpacking:
@@ -200,6 +218,8 @@ parser.add_argument("--python3", help="path to the python3 executable that shoul
 parser.add_argument("--gcc", help="one can select the path to gcc manually if the automatically selected compiler is not correct.", default=None)
 parser.add_argument("--gxx", help="one can select the path to g++ manually if the automatically selected compiler is not correct.", default=None)
 parser.add_argument("--extract-datasets", help="Also extracts simulated datasets. These might be necessary for the unit tests.", action="store_true")
+parser.add_argument("--no-submodule-extraction", help="When set the script does not recursively download submodules. This is used for building the docker container.", action="store_true")
+parser.add_argument("--system-boost", help="Use the system boost installation instead of the one in this repository", action="store_true")
 args = parser.parse_args()
 
 
