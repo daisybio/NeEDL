@@ -9,6 +9,7 @@
 #include "../jobs/WriteSets.hpp"
 #include "../jobs/CreateRandomSets.hpp"
 #include "../jobs/CreateSetKMers.hpp"
+#include "../jobs/ShufflePhenotypes.hpp"
 
 
 void
@@ -38,6 +39,7 @@ void HelperPipelines::calculate_scores(
         std::string rank_model,
         std::string out_path,
         std::vector<std::shared_ptr<epi::Job>> snp_annotation_pipeline,
+        bool shuffle_phenotypes,
         int num_threads,
         bool random_sets,
         size_t num_random_sets,
@@ -45,6 +47,7 @@ void HelperPipelines::calculate_scores(
         size_t k_min,
         size_t k_max
         ) {
+
     if (num_threads < 0) {
         throw epi::Error("Invalid thread number provided.");
     }
@@ -64,6 +67,10 @@ void HelperPipelines::calculate_scores(
                 input_num_categories
         )
     }};
+
+    if (shuffle_phenotypes) {
+        seq.add(std::make_shared<epi::ShufflePhenotypes>());
+    }
 
     seq.add(snp_annotation_pipeline);
     seq.add(snp_reader);

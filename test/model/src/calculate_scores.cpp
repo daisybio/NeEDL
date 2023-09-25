@@ -72,6 +72,13 @@ int main(int argc, char **argv) {
     std::string k_mers;
     app.add_option("--k-mers", k_mers, "Give a number (eg. 4) or a range (eg. 2-4) for k to generate scores of all k-mers.");
 
+    bool ignore_unknown_snps = false;
+    app.add_flag("--ignore-unknown-snps", ignore_unknown_snps, "If this flag is set, all SNP sets that contain a SNP which is not present in the selected dataset are ignored.");
+
+    bool shuffle_phenotypes = false;
+    app.add_flag("--shuffle-phenotypes", shuffle_phenotypes, "If this flag is set, the individuals' phenotypes are shuffled prior to score calculation.");
+
+
 
 
     // Parse the options.
@@ -80,11 +87,11 @@ int main(int argc, char **argv) {
     snp_sets_input_type = toUpperCase(snp_sets_input_type);
     std::shared_ptr<epi::Job> reader;
     if (snp_sets_input_type == "NEEDL") {
-        reader = std::make_shared<epi::ReadNeEDLSets>(snp_sets_input_file);
+        reader = std::make_shared<epi::ReadNeEDLSets>(snp_sets_input_file, ignore_unknown_snps);
     } else if (snp_sets_input_type == "MACOED") {
-        reader = std::make_shared<epi::ReadMACOEDSets>(snp_sets_input_file);
+        reader = std::make_shared<epi::ReadMACOEDSets>(snp_sets_input_file, ignore_unknown_snps);
     } else if (snp_sets_input_type == "LINDEN") {
-        reader = std::make_shared<epi::ReadLINDENSets>(snp_sets_input_file);
+        reader = std::make_shared<epi::ReadLINDENSets>(snp_sets_input_file, ignore_unknown_snps);
     } else {
         throw epi::Error("Unknown SNP-sets input type: " + snp_sets_input_type);
     }
@@ -126,6 +133,7 @@ int main(int argc, char **argv) {
             rank_model,
             snp_sets_output_file,
             snpAnnotationPipeline,
+            shuffle_phenotypes,
             num_threads,
             create_random_sets,
             num_random_sets,

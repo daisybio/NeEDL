@@ -392,4 +392,8 @@ namespace epi {
         return {};
     }
 
+    void SNPStorage_WithoutGeno::shuffle_phenotypes() {
+        throw epi::Error("Shuffling phenotype data is not available in BIM-only SNPStorage.");
+    }
+
 } // epi

@@ -650,10 +650,10 @@ With calculate_scores the user can apply the statistical models mentioned in *Lo
 --gwas-input-format JSON_EPIGEN
 
 # The input file path. Either specify a path to a .json file or path to a directory containing only one .json file.
---input-path <path>
+--gwas-input-file <path>
 
 # Phenotype information of the dataset. NeEDL can deal with DICHOTOMOUS, CATEGORICAL and QUANTITATIVE phenotypes. --num-categories is only necessary for CATEGORICAL phenotypes with more than two categories.
---phenotype CATEGORICAL
+--gwas-input-phenotype CATEGORICAL
 --num-categories 2
 ```
 

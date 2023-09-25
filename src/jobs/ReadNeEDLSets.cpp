@@ -7,7 +7,7 @@
 #include "../util/helper_functions.hpp"
 
 namespace epi {
-    ReadNeEDLSets::ReadNeEDLSets(const std::string& path) {
+    ReadNeEDLSets::ReadNeEDLSets(const std::string& path, bool ignore_unknown_snps) {
         FileFinder ff;
         ff.add_ends_with(".csv");
         this->path = find_file_by_ending(std::move(path), ff);
@@ -30,6 +30,8 @@ namespace epi {
         }
 
         file.close();
+
+        this->ignore_unknown_snps = ignore_unknown_snps;
     }
 
     void ReadNeEDLSets::run(std::shared_ptr<DataModel> data) {
@@ -53,15 +55,20 @@ namespace epi {
 
         data->snpSetStorage.clear();
         for (size_t i = 1; i < parser.num_rows(); i++) {
-            const std::string& snp_string = parser.cell(i, column_index);
+            const std::string &snp_string = parser.cell(i, column_index);
             auto rs_ids = string_split(snp_string, ';');
             SNPSet set;
-            for (auto & id : rs_ids) {
-                auto snp = data->snpStorage->by_name(id);
-                set += snp;
+            for (auto &id: rs_ids) {
+                try {
+                    auto snp = data->snpStorage->by_name(id);
+                    set += snp;
+                } catch (epi::SNPNotFoundError &err) {
+                    if (!ignore_unknown_snps) throw err;
+                }
             }
+            if (set.size() == 0) continue;
 
-            for (auto & col : property_cols) {
+            for (auto &col: property_cols) {
                 set.set_attribute(col.second, parser.cell(i, col.first));
             }
 

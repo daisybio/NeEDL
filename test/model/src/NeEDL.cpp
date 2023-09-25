@@ -3,6 +3,7 @@
 //
 
 #ifdef CMAKE_RELEASE
+#pragma message ("CMAKE_RELEASE set")
     #define HEADER_ONLY
 #endif
 
@@ -10,7 +11,10 @@
 #include <omp.h>
 
 #include "../../src/pipelines/NeEDLPipeline.hpp"
-
+#include "../../src/util/helper_functions.hpp"
+#include "../../../src/jobs/SeedingRandomConnected.hpp"
+#include "../../../src/jobs/SeedingCommunityWise.hpp"
+#include "../../../src/jobs/SeedingQuantumComputing.hpp"
 
 
 
