@@ -86,6 +86,8 @@ python ./run/NeEDL.py \
 covariates_file=$(realpath ./data/COV_TEST/EpiGEN_RND_COV.csv)
 
 python ./run/NeEDL.py \
+    --docker-image-name "$1" \
+    --docker-no-pulling \
     --input-path "$dummy_dataset" \
     --input-format JSON_EPIGEN \
     --phenotype DICHOTOMOUS \
