@@ -37,6 +37,9 @@
 #include <stdexcept> // std::runtime_error
 #include <sstream> // std::stringstream
 
+#include "../../../src/jobs/InstanceLoader.hpp"
+#include "../../../src/jobs/WriteSets.hpp"
+
 TEST_CASE("Quantitative Instance") {
     epi::Instance<epi::QuantitativePhenoType> instance;
     REQUIRE_NOTHROW(instance.load(epi::options::InputFormat::JSON_EPIGEN, "../../../data/EpiGEN/quantitative/2_disease_snps/exponential/0_1_ASW.json"));
@@ -361,15 +364,54 @@ TEST_CASE("Categorical Instance 1 - No NaN values") {
         CHECK(found);
     }
 
-    std::vector<std::string> scores{"CLG-Q-QC", "CLG-L-LC", "CLG-Q-LC", "LLH", "NLL", "AIC", "BIC", "LLH-GAIN", "NLL-GAIN", "AIC-GAIN", "BIC-GAIN"};
-    for(size_t i = 0; i < 3; ++i) {
+    std::vector<std::string> scores{"CLG-Q-QC", "CLG-L-LC", "CLG-Q-LC", "LLH", "NLL", "AIC", "BIC" };
+    for(size_t i = 0; i < 1; ++i) {
         for (const auto &score: scores) {
             REQUIRE_NOTHROW(model.set_options(std::string("--score " + score)));
+            REQUIRE_NOTHROW(model.initialize());
             REQUIRE_NOTHROW(model.cov_activate());
-            double value = model.evaluate(problematic_snps);
 
+            double value = model.evaluate(problematic_snps);
             CHECK(!std::isnan(value));
             std::cout << value << std::endl;
         }
+    }
+}
+
+TEST_CASE("Categorical Instance through NeEDL Pipelines - No NaN values") {
+    // load the instance via InstanceLoader Job
+    omp_set_num_threads(1);
+    epi::InstanceLoader loader(
+                                           "../../../data/EpiGEN/dichotomous/2_disease_snps/exponential/1_1_ASW.json",
+                                           "JSON_EPIGEN",
+                                           "DICHOTOMOUS",
+                                           2,
+                                           "../../../data/COV_TEST/EpiGEN_RND_COV.csv"
+                                   );
+
+    auto data = std::make_shared<epi::DataModel>(true);
+    loader.run(data);
+
+    // construct SNP set
+    epi::SNPSet set {{data->snpStorage->by_name("rs11589207"),data->snpStorage->by_name("rs10927631")}};
+    data->snpSetStorage.push_back(set);
+
+    epi::WriteSets write_sets("PENETRANCE", epi::options::get_all_epistasis_scores(true));
+    write_sets.outfile_path("regression_model.test.csv");
+    write_sets.run(data);
+
+    for (size_t i = 0; i < 20; ++i) {
+        double score_value = set.calculate_score(epi::options::EpistasisScore::PENETRANCE_NLL);
+        CHECK(!std::isnan(score_value));
+    }
+
+    // test scores
+    auto all_scores = epi::options::get_all_epistasis_scores(true);
+    for (const auto & score : all_scores) {
+        auto score_rep = epi::options::epistasis_score_from_string(score);
+        double score_value = set.calculate_score(score_rep);
+
+        CHECK(!std::isnan(score_value));
+        std::cout << score_value << std::endl;
     }
 }

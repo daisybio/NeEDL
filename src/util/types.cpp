@@ -27,7 +27,7 @@ std::ostream &operator<<(std::ostream &os, const epi::options::EpistasisScore &m
             os << "BAYESIAN";
             break;
         case epi::options::EpistasisScore::BAYESIAN_COV:
-            os << "BAYESIAN";
+            os << "BAYESIAN_COV";
             break;
         case epi::options::EpistasisScore::PENETRANCE_NLL:
             os << "PENETRANCE_NLL";
@@ -66,16 +66,16 @@ std::ostream &operator<<(std::ostream &os, const epi::options::EpistasisScore &m
             os << "REGRESSION_BIC";
             break;
         case epi::options::EpistasisScore::REGRESSION_NLL_GAIN:
-            os << "REGRESSION_NLL-GAIN";
+            os << "REGRESSION_NLL_GAIN";
             break;
         case epi::options::EpistasisScore::REGRESSION_LLH_GAIN:
-            os << "REGRESSION_LLH-GAIN";
+            os << "REGRESSION_LLH_GAIN";
             break;
         case epi::options::EpistasisScore::REGRESSION_AIC_GAIN:
-            os << "REGRESSION_AIC-GAIN";
+            os << "REGRESSION_AIC_GAIN";
             break;
         case epi::options::EpistasisScore::REGRESSION_BIC_GAIN:
-            os << "REGRESSION_BIC-GAIN";
+            os << "REGRESSION_BIC_GAIN";
             break;
         case epi::options::EpistasisScore::REGRESSION_COV_NLL:
             os << "REGRESSION_COV_NLL";
@@ -144,7 +144,7 @@ namespace epi {
                 case EpistasisScore::VARIANCE_COV:
                     return EpistasisModel::VARIANCE_MODEL;
                 default:
-                    return EpistasisModel::BAYESIAN_MODEL;
+                    throw epi::Error("Unknown Epistasis Score.");
             }
         }
 
@@ -162,8 +162,8 @@ namespace epi {
             } else if (model_string == "REGRESSION") {
                 return EpistasisModel::REGRESSION_MODEL;
             } else if (model_string.substr(0, 11) == "REGRESSION_") {
-                std::vector<std::string> scores = {"NLL", "LLH", "AIC", "BIC", "COV_NLL", "COV_LLH", "COV_AIC", "COV_BIC", "NLL-GAIN", "LLH-GAIN", "AIC-GAIN",
-                                                   "BIC-GAIN", "CLG-L-LC", "CLG-Q-QC", "CLG-Q-LC"};
+                std::vector<std::string> scores = {"NLL", "LLH", "AIC", "BIC", "COV_NLL", "COV_LLH", "COV_AIC", "COV_BIC", "NLL_GAIN", "LLH_GAIN", "AIC_GAIN",
+                                                   "BIC_GAIN", "CLG_L_LC", "CLG_Q_QC", "CLG_Q_LC"};
                 if (std::find(scores.begin(), scores.end(), model_string.substr(12)) == scores.end()) {
                     throw epi::Error("Unknown REGRESSION score " + model_string);
                 }
@@ -204,13 +204,13 @@ namespace epi {
                 return EpistasisScore::REGRESSION_AIC;
             } else if (model_string == "REGRESSION_BIC") {
                 return EpistasisScore::REGRESSION_BIC;
-            } else if (model_string == "REGRESSION_NLL-GAIN") {
+            } else if (model_string == "REGRESSION_NLL_GAIN") {
                 return EpistasisScore::REGRESSION_NLL_GAIN;
-            } else if (model_string == "REGRESSION_LLH-GAIN") {
+            } else if (model_string == "REGRESSION_LLH_GAIN") {
                 return EpistasisScore::REGRESSION_LLH_GAIN;
-            } else if (model_string == "REGRESSION_AIC-GAIN") {
+            } else if (model_string == "REGRESSION_AIC_GAIN") {
                 return EpistasisScore::REGRESSION_AIC_GAIN;
-            } else if (model_string == "REGRESSION_BIC-GAIN") {
+            } else if (model_string == "REGRESSION_BIC_GAIN") {
                 return EpistasisScore::REGRESSION_BIC_GAIN;
             } else if (model_string == "REGRESSION_COV" || model_string == "REGRESSION_COV_NLL") {
                 return EpistasisScore::REGRESSION_COV_NLL;
@@ -241,7 +241,7 @@ namespace epi {
                 "BAYESIAN",
                 "PENETRANCE_NLL", "PENETRANCE_LLH", "PENETRANCE_AIC", "PENETRANCE_BIC",
                 "REGRESSION_NLL", "REGRESSION_LLH", "REGRESSION_AIC", "REGRESSION_BIC",
-                "REGRESSION_NLL-GAIN", "REGRESSION_LLH-GAIN", "REGRESSION_AIC-GAIN", "REGRESSION_BIC-GAIN",
+                "REGRESSION_NLL_GAIN", "REGRESSION_LLH_GAIN", "REGRESSION_AIC_GAIN", "REGRESSION_BIC_GAIN",
                 "VARIANCE"
             };
 
@@ -279,8 +279,8 @@ namespace epi {
                 std::vector<std::string> scores = {"NLL", "LLH", "AIC", "BIC", "COV_NLL", "COV_LLH", "COV_AIC", "COV_BIC"};
                 return std::find(scores.begin(), scores.end(), model_string.substr(12)) != scores.end();
             } else if (model_string.substr(0, 11) == "REGRESSION_") {
-                std::vector<std::string> scores = {"NLL", "LLH", "AIC", "BIC", "COV_NLL", "COV_LLH", "COV_AIC", "COV_BIC", "NLL-GAIN", "LLH-GAIN", "AIC-GAIN",
-                                                   "BIC-GAIN", "CLG-L-LC", "CLG-Q-QC", "CLG-Q-LC"};
+                std::vector<std::string> scores = {"NLL", "LLH", "AIC", "BIC", "COV_NLL", "COV_LLH", "COV_AIC", "COV_BIC", "NLL_GAIN", "LLH_GAIN", "AIC_GAIN",
+                                                   "BIC_GAIN", "CLG_L_LC", "CLG_Q_QC", "CLG_Q_LC"};
                 return std::find(scores.begin(), scores.end(), model_string.substr(12)) != scores.end();
             } else {
                 return false;
