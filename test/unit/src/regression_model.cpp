@@ -38,7 +38,8 @@
 #include <sstream> // std::stringstream
 
 #include "../../../src/jobs/InstanceLoader.hpp"
-#include "../../../src/jobs/WriteSets.hpp"
+#include "../../../src/jobs/DummyErrorTask.hpp"
+
 
 TEST_CASE("Quantitative Instance") {
     epi::Instance<epi::QuantitativePhenoType> instance;
@@ -378,35 +379,41 @@ TEST_CASE("Categorical Instance 1 - No NaN values") {
     }
 }
 
-TEST_CASE("Categorical Instance through NeEDL Pipelines - No NaN values") {
+TEST_CASE("Categorical Instance 1 - NeEDL with CSVParser") {
     // load the instance via InstanceLoader Job
     omp_set_num_threads(1);
-    epi::InstanceLoader loader(
+    auto data = std::make_shared<epi::DataModel>(true);
+
+    epi::InstanceLoader(
                                            "../../../data/EpiGEN/dichotomous/2_disease_snps/exponential/1_1_ASW.json",
                                            "JSON_EPIGEN",
                                            "DICHOTOMOUS",
                                            2,
                                            "../../../data/COV_TEST/EpiGEN_RND_COV.csv"
-                                   );
+                                   ).run(data);
 
-    auto data = std::make_shared<epi::DataModel>(true);
-    loader.run(data);
+    // this is the error-causing code (src/jobs/DummyErrorTask)
+    // in the DummyErrorTask class I reduced the problematic code essentially to a CSVParser call after which the scores are nan
+    epi::DummyErrorTask(
+            "BIOGRID",
+            "../../../data/BIOGRID/BIOGRID-ORGANISM-Homo_sapiens-3.5.182.tab2.txt",
+            "Official Symbol Interactor A",
+            "Official Symbol Interactor B",
+            '\t',
+            -1,
+            -1).run(data);
+
+
+    // the error does not occur when adding the CSVParser code directly to the test here
+
 
     // construct SNP set
     epi::SNPSet set {{data->snpStorage->by_name("rs11589207"),data->snpStorage->by_name("rs10927631")}};
     data->snpSetStorage.push_back(set);
 
-    epi::WriteSets write_sets("PENETRANCE", epi::options::get_all_epistasis_scores(true));
-    write_sets.outfile_path("regression_model.test.csv");
-    write_sets.run(data);
-
-    for (size_t i = 0; i < 20; ++i) {
-        double score_value = set.calculate_score(epi::options::EpistasisScore::PENETRANCE_NLL);
-        CHECK(!std::isnan(score_value));
-    }
-
     // test scores
-    auto all_scores = epi::options::get_all_epistasis_scores(true);
+    // auto all_scores = epi::options::get_all_epistasis_scores(true);
+    std::vector<std::string> all_scores = { "REGRESSION_COV_NLL" };
     for (const auto & score : all_scores) {
         auto score_rep = epi::options::epistasis_score_from_string(score);
         double score_value = set.calculate_score(score_rep);
@@ -414,4 +421,38 @@ TEST_CASE("Categorical Instance through NeEDL Pipelines - No NaN values") {
         CHECK(!std::isnan(score_value));
         std::cout << score_value << std::endl;
     }
+
+    data->snpStorage.reset();
+}
+
+// this test is just here to show that the above issue really comes from the call to epi::DummyErrorTask
+TEST_CASE("Categorical Instance 1 - NeEDL without CSVParser") {
+    // load the instance via InstanceLoader Job
+    omp_set_num_threads(1);
+    auto data = std::make_shared<epi::DataModel>(true);
+
+    epi::InstanceLoader(
+            "../../../data/EpiGEN/dichotomous/2_disease_snps/exponential/1_1_ASW.json",
+            "JSON_EPIGEN",
+            "DICHOTOMOUS",
+            2,
+            "../../../data/COV_TEST/EpiGEN_RND_COV.csv"
+    ).run(data);
+
+    // construct SNP set
+    epi::SNPSet set {{data->snpStorage->by_name("rs11589207"),data->snpStorage->by_name("rs10927631")}};
+    data->snpSetStorage.push_back(set);
+
+    // test scores
+    // auto all_scores = epi::options::get_all_epistasis_scores(true);
+    std::vector<std::string> all_scores = { "REGRESSION_COV_NLL" };
+    for (const auto & score : all_scores) {
+        auto score_rep = epi::options::epistasis_score_from_string(score);
+        double score_value = set.calculate_score(score_rep);
+
+        CHECK(!std::isnan(score_value));
+        std::cout << score_value << std::endl;
+    }
+
+    data->snpStorage.reset();
 }
