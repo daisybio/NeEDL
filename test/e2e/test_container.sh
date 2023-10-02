@@ -9,6 +9,17 @@
 # abort on first error
 set -e
 
+# die method to fail the test
+warn () {
+    echo "$0:" "$@" >&2
+}
+die () {
+    rc=$1
+    shift
+    warn "$@"
+    exit $rc
+}
+
 # create temp output folder
 mkdir -p ./test_out
 out_dir=$(realpath ./test_out)
@@ -40,16 +51,16 @@ dummy_dataset=$(realpath ./data/e2e_tests/dummy_dataset.json)
 python ./run/NeEDL.py \
     --docker-image-name "$1" \
     --docker-no-pulling \
-    "--num-threads" "1" \
-    "--output-directory" "$out_dir" \
-    "--input-format" "JSON_EPIGEN" \
-    "--input-path" "$dummy_dataset" \
-    "--phenotype" "DICHOTOMOUS" \
-    "--snp-annotate-dbSNP" \
-    "--network-BIOGRID" \
-    "--ms-seeding-routine" "RANDOM_CONNECTED" \
-    "--ms-rc-start-seeds" "5" \
-    "--ms-model" "PENETRANCE_NLL"
+    --num-threads 1 \
+    --output-directory "$out_dir" \
+    --input-format JSON_EPIGEN \
+    --input-path "$dummy_dataset" \
+    --phenotype DICHOTOMOUS \
+    --snp-annotate-dbSNP \
+    --network-BIOGRID \
+    --ms-seeding-routine RANDOM_CONNECTED \
+    --ms-rc-start-seeds 5 \
+    --ms-model PENETRANCE_NLL
 
 
 # test that custom annotation files and custom networks work
@@ -61,17 +72,48 @@ network_file=$(realpath ./data/e2e_tests/network.csv)
 python ./run/NeEDL.py \
     --docker-image-name "$1" \
     --docker-no-pulling \
-    "--num-threads" "1" \
-    "--output-directory" "$out_dir" \
-    "--input-format" "JSON_EPIGEN" \
-    "--input-path" "$dummy_dataset" \
-    "--phenotype" "DICHOTOMOUS" \
-    "--snp-annotate" "$annotation_file|yes|SNP|gene|\t|-1|-1" \
-    "--network" "dummy_network|$network_file|yes|col1|col2|\t|-1|-1" \
-    "--ms-seeding-routine" "RANDOM_CONNECTED" \
-    "--ms-rc-start-seeds" "5" \
-    "--ms-model" "PENETRANCE_NLL"
+    --num-threads 1 \
+    --output-directory "$out_dir" \
+    --input-format JSON_EPIGEN \
+    --input-path "$dummy_dataset" \
+    --phenotype DICHOTOMOUS \
+    --snp-annotate "$annotation_file|yes|SNP|gene|\t|-1|-1" \
+    --network "dummy_network|$network_file|yes|col1|col2|\t|-1|-1" \
+    --ms-seeding-routine RANDOM_CONNECTED \
+    --ms-rc-start-seeds 5 \
+    --ms-model PENETRANCE_NLL
  
+covariates_file=$(realpath ./data/COV_TEST/EpiGEN_RND_COV.csv)
+
+python ./run/NeEDL.py \
+    --input-path "$dummy_dataset" \
+    --input-format JSON_EPIGEN \
+    --phenotype DICHOTOMOUS \
+    --num-threads 1 \
+    --output-directory "$out_dir" \
+    --snp-annotate-dbSNP \
+    --network-BIOGRID \
+    --ms-model PENETRANCE \
+    --ms-seeding-routine RANDOM_CONNECTED \
+    --ms-rc-start-seeds 5 \
+    --ms-search-time-limit 5s \
+    --covariates-file "$covariates_file"
+
+# check that no NA values are present
+for dir in "$out_dir"/* ; do
+    if [ -f "$dir/BIOGRID_seeds.csv" ]; then
+        if grep -Fxq "nan" "$dir/BIOGRID_seeds.csv"; then
+            die 1 "'nan' found in $dir/BIOGRID_seeds.csv"
+        fi
+    fi
+
+    if [ -f "$dir/BIOGRID_results.csv" ]; then
+        if grep -Fxq "nan" "$dir/BIOGRID_results.csv"; then
+            die 1 "'nan' found in $dir/BIOGRID_results.csv"
+        fi
+    fi
+
+done
 
 
 # TODO: add more tests here
