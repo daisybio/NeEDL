@@ -89,9 +89,11 @@ namespace epi {
     }
 
     SNPSet::SNPSet(const std::vector<SNP_t> &snps) {
+        /*
         if (snps.size() > MAXIMUM_SNP_SET_SIZE) {
             throw epi::Error("Tried to create a snp-set with size > " + std::to_string(MAXIMUM_SNP_SET_SIZE));
         }
+         */
         this->snps = std::make_shared<std::vector<SNP_t>>(snps.begin(), snps.end());
         std::sort(this->snps->begin(), this->snps->end());
     }
@@ -183,9 +185,11 @@ namespace epi {
         if (std::find(snps->begin(), snps->end(), snp) == snps->end()) {
             snps->insert(snps->end(), snp);
 
+            /*
             if (snps->size() > MAXIMUM_SNP_SET_SIZE) {
                 throw epi::Error("Tried to create a snp-set with size > " + std::to_string(MAXIMUM_SNP_SET_SIZE));
             }
+             */
 
             std::sort(snps->begin(), snps->end());
             scores = nullptr;
@@ -213,11 +217,13 @@ namespace epi {
         snps->erase( unique( snps->begin(), snps->end() ), snps->end() );
 
         if (snps->size() != size_before) {
+            /*
             if (snps->size() > MAXIMUM_SNP_SET_SIZE) {
                 throw epi::Error("Tried to create a snp-set with size > " + std::to_string(MAXIMUM_SNP_SET_SIZE));
             }
             scores = nullptr;
             scores_calculated = 0;
+             */
         }
 
         return *this;

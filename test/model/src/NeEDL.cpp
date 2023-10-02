@@ -2,6 +2,10 @@
 // Created by juli on 25.05.22.
 //
 
+#ifdef CMAKE_RELEASE
+#pragma message ("CMAKE_RELEASE set")
+    #define HEADER_ONLY
+#endif
 
 #include <CLI11.hpp>
 #include <omp.h>
@@ -11,7 +15,6 @@
 #include "../../../src/jobs/SeedingRandomConnected.hpp"
 #include "../../../src/jobs/SeedingCommunityWise.hpp"
 #include "../../../src/jobs/SeedingQuantumComputing.hpp"
-
 
 
 

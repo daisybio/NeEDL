@@ -283,7 +283,7 @@ namespace epi {
                                       "node         INT         NOT NULL,"
                                       "annotation   INT         NOT NULL,"
                                       "FOREIGN KEY(node) REFERENCES nodes(id),"
-                                      "FOREIGN KEY(annotation) REFERENCES node_annotation(id),"
+                                      "FOREIGN KEY(annotation) REFERENCES node_annotations(id),"
                                       "PRIMARY KEY (node, annotation)"
                                       ") WITHOUT ROWID;"
                                       "CREATE TABLE nodes ("

@@ -382,6 +382,11 @@ namespace epi {
         return {};
     }
 
+    template<class PhenoType>
+    void SNPStorage_PhenoType<PhenoType>::shuffle_phenotypes() {
+        instance->shuffle_phenotypes();
+    }
+
 
 }
 

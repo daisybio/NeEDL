@@ -60,9 +60,13 @@ namespace epi {
         TimeLogger logger("loading GWAS data");
         Logger::logLine("input file: " + path);
 
+        std::uniform_int_distribution<size_t> seed_gen (0, std::numeric_limits<size_t>::max());
+        size_t seed = seed_gen(data->random_device[omp_get_thread_num()]);
+
         if (phenotype == options::PhenoType::QUANTITATIVE) {
             auto instance = std::make_shared<Instance<epi::QuantitativePhenoType>>();
             instance->load(inputFormat, path);
+            instance->set_seed(seed);
             if (!covariates_file.empty()) {
                 instance->load_cov(options::InputFormat::CSV_COV, covariates_file);
             }
@@ -73,6 +77,7 @@ namespace epi {
         } else if (phenotype == options::PhenoType::CATEGORICAL) {
             auto instance = std::make_shared<Instance<epi::CategoricalPhenoType>>(num_categories);
             instance->load(inputFormat, path);
+            instance->set_seed(seed);
             if (!covariates_file.empty()) {
                 instance->load_cov(options::InputFormat::CSV_COV, covariates_file);
             }

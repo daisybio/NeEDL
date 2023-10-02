@@ -16,12 +16,14 @@
             - [QUANTUM_COMPUTING seeding](#quantum_computing-seeding)
         - [Local search](#local-search)
     - [Documentation of the output files of NeEDL](#documentation-of-the-output-files-of-needl)
-        - [run.log](#runlog)
-        - [pipeline_config.json](#pipeline_configjson)
-        - [<network>_seeds.csv](#network_seedscsv)
-        - [<network>_results.csv](#network_resultscsv)
-        - [<network>_ind_SNP_scores.csv](#network_ind_snp_scorescsv)
-        - [<network>_search_score_over_time.csv](#network_search_score_over_timecsv)
+        - [General files](#general-files)
+            - [run.log](#runlog)
+            - [pipeline_config.json](#pipeline_configjson)
+        - [Network files](#network-files)
+            - [<network>_seeds.csv](#network_seedscsv)
+            - [<network>_results.csv](#network_resultscsv)
+            - [<network>_ind_SNP_scores.csv](#network_ind_snp_scorescsv)
+            - [<network>_search_score_over_time.csv](#network_search_score_over_timecsv)
         - [<network>_network.sqlite3](#network_networksqlite3)
         - [<network>_joint_degree.csv](#network_joint_degreecsv)
     - [Advanced features of NeEDL](#advanced-features-of-needl)
@@ -60,29 +62,34 @@ The project is distributed under the [GNU General Public License](https://www.gn
 
 **The easiest way to use our toolset is via our docker container**. This repo is big and contains much more than a typical user likely needs. Thus, we strongly encourage you to try out the docker container first, which comes with up-to-date versions of all of our tools in a smaller size.
 
-In order to use our docker container, it is required to have docker installed. The user also needs permission to create and run docker containers (p.r.n., ask your system administrator). Additionally, a Python 3 installation and the command-line tool `curl` are necessary.
+In order to use our docker container, it is required to have docker installed. The user also needs permission to create and run docker containers (p.r.n., ask your system administrator). Additionally, a Python 3 installation and the command-line tool `curl` are necessary. To make all tools in this repository available in your current terminal session, please first source our installer script. This step needs to be done each time a new terminal session is started. It will only create some lightweight aliases, the actual download will take place only if you actually use one of the tools.
+```bash
+# install all tools in this repository for the current terminal session
+needl_install_sh="$(curl -s https://raw.githubusercontent.com/biomedbigdata/NeEDL/main/run/bash_install.sh)" && eval "$needl_install_sh"
+```
 
-
+After that, you can use our tools in the following way:
 ```bash
 # run NeEDL
-curl https://raw.githubusercontent.com/biomedbigdata/NeEDL/main/run/NeEDL.py | python3 - <parameters...>
+NeEDL <parameters...>
 ```
 ```bash
 # run epiJSON
-curl https://raw.githubusercontent.com/biomedbigdata/NeEDL/main/run/epiJSON.py | python3 - <parameters...>
+epiJSON <parameters...>
 ```
 ```bash
 # run calculate_scores
-curl https://raw.githubusercontent.com/biomedbigdata/NeEDL/main/run/calculate_scores.py | python3 - <parameters...>
+calculate_scores <parameters...>
 ```
 
 
-Parameters that can be used with the tools are explained below. Please note the "` - `" before the first parameter. It is necessary to pipe the code of the Python script correctly.
+All parameters that can be used with the tools are explained below.
 
 Example command to check that everything works:
 ```bash
-curl https://raw.githubusercontent.com/biomedbigdata/NeEDL/main/run/NeEDL.py | python3 - --help
+NeEDL --help
 ```
+This sould print out a long list of command line options if everything worked correctly.
 
 
 ## Parameters for NeEDL
@@ -102,9 +109,9 @@ To run NeEDL the default way that we also used during our publication use the fo
 --ms-model PENETRANCE_NLL
 ```
 
-The full command then looks like this:
+The full command then looks like this (Please follow the install step at the beginning of this readme before using this command):
 ```bash
-curl https://raw.githubusercontent.com/biomedbigdata/NeEDL/main/run/NeEDL.py | python3 - \
+NeEDL \
     --num-threads <num-threads> \
     --output-directory <output-directory> \
     --input-format JSON_EPIGEN \
@@ -321,10 +328,14 @@ One can influence how the local search that NeEDL applies to the SSI network beh
 --ms-per-seed-time-limit 10m   # default is no limit
 --ms-search-time-limit 3d  # default is no limit
 
-# The arguments below usually are not necessary to be set. The change the behaviour of the local search and simulated annealing.
+# optionally set a different value for the maximal rounds (=iterations) of the local search
 --ms-max-rounds 300
---ms-min-set 2 
---ms-max-set 10    
+
+# optionally modify the allowed SNP set sizes, default size is between 2 and 10
+--ms-min-set 2
+--ms-max-set 10
+
+# The arguments below usually are not necessary to be set. The change the behaviour of the simulated annealing
 --ms-annealing-type SIMULATED_ANNEALING
 --ms-cooling-factor 1.0
 --ms-annealing-start-prob 0.8
@@ -333,17 +344,11 @@ One can influence how the local search that NeEDL applies to the SSI network beh
 
 NeEDL supports various statistical scores that can be used for `--ms-model`. Please refer to Blumenthal et al. (doi: [10.1093/bioinformatics/btaa990](https://doi.org/10.1093/bioinformatics/btaa990)) for details about the provided models. All scores work with `CATEGORICAL` and `QUANTITATIVE` phenotypes. Here is a full list of scores NeEDL supports for optimization:
 - `BAYESIAN`: K2 score
-- `BAYESIAN_COV`: K2 score, includes covariates
 - `VARIANCE`: $P$-value of the $\chi^2$ test
-- `VARIANCE_COV`: $P$-value of the $\chi^2$ test, includes covariates
 - `PENETRANCE_NLL`: negative log-likelihood of the maximum-likelihood model
 - `PENETRANCE_LLH`: likelihood of the maximum-likelihood model
 - `PENETRANCE_AIC`: Aikake information criterion of the maximum-likelihood model
 - `PENETRANCE_BIC`: Bayesian information criterion of the maximum-likelihood model
-- `PENETRANCE_COV_NLL`: negative log-likelihood of the maximum-likelihood model, includes covariates
-- `PENETRANCE_COV_LLH`: likelihood of the maximum-likelihood model, includes covariates
-- `PENETRANCE_COV_AIC`: Aikake information criterion of the maximum-likelihood model, includes covariates
-- `PENETRANCE_COV_BIC`: Bayesian information criterion of the maximum-likelihood model, includes covariates
 - `REGRESSION_NLL`: negative log-likelihood of the quadratic-regression model
 - `REGRESSION_LLH`: likelihood of the quadratic-regression model
 - `REGRESSION_AIC`: Akaike information criterion of the quadratic-regression model
@@ -367,30 +372,77 @@ Options for the annealing type are `SIMULATED_ANNEALING`, `RANDOM_ANNEALING`, `H
 ## Documentation of the output files of NeEDL
 NeEDL creates a new subdirectory within the output directory for every run. The directory consits of the date, time and a random number. This allows the user to start multiple runs of NeEDL with the same output directory in parallel without risking to override any results. 
 
-### `run.log`
+### General files
+#### `run.log`
 This text file is always created and holds all information about how the NeEDL pipeline was executed and contains additional data like the network properties and the resource usage of NeEDL.
 
-### `pipeline_config.json`
+#### `pipeline_config.json`
 This JSON file describes how exactly the pipeline was configured for the run and holds all relevant configuration parameters (required, optional, and internal ones). It can help to integrate the NeEDL results into other workflows.
 
-### `<network>_seeds.csv`
+### Network files
+The files below are created once for every specified network. In the default configuration (use with BioGRID or a single custom network) these files only exist once. `<network>` is replaced with the name of the used network (default: BIOGRID).
+
+#### `<network>_seeds.csv`
 This CSV file contains the start seeds used for the local search on network `<network>`.
 
-### `<network>_results.csv`
+The file contains the following columns:
+- `RANK (<score>)`: Rank of the start seed w.r.t. to the statistical score used (low rank is better). NeEDL always uses the score for ranking that is specified for the optimization during the local search (specified via `--ms-model`).
+- `RS_IDS`: `;`-separated list of SNPs in the start seed (rsID from dbSNP)
+- `<score>`: One column for every available statistical score. If `--no-additional-scores` is set, only one column with the score used during optimization in the local search is present.
+- `SEED_ORIGIN`: Seeding routine or decision that generated the start seed.
+- `ANNOTATIONS`: Annotations (default: gene annotations when using `--snp-annotate-dbSNP`) that are associated with at least one of the SNPs in the start seed. 
+
+Optional columns when using categorical or dichotomous phenotypes. All columns below are present once for each category where `<value>` is replaced by the respective value of the category:
+- `NUM_INDIVIDUALS_<value>`: number of individuals with the phenotype `<value>` that have at least one minor allele at all SNPs in the set
+- `FREQ_INDIVIDUALS_<value>`: ratio of individuals with the phenotype `<value>` that have at least one minor allele at all SNPs in the set
+- `INDIVIDUALS_<value>`: List of indices (zero-based) of all individuals with the phenotype `<value>` that have at least one minor allele at all SNPs in the set
+
+#### `<network>_results.csv`
 This CSV file contains the results of the local search on network `<network>`. This usually is the final result of NeEDL (if only a single network is used, see *Advanced/Multi-network approach*).
 
-### `<network>_ind_SNP_scores.csv`
-This CSV file contains the scores and information of all SNPs individually, that are contained in the final result.
+The file contains the following columns:
+- `RANK (<score>)`: Rank of the result SNP set w.r.t. to the statistical score used (low rank is better). NeEDL always uses the score for ranking that is specified for the optimization during the local search (specified via `--ms-model`).
+- `RS_IDS`: `;`-separated list of SNPs in the result SNP set (rsID from dbSNP)
+- `<score>`: One column for every available statistical score. If `--no-additional-scores` is set, only one column with the score used during optimization in the local search is present.
 
-### `<network>_search_score_over_time.csv`
+The local search can potentially find some results multiple times if they are reachable in the network from multiple start seeds. The following parameters give information about the merged results:
+- `NUM_MERGED`: number of results that were merged (because the SNP set is identical)
+- `NUM_ROUNDS_ALL`: Number of rounds of the local search each seed needed to reach the result state (`;`-separated list)
+- `NUM_ROUNDS_DISTINCT`: Same as `NUM_ROUNDS_ALL` but without duplicate values (`;`-separated list)
+- `SEED_ORIGIN_ALL`: Seeding routine or decision that generated the start seed that reached the result SNP set (`;`-separated list)
+- `SEED_ORIGIN_DISTINCT`: Same as `SEED_ORIGIN_ALL` but without duplicate values (`;`-separated list)
+- `STOPPING_REASON_ALL`: Reason for the stopping reason for the local search on the SNP set (`;`-separated list)
+- `STOPPING_REASON_DISTINCT`: Same as `STOPPING_REASON_ALL` but without duplicate values (`;`-separated list)
+
+
+- `ANNOTATIONS`: Annotations (default: gene annotations when using `--snp-annotate-dbSNP`) that are associated with at least one of the SNPs in the result SNP set. 
+
+Optional columns when using categorical or dichotomous phenotypes. All columns below are present once for each category where `<value>` is replaced by the respective value of the category:
+- `NUM_INDIVIDUALS_<value>`: number of individuals with the phenotype `<value>` that have at least one minor allele at all SNPs in the set
+- `FREQ_INDIVIDUALS_<value>`: ratio of individuals with the phenotype `<value>` that have at least one minor allele at all SNPs in the set
+- `INDIVIDUALS_<value>`: List of indices (zero-based) of all individuals with the phenotype `<value>` that have at least one minor allele at all SNPs in the set
+
+#### `<network>_ind_SNP_scores.csv`
+This CSV file contains information about all SNPs that are present in at least one result SNP set. It has the same columns as the `<network>_seeds.csv` file except the `SEED_ORIGIN` column. Every SNP is treated as a SNP set with size 1.
+
+#### `<network>_search_score_over_time.csv`
 This CSV file documents how the score quality improves during the local search. It tracks the score value of the globally most optimal SNP set NeEDL found so far during the local search. This file shows how quickly NeEDL converged towards the final optimum it found.
+
+The file consists of two columns:
+- `time (ms)`: elapsed time since the start of the local search step, when this score was first reported
+- `score`: Current lowest score at the specific time point of the local search. The score always is the same as used for optimization in the local search (specified via `--ms-model`).
+
 
 ### `<network>_network.sqlite3`
 This SQLite3 database file contains the full SNP-SNP-interaction network together with annotation information. This file is only created if the flag `--disable-save-network` is not set. Depending on the size of the input files, this file can get very big (> 2 GB). Please consider before running NeEDL whether you require the SSI network for downstream analysis. Otherwise, disable saving it.
 
+The database file has the following tables:
+![Network Database Structure](misc/network_sqlite_diagram.png "Network Database Structure")
+
 ### `<network>_joint_degree.csv`
 This CSV file represents a matrix which counts how often two nodes with a specific degree are contected in the SSI network. This information can give insights into the network architecture. The file will only be created if the flag `--do-joint-degree-analysis` is set (see *Advanced/Additional analysis*)
 
+The file has a header containing a ascending list of node degrees in the SSI network and one column `TOTAL`. Without the header row and the `TOTAL` column, the file can be considered a matrix that counts how often two nodes with a specific degree are connected. The value at position $i,j$ in that matrix depicts how often a node with degree at the $i$-th cell in the header row is connected to a node with degree at the $j$-th cell in the header row. The `TOTAL` column depicts how many nodes have the respective degree.
 
 ## Advanced features of NeEDL
 
@@ -478,13 +530,13 @@ epiJSON is a wrapper around plink that can convert several plink-readable input 
 - LINDEN input files (*can only be generated not read by epiJSON*)
 
 ### Quick Start
-Quickly convert your files into the correct format for NeEDL without applying any optional filters:
+Quickly convert your files into the correct format for NeEDL without applying any optional filters (Please follow the install step at the beginning of this readme before using this command):
 ```bash
-curl https://raw.githubusercontent.com/biomedbigdata/NeEDL/main/run/epiJSON.py | python3 - \
+epiJSON \
     --num-threads <num-threads> \
     --output-directory <output-directory> \
     --input-file <path-to-input> \
-    --input-format <BIM_BED_FAM|PED_MAP|TPED_TFAM|VCF|BCF2> \
+    --input-format <BIM_BED_FAM|PED_MAP|TPED_TFAM|VCF|BCF2|JSON> \
     --phenotype <DICHOTOMOUS|CATEGORICAL|QUANTIATIVE> \
     --make-json
 ```
@@ -518,9 +570,9 @@ For every input file specify these parameters:
 --override-phenotype <value>
 ```
 
-Example for combining separate case and control files:
+Example for combining separate case and control files (Please follow the install step at the beginning of this readme before using this command):
 ```bash
-curl https://raw.githubusercontent.com/biomedbigdata/NeEDL/main/run/epiJSON.py | python3 - \
+epiJSON \
     --num-threads 1 \
     --output-directory combined_dataset \
     \
@@ -607,10 +659,10 @@ With calculate_scores the user can apply the statistical models mentioned in *Lo
 --gwas-input-format JSON_EPIGEN
 
 # The input file path. Either specify a path to a .json file or path to a directory containing only one .json file.
---input-path <path>
+--gwas-input-file <path>
 
 # Phenotype information of the dataset. NeEDL can deal with DICHOTOMOUS, CATEGORICAL and QUANTITATIVE phenotypes. --num-categories is only necessary for CATEGORICAL phenotypes with more than two categories.
---phenotype CATEGORICAL
+--gwas-input-phenotype CATEGORICAL
 --num-categories 2
 ```
 

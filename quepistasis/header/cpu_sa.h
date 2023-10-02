@@ -64,4 +64,8 @@ int general_simulated_annealing(
     void * const interrupt_function
 );
 
+#ifdef HEADER_ONLY
+#include "../src/cpu_sa.cpp"
+#endif
+
 #endif

@@ -7,7 +7,7 @@
 #include "../util/helper_functions.hpp"
 
 namespace epi {
-    ReadLINDENSets::ReadLINDENSets(const std::string& path) {
+    ReadLINDENSets::ReadLINDENSets(const std::string& path, bool ignore_unknown_snps) {
         FileFinder ff;
         ff.add_ends_with(".reciprocalPairs");
         this->path = find_file_by_ending(std::move(path), ff);
@@ -33,6 +33,9 @@ namespace epi {
         }
 
         file.close();
+
+
+        this->ignore_unknown_snps = ignore_unknown_snps;
     }
 
     void ReadLINDENSets::run(std::shared_ptr<DataModel> data) {
@@ -44,8 +47,20 @@ namespace epi {
             const std::string& snp1_string = parser.cell(i, column1_index);
             const std::string& snp2_string = parser.cell(i, column2_index);
             SNPSet set;
-            set += data->snpStorage->by_name(snp1_string);
-            set += data->snpStorage->by_name(snp2_string);
+
+            try {
+                set += data->snpStorage->by_name(snp1_string);
+            } catch (epi::SNPNotFoundError &err) {
+                if (!ignore_unknown_snps) throw err;
+            }
+
+            try {
+                set += data->snpStorage->by_name(snp2_string);
+            } catch (epi::SNPNotFoundError &err) {
+                if (!ignore_unknown_snps) throw err;
+            }
+
+            if (set.size() == 0) continue;
 
             set.set_attribute("LINDEN_rank", std::to_string(i));
 

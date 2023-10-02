@@ -116,6 +116,7 @@ namespace epi {
         virtual size_t num_categories() const = 0;
         virtual std::vector<std::vector<size_t>> get_individuals_per_category(const SNPSet & set) const = 0;
         virtual std::vector<size_t> get_num_individuals_per_category() const = 0;
+        virtual void shuffle_phenotypes() = 0;
 
 
         SNPStorage();
@@ -157,6 +158,7 @@ namespace epi {
         size_t num_categories() const override;
         std::vector<std::vector<size_t>> get_individuals_per_category(const SNPSet & set) const override;
         std::vector<size_t> get_num_individuals_per_category() const override;
+        void shuffle_phenotypes() override;
 
     private:
         std::vector<std::string> snp_names;
@@ -187,6 +189,7 @@ namespace epi {
         size_t num_categories() const override;
         std::vector<std::vector<size_t>> get_individuals_per_category(const SNPSet & set) const override;
         std::vector<size_t> get_num_individuals_per_category() const override;
+        void shuffle_phenotypes() override;
 
     private:
         std::shared_ptr<epi::Instance<PhenoType>> instance;

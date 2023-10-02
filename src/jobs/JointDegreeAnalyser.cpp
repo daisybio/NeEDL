@@ -18,7 +18,7 @@ namespace epi {
         }
 
         if (data->snpNetwork == nullptr) {
-            throw epi::Error("No network available to save.");
+            throw epi::Error("No network available to analyze.");
         }
 
         std::vector<SNP_t> snp_list;
