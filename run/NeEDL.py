@@ -51,7 +51,7 @@ for i, arg in enumerate(arguments):
 input_paths = []
 
 # normal paths
-normal_path_attribs = ['--input-path', '--ms-ld-matrix', '--fs-ld-matrix']
+normal_path_attribs = ['--input-path', '--ms-ld-matrix', '--fs-ld-matrix', '--covariates-file']
 for i, arg in enumerate(arguments):
     if arg in normal_path_attribs:
         if len(arguments) > i + 1:
