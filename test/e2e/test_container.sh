@@ -103,15 +103,21 @@ python ./run/NeEDL.py \
 
 # check that no NA values are present
 for dir in "$out_dir"/* ; do
+    echo "NAN Check: entering directory '$dir'"
+
     if [ -f "$dir/BIOGRID_seeds.csv" ]; then
         if grep -Fxq "nan" "$dir/BIOGRID_seeds.csv"; then
             die 1 "'nan' found in $dir/BIOGRID_seeds.csv"
+        elif
+            echo "NAN Check: $dir/BIOGRID_seeds.csv passed"
         fi
     fi
 
     if [ -f "$dir/BIOGRID_results.csv" ]; then
         if grep -Fxq "nan" "$dir/BIOGRID_results.csv"; then
             die 1 "'nan' found in $dir/BIOGRID_results.csv"
+        elif
+            echo "NAN Check: $dir/BIOGRID_results.csv passed"
         fi
     fi
 
