@@ -12,6 +12,16 @@ arguments = sys.argv[1:]
 
 print(arguments)
 
+
+# check if singularity should be used instead of docker
+use_singularity = False
+for i, arg in enumerate(arguments):
+    if arg == '--singularity':
+        use_singularity = True
+        # remove argument from list as app cannot process it
+        del arguments[i]
+
+
 # define a different docker image name, needed for testing
 for i, arg in enumerate(arguments):
     if arg == '--docker-image-name':
@@ -24,7 +34,7 @@ for i, arg in enumerate(arguments):
 
 
 # disable pulling of docker container
-docker_pull = True
+docker_pull = not use_singularity
 for i, arg in enumerate(arguments):
     if arg == '--docker-no-pulling':
         docker_pull = False
@@ -65,15 +75,24 @@ for i, arg in enumerate(arguments):
             input_paths.append(path)
 
 
-volume_string = ' '.join([f'-v "{file}:/mnt/in_{i}:rw,Z"' for i, file in enumerate(input_paths)])
+if use_singularity:
+    volume_string = ' '.join([f'-B "{file}:/mnt/in_{i}:rw,Z"' for i, file in enumerate(input_paths)])
+    external_command = f"singularity exec {volume_string}"
 
-external_command = f"docker run --user='{os.getuid()}':'{os.getgid()}' {volume_string}"
+    if output_directory is not None:
+        external_command += f' -B "{output_directory}:/mnt/out:rw,Z" '
 
-if output_directory is not None:
-    external_command += f' -v "{output_directory}:/mnt/out:rw,Z" '
+    external_command += "docker://"
+
+else:
+    volume_string = ' '.join([f'-v "{file}:/mnt/in_{i}:rw,Z"' for i, file in enumerate(input_paths)])
+    external_command = f"docker run --user='{os.getuid()}':'{os.getgid()}' {volume_string}"
+
+    if output_directory is not None:
+        external_command += f' -v "{output_directory}:/mnt/out:rw,Z" '
+
 
 argument_string = ' '.join(map(lambda a: f'"{a}"', map(lambda b: b.replace('"', '\\"'), arguments)))
-
 external_command += f"{image} {command} {argument_string}"
 
 print(external_command)
