@@ -37,6 +37,7 @@
         - [Selecting the input](#selecting-the-input)
         - [Filter selection](#filter-selection)
         - [Output files](#output-files)
+        - [Shuffling the phenotype](#shuffling-the-phenotype)
     - [Parameters for calculate_scores](#parameters-for-calculate_scores)
         - [specify GWAS data](#specify-gwas-data)
         - [specify the SNP set data](#specify-the-snp-set-data)
@@ -639,6 +640,12 @@ There is the special case where one might want to override the phenotype only fo
 
 # Create input file for the tool MACOED
 --make-macoed
+```
+
+### Shuffling the phenotype
+The tool epiJSON can also shuffle the phenotype vector after processing all filters. This feature can be activated with the following flag:
+```bash
+--shuffle-phenotype
 ```
 
 ## Parameters for calculate_scores
