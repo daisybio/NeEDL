@@ -163,12 +163,6 @@ namespace epi {
                 edges[thr].clear();
                 nodes[thr].clear();
             }
-
-            /*
-            if (i % 10000 == 0) {
-                Logger::logProgress("applied " + std::to_string(i) + " of " + std::to_string(parser.num_rows()) + " lines of CSV file.");
-            }
-             */
         }
 
         // insert nodes and edges
@@ -179,7 +173,6 @@ namespace epi {
             data->snpNetwork->add_edges(edges[i].begin(), edges[i].end(), name);
         }
 
-        // Logger::logLine("applied " + std::to_string(parser.num_rows()) + " of " + std::to_string(parser.num_rows()) + " lines of CSV file.");
 
         logger.stop();
     }

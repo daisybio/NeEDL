@@ -77,6 +77,10 @@ int main(int argc, char** argv) {
                    "The number of categories for categorical phenotypes. DEFAULT: 2.")->check(
             CLI::Validator(check_integer_greater_1, "GREATER1"));
 
+    std::string covariates_file;
+    app.add_option("--covariates-file", covariates_file, "CSV file containing covariate data.");
+
+
     /*
     app.add_option("--input-SNP-format", options.input_SNP_format,
                     "The format of the SNPs, either rsIDs (RSID) or position based (POSITION_BASED)")->required();
@@ -559,6 +563,7 @@ int main(int argc, char** argv) {
                 input_format,
                 input_phenotype,
                 input_num_categories,
+                covariates_file,
                 disable_save_network,
                 calculate_advanced_network_statistics,
                 do_joint_degree_analysis,

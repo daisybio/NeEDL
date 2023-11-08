@@ -100,7 +100,8 @@ namespace epi {
             original_phenotypes_(),
             disease_snps_(),
             urng_(),
-            covariates_() {}
+            covariates_(),
+            has_cov_(false) {}
 
     template<class PhenoType>
     void
@@ -148,6 +149,7 @@ namespace epi {
             default:
                 throw Error("Unsupported input format.");
         }
+        has_cov_ = true;
     }
 
     template<class PhenoType>
@@ -162,6 +164,13 @@ namespace epi {
     Instance<PhenoType>::
     num_inds() const {
         return num_inds_;
+    }
+
+    template<class PhenoType>
+    bool
+    Instance<PhenoType>::
+    has_cov() {
+        return has_cov_;
     }
 
     template<class PhenoType>

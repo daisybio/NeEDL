@@ -357,6 +357,15 @@ NeEDL supports various statistical scores that can be used for `--ms-model`. Ple
 - `REGRESSION_LLH_GAIN`: likelihood gain of the quadratic-regression model
 - `REGRESSION_AIC_GAIN`: Akaike information criterion gain of the quadratic-regression model
 - `REGRESSION_BIC_GAIN`: Bayesian information criterion gain of the quadratic-regression model
+- `REGRESSION_COV_NLL`: negative log-likelihood of the quadratic-regression model, includes covariates
+- `REGRESSION_COV_LLH`: likelihood of the quadratic-regression model, includes covariates
+- `REGRESSION_COV_AIC`: Akaike information criterion of the quadratic-regression model, includes covariates
+- `REGRESSION_COV_BIC`: Bayesian information criterion of the quadratic-regression model, includes covariates
+- `REGRESSION_CLG_Q_LC`: Confounder corrected likelihood gain (CLG) of linear regression model vs linear regression model with covariates. We define CLG as the LLH-Gain of a model with covariates over a model without covariates. The higher the CLG, the better is our linear model with covariates.
+- `REGRESSION_CLG_Q_QC`: Confounder corrected likelihood gain (CLG) of quadratic regression model vs quadratic regression model with covariates. We define CLG as the LLH-Gain of a model with covariates over a model without covariates. The higher the CLG, the better is our quadratic model with covariates.
+- `REGRESSION_CLG_L_LC`: Confounder corrected likelihood gain (CLG) of  quadratic regression model vs linear regression model with covariates. We define CLG as the LLH-Gain of a model with covariates over a model without covariates. The higher the CLG, the better is our linear model with covariates.
+
+**IMPORTANT: Please make sure you selected a score that has `COV` in its name if you want to use covariates. Specifying a covariate file is not enough.**
 
 Options for the annealing type are `SIMULATED_ANNEALING`, `RANDOM_ANNEALING`, `HYPERBOLIC_TAN_ANNEALING`.
 

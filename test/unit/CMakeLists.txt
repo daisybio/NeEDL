@@ -31,6 +31,9 @@ add_executable(variance_model src/variance_model.cpp src/catch_main.cpp)
 add_executable(penetrance_model src/penetrance_model.cpp src/catch_main.cpp)
 add_executable(regression_model src/regression_model.cpp src/catch_main.cpp)
 add_executable(bayesian_model src/bayesian_model.cpp src/catch_main.cpp)
+
+target_link_libraries(regression_model boost_filesystem igraph)
+
 if(APPLE)
 target_link_libraries(regression_model omp)
 target_link_libraries(penetrance_model omp)

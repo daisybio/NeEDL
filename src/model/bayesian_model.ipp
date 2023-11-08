@@ -72,6 +72,10 @@ namespace epi {
     BayesianModel<PhenoType>::
     evaluate_(const std::vector<SNP> & snp_set, bool prepare_prediction) {
 
+        if (this->get_cov_status() and not this->instance_->has_cov()){
+            throw epi::Error("No Covariates specified.");
+        }
+
         Eigen::MatrixXd residuals;
         if (this->get_cov_status()){
             // linear regression model for phenotypes with covariates as target
@@ -139,7 +143,12 @@ namespace epi {
     void
     BayesianModel<PhenoType>::
     cov_activate() {
-        incl_cov_ = true;
+        if (this->instance_->has_cov() == false){
+            incl_cov_ = false;
+            throw epi::Error("No covariates specified.");
+        } else {
+            incl_cov_ = true;
+        }
     }
 
     template<class PhenoType>

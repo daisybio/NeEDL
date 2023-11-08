@@ -143,7 +143,7 @@ void Logger::logResourceUsage() {
     logLine("    File system outputs: " + std::to_string(usage_info.ru_oublock));
 
 #else
-    logLine("No resource usage information available. Only works under linux.")
+    logLine("No resource usage information available. Only works under linux.");
 #endif
 }
 

@@ -24,9 +24,14 @@ namespace epi {
         }
 
         std::set<options::EpistasisScore> models;
-        std::transform(scores.begin(), scores.end(), std::inserter(models, models.begin()), [] (auto & model_str) -> auto {
+        std::transform(scores.begin(), scores.end(), std::inserter(models, models.end()), [] (auto & model_str) -> auto {
            return options::epistasis_score_from_string(model_str);
         });
+        /*
+        if (has_rank_model) {
+            models.erase(this->rank_model);
+        }
+         */
 
         epi_models = {models.begin(), models.end()};
     }

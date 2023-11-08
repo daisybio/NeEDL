@@ -115,17 +115,6 @@ namespace epi {
             }
             return true;
         }
-        if (option == "cov") {
-            score_ = arg;
-            if (arg == "COV-ONLY") {
-                this->cov_activate();
-            } else if (arg == "COV-MIXED"){
-
-            } else {
-                throw Error(std::string("Invalid argument \"") + arg  + "\" for option \"--" + option + "\". Usage: options = \"[--" + option + " COV-ONLY|COV-MIXED] [...]\"");
-            }
-            return true;
-        }
         return false;
     }
 
@@ -145,7 +134,7 @@ namespace epi {
     std::string
     RegressionModel<PhenoType>::
     valid_options_() const {
-        return "[--score LLH|LLH-GAIN|NLL|NLL-GAIN|AIC|AIC-GAIN|BIC|BIC-GAIN|CLG-L-LC|CLG-Q-QC|CLG-Q-LC] [--max-itrs <convertible to int greater equal 0>] [--learning-rate <convertible to double greater 0>] [--epsilon <convertible to double greater 0>] [--cov COV-ONLY|COV-MIXED]";
+        return "[--score LLH|LLH-GAIN|NLL|NLL-GAIN|AIC|AIC-GAIN|BIC|BIC-GAIN|CLG-L-LC|CLG-Q-QC|CLG-Q-LC] [--max-itrs <convertible to int greater equal 0>] [--learning-rate <convertible to double greater 0>] [--epsilon <convertible to double greater 0>] [--cov]";
     }
 
     template<class PhenoType>
@@ -211,6 +200,9 @@ namespace epi {
     double
     RegressionModel<PhenoType>::
     evaluate_(const std::vector<SNP> & snp_set, bool prepare_prediction) {
+        if (this->get_cov_status() and not this->instance_->has_cov()){
+            throw epi::Error("No Covariates specified.");
+        }
         // Compute interaction model.
         // for CLG scores: here the second (bigger) model is created, e.g., CLG-L-LC here, LC (linear with covariates)
         Eigen::MatrixXd interaction_features;
@@ -466,7 +458,12 @@ namespace epi {
     void
     RegressionModel<PhenoType>::
     cov_activate() {
-        incl_cov_ = true;
+        if (this->instance_->has_cov() == false){
+            incl_cov_ = false;
+            throw epi::Error("No covariates specified.");
+        } else {
+            incl_cov_ = true;
+        }
     }
 
     template<class PhenoType>

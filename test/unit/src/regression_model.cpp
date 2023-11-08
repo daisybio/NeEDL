@@ -37,6 +37,10 @@
 #include <stdexcept> // std::runtime_error
 #include <sstream> // std::stringstream
 
+#include "../../../src/jobs/InstanceLoader.hpp"
+#include "../../../src/jobs/DummyErrorTask.hpp"
+
+
 TEST_CASE("Quantitative Instance") {
     epi::Instance<epi::QuantitativePhenoType> instance;
     REQUIRE_NOTHROW(instance.load(epi::options::InputFormat::JSON_EPIGEN, "../../../data/EpiGEN/quantitative/2_disease_snps/exponential/0_1_ASW.json"));
@@ -152,7 +156,7 @@ TEST_CASE("Quantitative Instance - Cov Scores") {
     std::vector<std::string> scores{"CLG-L-LC", "CLG-Q-QC", "CLG-Q-LC"};
 
     for (const auto & score : scores) {
-        REQUIRE_NOTHROW(model.set_options(std::string("--max-itrs 5 --cov COV-MIXED --score " + score)));
+        REQUIRE_NOTHROW(model.set_options(std::string("--max-itrs 5 --score " + score)));
         CHECK_THAT(model.evaluate(disease_snp_set), Catch::WithinAbs(model.evaluate(disease_snp_set_shuffled), 0.0001));
 
 
@@ -197,7 +201,7 @@ TEST_CASE("Categorical Instance 1 - Cov Scores") {
 
     std::vector<std::string> scores{"CLG-Q-QC", "CLG-L-LC", "CLG-Q-LC"};
     for (const auto & score : scores) {
-        REQUIRE_NOTHROW(model.set_options(std::string("--max-itrs 5 --cov COV-MIXED --score " + score)));
+        REQUIRE_NOTHROW(model.set_options(std::string("--max-itrs 5 --score " + score)));
         double check1 = model.evaluate(disease_snp_set);
         double check2 = model.evaluate(disease_snp_set_shuffled);
         CHECK_THAT(check1, Catch::WithinAbs(check2, 0.0001));
@@ -237,7 +241,7 @@ TEST_CASE("Categorical Instance 2 - Cov Scores") {
     std::vector<epi::SNP> disease_snp_set_shuffled{1, 0};
     std::vector<std::string> scores{"CLG-Q-QC", "CLG-L-LC", "CLG-Q-LC"};
     for (const auto & score : scores) {
-        REQUIRE_NOTHROW(model.set_options(std::string("--max-itrs 5 --cov COV-MIXED --score " + score)));
+        REQUIRE_NOTHROW(model.set_options(std::string("--max-itrs 5 --score " + score)));
         CHECK_THAT(model.evaluate(disease_snp_set), Catch::WithinAbs(model.evaluate(disease_snp_set_shuffled), 0.0001));
 
         CHECK_NOTHROW(model.evaluate_track_time(disease_snp_set));
@@ -267,7 +271,7 @@ TEST_CASE("Quantitative Instance - Cov activate/deactivate") {
     std::vector<epi::SNP> disease_snp_set_shuffled{30, 4, 43};
     std::vector<std::string> scores{"CLG-Q-QC", "CLG-L-LC", "CLG-Q-LC", "LLH", "NLL", "AIC", "BIC", "LLH-GAIN", "NLL-GAIN", "AIC-GAIN", "BIC-GAIN"};
     for (const auto & score : scores) {
-        REQUIRE_NOTHROW(model.set_options(std::string("--max-itrs 5 --cov COV-MIXED --score " + score)));
+        REQUIRE_NOTHROW(model.set_options(std::string("--max-itrs 5 --score " + score)));
         CHECK_THAT(model.evaluate(disease_snp_set), Catch::WithinAbs(model.evaluate(disease_snp_set_shuffled), 0.0001));
 
 
@@ -311,7 +315,7 @@ TEST_CASE("Categorical Instance 1 - Cov activate/deactivate") {
 
     std::vector<std::string> scores{"CLG-Q-QC", "CLG-L-LC", "CLG-Q-LC", "LLH", "NLL", "AIC", "BIC", "LLH-GAIN", "NLL-GAIN", "AIC-GAIN", "BIC-GAIN"};
     for (const auto & score : scores) {
-        REQUIRE_NOTHROW(model.set_options(std::string("--max-itrs 5 --cov COV-MIXED --score " + score)));
+        REQUIRE_NOTHROW(model.set_options(std::string("--max-itrs 5 --score " + score)));
         double check1 = model.evaluate(disease_snp_set);
         double check2 = model.evaluate(disease_snp_set_shuffled);
         CHECK_THAT(check1, Catch::WithinAbs(check2, 0.0001));
@@ -336,4 +340,119 @@ TEST_CASE("Categorical Instance 1 - Cov activate/deactivate") {
             CHECK(predictions.at(ind) == model.predict(ind));
         }
     }
+}
+
+TEST_CASE("Categorical Instance 1 - No NaN values") {
+    epi::Instance<epi::CategoricalPhenoType> instance(2);
+    REQUIRE_NOTHROW(instance.load(epi::options::InputFormat::JSON_EPIGEN, "../../../data/EpiGEN/dichotomous/2_disease_snps/exponential/1_1_ASW.json"));
+    REQUIRE_NOTHROW(instance.load_cov(epi::options::InputFormat::CSV_COV, "../../../data/COV_TEST/EpiGEN_RND_COV.csv"));
+    epi::RegressionModel<epi::CategoricalPhenoType> model(&instance);
+    REQUIRE_NOTHROW(model.initialize());
+    CHECK(model.is_predictive());
+    CHECK(model.model_sense() == epi::options::ModelSense::MINIMIZE);
+
+    std::vector<std::string> problematic_rs_ids = { "rs11589207", "rs10927631" };
+    std::vector<epi::SNP> problematic_snps(2);
+    // ugly way to find RS-IDs in dataset
+    for (size_t i = 0; i < problematic_rs_ids.size(); ++i) {
+        bool found = false;
+        for (size_t j = 0; j < instance.rs_ids_.size(); ++j) {
+            if (problematic_rs_ids[i] == instance.rs_ids_[j]) {
+                problematic_snps[i] = j;
+                found = true;
+            }
+        }
+        CHECK(found);
+    }
+
+    std::vector<std::string> scores{"CLG-Q-QC", "CLG-L-LC", "CLG-Q-LC", "LLH", "NLL", "AIC", "BIC" };
+    for(size_t i = 0; i < 1; ++i) {
+        for (const auto &score: scores) {
+            REQUIRE_NOTHROW(model.set_options(std::string("--score " + score)));
+            REQUIRE_NOTHROW(model.initialize());
+            REQUIRE_NOTHROW(model.cov_activate());
+
+            double value = model.evaluate(problematic_snps);
+            CHECK(!std::isnan(value));
+            std::cout << value << std::endl;
+        }
+    }
+}
+
+TEST_CASE("Categorical Instance 1 - NeEDL with CSVParser") {
+    // load the instance via InstanceLoader Job
+    omp_set_num_threads(1);
+    auto data = std::make_shared<epi::DataModel>(true);
+
+    epi::InstanceLoader(
+                                           "../../../data/EpiGEN/dichotomous/2_disease_snps/exponential/1_1_ASW.json",
+                                           "JSON_EPIGEN",
+                                           "DICHOTOMOUS",
+                                           2,
+                                           "../../../data/COV_TEST/EpiGEN_RND_COV.csv"
+                                   ).run(data);
+
+    // this is the error-causing code (src/jobs/DummyErrorTask)
+    // in the DummyErrorTask class I reduced the problematic code essentially to a CSVParser call after which the scores are nan
+    epi::DummyErrorTask(
+            "BIOGRID",
+            "../../../data/BIOGRID/BIOGRID-ORGANISM-Homo_sapiens-3.5.182.tab2.txt",
+            "Official Symbol Interactor A",
+            "Official Symbol Interactor B",
+            '\t',
+            -1,
+            -1).run(data);
+
+
+    // the error does not occur when adding the CSVParser code directly to the test here
+
+
+    // construct SNP set
+    epi::SNPSet set {{data->snpStorage->by_name("rs11589207"),data->snpStorage->by_name("rs10927631")}};
+    data->snpSetStorage.push_back(set);
+
+    // test scores
+    // auto all_scores = epi::options::get_all_epistasis_scores(true);
+    std::vector<std::string> all_scores = { "REGRESSION_COV_NLL" };
+    for (const auto & score : all_scores) {
+        auto score_rep = epi::options::epistasis_score_from_string(score);
+        double score_value = set.calculate_score(score_rep);
+
+        CHECK(!std::isnan(score_value));
+        std::cout << score_value << std::endl;
+    }
+
+    data->snpStorage.reset();
+}
+
+// this test is just here to show that the above issue really comes from the call to epi::DummyErrorTask
+TEST_CASE("Categorical Instance 1 - NeEDL without CSVParser") {
+    // load the instance via InstanceLoader Job
+    omp_set_num_threads(1);
+    auto data = std::make_shared<epi::DataModel>(true);
+
+    epi::InstanceLoader(
+            "../../../data/EpiGEN/dichotomous/2_disease_snps/exponential/1_1_ASW.json",
+            "JSON_EPIGEN",
+            "DICHOTOMOUS",
+            2,
+            "../../../data/COV_TEST/EpiGEN_RND_COV.csv"
+    ).run(data);
+
+    // construct SNP set
+    epi::SNPSet set {{data->snpStorage->by_name("rs11589207"),data->snpStorage->by_name("rs10927631")}};
+    data->snpSetStorage.push_back(set);
+
+    // test scores
+    // auto all_scores = epi::options::get_all_epistasis_scores(true);
+    std::vector<std::string> all_scores = { "REGRESSION_COV_NLL" };
+    for (const auto & score : all_scores) {
+        auto score_rep = epi::options::epistasis_score_from_string(score);
+        double score_value = set.calculate_score(score_rep);
+
+        CHECK(!std::isnan(score_value));
+        std::cout << score_value << std::endl;
+    }
+
+    data->snpStorage.reset();
 }

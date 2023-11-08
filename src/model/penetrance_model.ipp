@@ -59,6 +59,9 @@ namespace epi {
     double
     PenetranceModel<PhenoType>::
     evaluate_(const std::vector<SNP> & snp_set, bool prepare_prediction) {
+        if (cov_score_() and not this->instance_->has_cov()){
+            throw epi::Error("No Covariates specified.");
+        }
 
         Eigen::MatrixXd beta;
         Eigen::MatrixXd residuals;
@@ -258,7 +261,12 @@ namespace epi {
     void
     PenetranceModel<PhenoType>::
     cov_activate() {
-        incl_cov_ = true;
+        if (this->instance_->has_cov() == false){
+            incl_cov_ = false;
+            throw epi::Error("No covariates specified.");
+        } else {
+            incl_cov_ = true;
+        }
     }
 
     template<class PhenoType>
@@ -266,6 +274,13 @@ namespace epi {
     PenetranceModel<PhenoType>::
     cov_deactivate() {
         incl_cov_ = false;
+    }
+
+    template<class PhenoType>
+    bool
+    PenetranceModel<PhenoType>::
+    cov_score_() const {
+        return score_ == "CLG-L-LC" or score_ == "CLG-Q-QC" or score_ == "CLG-Q-LC";
     }
 
     template<class PhenoType>

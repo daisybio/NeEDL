@@ -52,7 +52,7 @@ namespace epi {
      * @brief Constructs and empty instance.
      * @param[in] num_categories The number of categories for categorical phenotypes. Has no effect if @p PhenoType is set to epi::QuantititativePhenoType.
      */
-        Instance(std::size_t num_categories = 2);
+        explicit Instance(std::size_t num_categories = 2);
 
         /*!
          * @brief Constant iterator for iterating over the genotype of an individual at all SNPs.
@@ -306,6 +306,8 @@ namespace epi {
 
         Eigen::VectorXd get_covariates_at_ind(Ind ind) const;
 
+        bool has_cov();
+
     private:
 
         std::size_t num_categories_;
@@ -337,6 +339,8 @@ namespace epi {
         std::size_t construct_folds_(std::size_t num_folds, std::size_t fold_id, options::DataPurpose cv_data, std::vector<bool> & skip);
 
         void load_csv_cov_(const std::string &filename);
+
+        bool has_cov_;
     };
 
 }

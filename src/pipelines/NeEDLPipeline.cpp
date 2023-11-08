@@ -26,7 +26,7 @@
 
 
 NeEDLPipeline::NeEDLPipeline(std::string input_path, std::string input_format, std::string input_phenotype,
-                                  size_t input_num_categories, bool disable_save_network, bool calculate_advanced_network_stats, bool joint_degree_analysis,
+                                  size_t input_num_categories, std::string covariates_file, bool disable_save_network, bool calculate_advanced_network_stats, bool joint_degree_analysis,
                                   bool no_additional_scores, std::string output_directory,
                                   int num_threads, std::string data_directory) {
 
@@ -36,7 +36,7 @@ NeEDLPipeline::NeEDLPipeline(std::string input_path, std::string input_format, s
     this->disable_save_network = disable_save_network;
 
     if (!no_additional_scores) {
-        additional_scores = epi::options::get_all_epistasis_scores();
+        additional_scores = epi::options::get_all_epistasis_scores(!covariates_file.empty());
     }
 
     if (output_directory.empty()) {
@@ -61,7 +61,8 @@ NeEDLPipeline::NeEDLPipeline(std::string input_path, std::string input_format, s
                     input_path,
                     input_format,
                     input_phenotype,
-                    input_num_categories
+                    input_num_categories,
+                    covariates_file
             );
 
     preparationPipeline = {

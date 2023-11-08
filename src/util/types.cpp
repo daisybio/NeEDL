@@ -27,7 +27,7 @@ std::ostream &operator<<(std::ostream &os, const epi::options::EpistasisScore &m
             os << "BAYESIAN";
             break;
         case epi::options::EpistasisScore::BAYESIAN_COV:
-            os << "BAYESIAN";
+            os << "BAYESIAN_COV";
             break;
         case epi::options::EpistasisScore::PENETRANCE_NLL:
             os << "PENETRANCE_NLL";
@@ -144,7 +144,7 @@ namespace epi {
                 case EpistasisScore::VARIANCE_COV:
                     return EpistasisModel::VARIANCE_MODEL;
                 default:
-                    return EpistasisModel::BAYESIAN_MODEL;
+                    throw epi::Error("Unknown Epistasis Score.");
             }
         }
 
@@ -235,23 +235,29 @@ namespace epi {
             }
         }
 
-        std::vector<std::string> get_all_epistasis_scores() {
-            /*
-            return std::vector<std::string>{"BAYESIAN", "BAYESIAN_COV",
-                                            "PENETRANCE_NLL", "PENETRANCE_LLH", "PENETRANCE_AIC", "PENETRANCE_BIC",
-                                            "PENETRANCE_COV_NLL", "PENETRANCE_COV_LLH", "PENETRANCE_COV_AIC", "PENETRANCE_COV_BIC",
-                                            "REGRESSION_NLL", "REGRESSION_LLH", "REGRESSION_AIC", "REGRESSION_BIC",
-                                            "REGRESSION_COV_NLL", "REGRESSION_COV_LLH", "REGRESSION_COV_AIC", "REGRESSION_COV_BIC",
-                                            "REGRESSION_NLL_GAIN", "REGRESSION_LLH_GAIN", "REGRESSION_AIC_GAIN", "REGRESSION_BIC_GAIN",
-                                            "REGRESSION_CLG_Q_LC", "REGRESSION_CLG_Q_QC", "REGRESSION_CLG_L_LC",
-                                            "VARIANCE", "VARIANCE_COV"};
-                                            */
+        std::vector<std::string> get_all_epistasis_scores(bool include_covariates) {
+            // return { "PENETRANCE" };
+            auto without_cov = std::vector<std::string>{
+                "BAYESIAN",
+                "PENETRANCE_NLL", "PENETRANCE_LLH", "PENETRANCE_AIC", "PENETRANCE_BIC",
+                "REGRESSION_NLL", "REGRESSION_LLH", "REGRESSION_AIC", "REGRESSION_BIC",
+                "REGRESSION_NLL_GAIN", "REGRESSION_LLH_GAIN", "REGRESSION_AIC_GAIN", "REGRESSION_BIC_GAIN",
+                "VARIANCE"
+            };
 
-            return std::vector<std::string>{"BAYESIAN",
-                                            "PENETRANCE_NLL", "PENETRANCE_LLH", "PENETRANCE_AIC", "PENETRANCE_BIC",
-                                            "REGRESSION_NLL", "REGRESSION_LLH", "REGRESSION_AIC", "REGRESSION_BIC",
-                                            "REGRESSION_NLL_GAIN", "REGRESSION_LLH_GAIN", "REGRESSION_AIC_GAIN", "REGRESSION_BIC_GAIN",
-                                            "VARIANCE"};
+            if (include_covariates) {
+                auto with_cov = std::vector<std::string>{
+                    "BAYESIAN_COV",
+                    "PENETRANCE_COV_NLL", "PENETRANCE_COV_LLH", "PENETRANCE_COV_AIC", "PENETRANCE_COV_BIC",
+                    "REGRESSION_COV_NLL", "REGRESSION_COV_LLH", "REGRESSION_COV_AIC", "REGRESSION_COV_BIC",
+                    "REGRESSION_CLG_Q_LC", "REGRESSION_CLG_Q_QC","REGRESSION_CLG_L_LC",
+                    "VARIANCE_COV"
+                };
+
+                without_cov.insert(without_cov.begin(), with_cov.begin(), with_cov.end());
+            }
+
+            return without_cov;
         }
 
         std::string epistasis_score_to_string(EpistasisScore model) {
