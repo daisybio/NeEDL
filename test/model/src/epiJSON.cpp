@@ -36,6 +36,7 @@
 #include "../../../src/jobs/PlinkConvertPlinkBinToMACOEDInput.hpp"
 #include "../../../src/jobs/PlinkConvertJsonToPlink.hpp"
 #include "../../../src/jobs/PlinkConvertPlinkBinToLINDENInput.hpp"
+#include "../../../src/jobs/PlinkShufflePhenotype.hpp"
 
 using namespace epi;
 
@@ -51,6 +52,9 @@ int main(int argc, char **argv) {
 
     std::vector<std::string> override_phenotypes;
     app.add_option("--override-phenotype", override_phenotypes, "This option can optionally be set to override the phenotype contained in the input file. This is helpful if cases and controls are in separate files. If used, it needs to be specified once for every input file. If you want to use this feature only for some input files, set to 'NO' to use the phenotype in the input file. Please use the same notation as used in .fam files (1 = control, 2 = case, -9/0 = missing, or numeric data for categorical/quantitative data");
+
+    bool shuffle_phenotype = false;
+    app.add_flag("--shuffle-phenotype", shuffle_phenotype, "If this flag is set, the phenotype of all samples is shuffled.");
 
     std::string output_directory;
     app.add_option("--output-directory", output_directory,
@@ -290,11 +294,21 @@ int main(int argc, char **argv) {
         current_input_file = outfile;
     }
 
+    // optionally shuffle the phenotypes of all individuals
+    if (shuffle_phenotype) {
+        std::string outfile = output_directory + "shuffled_pheno";
+        seq.add(std::make_shared<epi::PlinkShufflePhenotype>(current_input_file, outfile));
+        seq.add(std::make_shared<epi::PlinkCollectDatasetStats>(outfile, phenotype, "shuffle_phenotype"));
+        seq.add(std::make_shared<epi::PlinkRemoveTempFiles>(current_input_file, std::vector<std::string>{".bim", ".bed", ".fam" }));
+        current_input_file = outfile;
+    }
+
 
     // process disease SNPs if provided
     if (!disease_snps_file.empty()) {
         seq.add(std::make_shared<epi::DiseaseSNPReader>(disease_snps_file, current_input_file));
     }
+
 
     // create requested output
     if (make_all_formats) {
