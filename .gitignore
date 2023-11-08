@@ -129,3 +129,6 @@ __pycache__
 
 
 test_out
+debug_scripts
+.cache
+compile_commands.json
