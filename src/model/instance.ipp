@@ -92,7 +92,6 @@ namespace epi {
     Instance(std::size_t num_categories):
             rs_ids_(),
             rs_ids_chromosomes_(),
-            has_cov_(false),
             num_categories_{num_categories},
             num_snps_{undefined_uint()},
             num_inds_{undefined_uint()},
@@ -101,7 +100,8 @@ namespace epi {
             original_phenotypes_(),
             disease_snps_(),
             urng_(),
-            covariates_() {}
+            covariates_(),
+            has_cov_(false) {}
 
     template<class PhenoType>
     void

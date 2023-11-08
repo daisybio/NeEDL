@@ -52,7 +52,7 @@ namespace epi {
      * @brief Constructs and empty instance.
      * @param[in] num_categories The number of categories for categorical phenotypes. Has no effect if @p PhenoType is set to epi::QuantititativePhenoType.
      */
-        Instance(std::size_t num_categories = 2);
+        explicit Instance(std::size_t num_categories = 2);
 
         /*!
          * @brief Constant iterator for iterating over the genotype of an individual at all SNPs.

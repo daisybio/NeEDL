@@ -17,6 +17,7 @@ namespace epi {
     class SNPData {
     public:
         SNPData() = default;
+        virtual ~SNPData() {};
     private:
         // attributes
         std::vector<std::string> annotations {};
