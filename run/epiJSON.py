@@ -16,9 +16,15 @@ print(arguments)
 
 # check if singularity should be used instead of docker
 use_singularity = False
+singularity_cmd = 'singularity'
 for i, arg in enumerate(arguments):
     if arg == '--singularity':
         use_singularity = True
+        # remove argument from list as app cannot process it
+        del arguments[i]
+    if arg == '--apptainer':
+        use_singularity = True
+        singularity_cmd = 'apptainer'
         # remove argument from list as app cannot process it
         del arguments[i]
 
@@ -90,7 +96,7 @@ if '--data-directory' in arguments:
 
 if use_singularity:
     volume_string = ' '.join([f'-B "{file}:/mnt/in_{i}:rw"' for i, file in enumerate(input_paths)])
-    external_command = f"singularity exec {volume_string}"
+    external_command = f"{singularity_cmd} exec {volume_string}"
 
     if output_directory is not None:
         external_command += f' -B "{output_directory}:/mnt/out:rw" '
