@@ -28,6 +28,14 @@ for i, arg in enumerate(arguments):
         del arguments[i]
 
 
+# on selinux systems the Z flag might be necessary to mount the directories correctly to the docker container
+docker_selinux_flag = ''
+for i, arg in enumerate(arguments):
+    if arg == '--docker-selinux':
+        docker_selinux_flag = ',Z'
+        # remove argument from list as app cannot process it
+        del arguments[i]
+
 # define a different docker image name, needed for testing
 for i, arg in enumerate(arguments):
     if arg == '--docker-image-name':
@@ -104,20 +112,20 @@ if '--data-directory' in arguments:
     exit(1)
 
 if use_singularity:
-    volume_string = ' '.join([f'-B "{file}:/mnt/in_{i}:rw,Z"' for i, file in enumerate(input_paths)])
+    volume_string = ' '.join([f'-B "{file}:/mnt/in_{i}:rw"' for i, file in enumerate(input_paths)])
     external_command = f"{singularity_cmd} exec {volume_string}"
 
     if output_directory is not None:
-        external_command += f' -B "{output_directory}:/mnt/out:rw,Z" '
+        external_command += f' -B "{output_directory}:/mnt/out:rw" '
 
     external_command += "docker://"
 
 else:
-    volume_string = ' '.join([f'-v "{file}:/mnt/in_{i}:rw,Z"' for i, file in enumerate(input_paths)])
+    volume_string = ' '.join([f'-v "{file}:/mnt/in_{i}:rw{docker_selinux_flag}"' for i, file in enumerate(input_paths)])
     external_command = f"docker run --user='{os.getuid()}':'{os.getgid()}' {volume_string}"
 
     if output_directory is not None:
-        external_command += f' -v "{output_directory}:/mnt/out:rw,Z" '
+        external_command += f' -v "{output_directory}:/mnt/out:rw{docker_selinux_flag}" '
 
 
 argument_string = ' '.join(map(lambda a: f'"{a}"', map(lambda b: b.replace('"', '\\"'), arguments)))
