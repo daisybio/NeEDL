@@ -909,6 +909,42 @@ namespace epi {
         }
 
     }
+
+
+    template <class PhenoType>
+    double
+    Instance<PhenoType>::calculate_linkage_disequilibrium(SNP snp1,
+                                                          SNP snp2) const {
+
+        // first pass: calculate means
+        double snp1_mean = 0.;
+        for (auto geno = genotypes_of_all_inds_begin(snp1); geno != genotypes_of_all_inds_end(snp1); geno++) {
+            snp1_mean += *geno;
+        }
+        snp1_mean /= num_inds_;
+        double snp1_mean_squared = snp1_mean * snp1_mean;
+        double snp2_mean = 0.;
+        for (auto geno = genotypes_of_all_inds_begin(snp2); geno != genotypes_of_all_inds_end(snp2); geno++) {
+            snp2_mean += *geno;
+        }
+        snp2_mean /= num_inds_;
+        double snp2_mean_squared = snp2_mean * snp2_mean;
+
+        // calculate pearson correlation
+        double pearson_numerator = - num_inds_ * snp1_mean * snp2_mean;
+        double pearson_denominator_snp1 = 0.;
+        double pearson_denominator_snp2 = 0.;
+        auto snp1_it = genotypes_of_all_inds_begin(snp1);
+        auto snp2_it = genotypes_of_all_inds_begin(snp2);
+        for(; snp1_it != genotypes_of_all_inds_end(snp1) && genotypes_of_all_inds_end(snp2); ++ snp1_it, ++ snp2_it) {
+            pearson_numerator += (*snp1_it) * (*snp2_it);
+            pearson_denominator_snp1 += (*snp1_it) * (*snp1_it) - num_inds_ * snp1_mean_squared;
+            pearson_denominator_snp2 += (*snp2_it) * (*snp2_it) - num_inds_ * snp2_mean_squared;
+        }
+        double pearson = pearson_numerator / (sqrt(pearson_denominator_snp1) * sqrt(pearson_denominator_snp2);
+
+        return pearson * pearson;
+    }
 }
 
 

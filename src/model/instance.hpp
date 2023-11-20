@@ -306,6 +306,9 @@ namespace epi {
 
         Eigen::VectorXd get_covariates_at_ind(Ind ind) const;
 
+
+      double calculate_linkage_disequilibrium(SNP snp1, SNP snp2) const;
+
     private:
 
         std::size_t num_categories_;
@@ -339,7 +342,8 @@ namespace epi {
         void load_csv_cov_(const std::string &filename);
     };
 
-}
+
+    }
 
 #include "instance.ipp"
 
