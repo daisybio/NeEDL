@@ -10,6 +10,7 @@
 #include "../jobs/CreateRandomSets.hpp"
 #include "../jobs/CreateSetKMers.hpp"
 #include "../jobs/ShufflePhenotypes.hpp"
+#include "../jobs/WriteSNPSetsLD.hpp"
 
 
 void
@@ -45,7 +46,8 @@ void HelperPipelines::calculate_scores(
         size_t num_random_sets,
         bool create_k_mers,
         size_t k_min,
-        size_t k_max
+        size_t k_max,
+        std::string ld_directory
         ) {
 
     if (num_threads < 0) {
@@ -86,6 +88,12 @@ void HelperPipelines::calculate_scores(
     auto writer = std::make_shared<epi::WriteSets>(rank_model, epistasis_models);
     writer->outfile_path(out_path);
     seq.add(writer);
+
+    if (!ld_directory.empty()) {
+        auto write_ld = std::make_shared<epi::WriteSNPSetsLD>("results_LD", rank_model);
+        write_ld->set_root_path(ld_directory);
+        seq.add(write_ld);
+    }
 
     auto data = std::make_shared<epi::DataModel>(true);
     seq.run(data);

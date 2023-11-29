@@ -78,7 +78,8 @@ int main(int argc, char **argv) {
     bool shuffle_phenotypes = false;
     app.add_flag("--shuffle-phenotypes", shuffle_phenotypes, "If this flag is set, the individuals' phenotypes are shuffled prior to score calculation.");
 
-
+    std::string LD_directory;
+    app.add_option("--ld-output-directory", LD_directory, "If this path is set, a LD matrix file (csv-format) is created in that directory for every SNP set. This should be a path to an existing directory");
 
 
     // Parse the options.
@@ -139,7 +140,8 @@ int main(int argc, char **argv) {
             num_random_sets,
             create_k_mers,
             k_min,
-            k_max
+            k_max,
+            LD_directory
             );
 
 

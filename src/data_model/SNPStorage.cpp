@@ -396,4 +396,8 @@ namespace epi {
         throw epi::Error("Shuffling phenotype data is not available in BIM-only SNPStorage.");
     }
 
+    double SNPStorage_WithoutGeno::calculate_LD(const SNP_t &snp1, const SNP_t &snp2) {
+        throw epi::Error("LD calculation currently not implemented for BIM-only SNPStorage.");
+    }
+
 } // epi
