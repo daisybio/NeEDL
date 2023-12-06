@@ -47,7 +47,8 @@ void HelperPipelines::calculate_scores(
         bool create_k_mers,
         size_t k_min,
         size_t k_max,
-        std::string ld_directory
+        std::string ld_directory,
+        bool ld_only
         ) {
 
     if (num_threads < 0) {
@@ -85,9 +86,11 @@ void HelperPipelines::calculate_scores(
         seq.add(std::make_shared<epi::CreateSetKMers>(k_min, k_max));
     }
 
-    auto writer = std::make_shared<epi::WriteSets>(rank_model, epistasis_models);
-    writer->outfile_path(out_path);
-    seq.add(writer);
+    if (!ld_only) {
+        auto writer = std::make_shared<epi::WriteSets>(rank_model, epistasis_models);
+        writer->outfile_path(out_path);
+        seq.add(writer);
+    }
 
     if (!ld_directory.empty()) {
         auto write_ld = std::make_shared<epi::WriteSNPSetsLD>("results_LD", rank_model);

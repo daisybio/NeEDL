@@ -77,7 +77,7 @@ for i, arg in enumerate(arguments):
 input_paths = []
 
 # normal paths
-normal_path_attribs = ['--gwas-input-file', '--snp-sets-input-file']
+normal_path_attribs = ['--gwas-input-file', '--snp-sets-input-file', "--ld-output-directory"]
 for i, arg in enumerate(arguments):
     if arg in normal_path_attribs:
         if len(arguments) > i + 1:

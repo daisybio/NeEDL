@@ -37,7 +37,8 @@ public:
             bool create_k_mers = false,
             size_t k_min = 0,
             size_t k_max = 0,
-            std::string LD_directory = ""
+            std::string LD_directory = "",
+            bool ld_only = false
     );
 };
 
