@@ -291,6 +291,11 @@ namespace epi {
     }
 
 
+    template<class PhenoType>
+    double SNPStorage_PhenoType<PhenoType>::calculate_LD(const SNP_t &snp1, const SNP_t &snp2) {
+        return instance->calculate_linkage_disequilibrium(snp1.value, snp2.value);
+    }
+
 }
 
 #endif // GENEPISEEKER_SNPSTORAGE_IPP

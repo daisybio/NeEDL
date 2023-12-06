@@ -291,6 +291,12 @@ namespace epi {
         std::string snp_descriptor(SNP snp) const;
 
         /*!
+         * @brief calculates the Pearson Correlation of the two genotype vectors of snp1 and snp2. This value is a measure for the Linkage Disequilibrium.
+         * @returns the $r^2$ value of the Pearson correlation
+         */
+        double calculate_linkage_disequilibrium(SNP snp1, SNP snp2) const;
+
+        /*!
          * @brief stores the instance in a compact binary format that can be loaded more quickly than a json file
          * @param filename path to the output file
          */
@@ -305,6 +311,7 @@ namespace epi {
         Eigen::MatrixXd get_covariates() const;
 
         Eigen::VectorXd get_covariates_at_ind(Ind ind) const;
+
 
     private:
 
@@ -339,7 +346,8 @@ namespace epi {
         void load_csv_cov_(const std::string &filename);
     };
 
-}
+
+    }
 
 #include "instance.ipp"
 

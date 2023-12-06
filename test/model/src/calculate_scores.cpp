@@ -31,7 +31,7 @@ int main(int argc, char **argv) {
 
     std::string snp_sets_output_file;
     app.add_option("--snp-sets-output-file", snp_sets_output_file,
-                   "The output file containing the calculated scores.")->required();
+                   "The output file containing the calculated scores.");
     std::string snp_sets_input_type;
     app.add_option("--snp-sets-input-type", snp_sets_input_type,
                    "What format the SNP sets are in. Options are: NEEDL, MACOED, LINDEN")->required();
@@ -78,11 +78,26 @@ int main(int argc, char **argv) {
     bool shuffle_phenotypes = false;
     app.add_flag("--shuffle-phenotypes", shuffle_phenotypes, "If this flag is set, the individuals' phenotypes are shuffled prior to score calculation.");
 
+    std::string ld_directory;
+    app.add_option("--ld-output-directory", ld_directory, "If this path is set, a LD matrix file (csv-format) is created in that directory for every SNP set. This should be a path to an existing directory");
 
+    bool ld_only = false;
+    app.add_flag("--ld-only", ld_only, "If this flag is set, only LD calculation but no score calculation is performed.");
 
 
     // Parse the options.
     CLI11_PARSE(app, argc, argv);
+
+    if (snp_sets_output_file.empty() && !ld_only) {
+        throw epi::Error("Either specify an output file via --snp-sets-output-file or select --ld-only.");
+    }
+    if (!snp_sets_output_file.empty() && ld_only) {
+        Logger::logLine("Warning: --ld-only specified but an output file was specified via --snp-sets-output-file. Output file will be ignored.");
+    }
+    if (ld_only && ld_directory.empty()) {
+        throw epi::Error("--ld-only set but no LD output directory given with --ld-output-directory.");
+    }
+
 
     snp_sets_input_type = toUpperCase(snp_sets_input_type);
     std::shared_ptr<epi::Job> reader;
@@ -139,7 +154,9 @@ int main(int argc, char **argv) {
             num_random_sets,
             create_k_mers,
             k_min,
-            k_max
+            k_max,
+            ld_directory,
+            ld_only
             );
 
 
