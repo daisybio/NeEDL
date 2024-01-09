@@ -33,11 +33,15 @@ ENV DEBIAN_FRONTEND=noninteractive
 
 # install build dependencies
 RUN apt-get update -y && \
-    apt-get install -y build-essential git cmake autoconf libtool pkg-config python3.10 python3.10-dev gcc g++ sqlite3 libsqlite3-dev python3.10-distutils unzip curl libevent-dev libboost-all-dev && \
-    curl https://dl.google.com/go/go1.21.1.linux-amd64.tar.gz | tar -xz -C /usr/local
+    apt-get install -y build-essential pkg-config git cmake autoconf gfortran ninja-build libtool pkg-config python3.10 python3.10-dev gcc g++ sqlite3 libsqlite3-dev python3.10-distutils unzip curl libevent-dev libboost-all-dev && \
+    rm -rf /var/lib/apt/lists/* && \
+    git clone https://github.com/Microsoft/vcpkg.git vcpkg && \
+    ./vcpkg/bootstrap-vcpkg.sh -disableMetrics
 
-ENV PATH /usr/local/go/bin:$PATH
 
+# install vcpkg dependencies
+COPY ./vcpkg.json ./vcpkg.json
+RUN ./vcpkg/vcpkg install
 
 # copy necessary NeEDL repo files
 COPY ext ./ext
