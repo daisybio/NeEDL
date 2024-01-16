@@ -59,6 +59,7 @@ endif()
 # vcpkg packages
 find_path(UWEBSOCKETS_INCLUDE_DIRS "uwebsockets/App.h" REQUIRED)
 find_library(LIBUSOCKETS_LIB libuSockets.a REQUIRED)
+find_package(ZLIB REQUIRED)
 
 # needed for the quantum-computing part
 find_package(Python COMPONENTS Interpreter Development)

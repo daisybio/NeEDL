@@ -69,6 +69,7 @@ target_link_libraries(realtime_scores
         boost_filesystem
         igraph
         ${LIBUSOCKETS_LIB}
+        ${ZLIB_LIBRARIES}
 )
 target_include_directories(realtime_scores
         PRIVATE ${UWEBSOCKETS_INCLUDE_DIRS}
