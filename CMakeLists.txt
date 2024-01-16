@@ -56,6 +56,10 @@ endif()
 #  add_custom_target(docs ${DOXYGEN_EXECUTABLE} ${CMAKE_CURRENT_BINARY_DIR}/doxyfile WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR} COMMENT "Generating documentation with Doxygen." VERBATIM)
 #endif()
 
+# vcpkg packages
+find_path(UWEBSOCKETS_INCLUDE_DIRS "uwebsockets/App.h" REQUIRED)
+find_library(LIBUSOCKETS_LIB libuSockets.a REQUIRED)
+
 # needed for the quantum-computing part
 find_package(Python COMPONENTS Interpreter Development)
 find_package(SQLite3 REQUIRED)
@@ -69,7 +73,8 @@ cmake_print_variables(SQLite3_INCLUDE_DIRS)
 cmake_print_variables(SQLite3_LIBRARIES)
 
 # Set up the compiler.
-set(CMAKE_CXX_FLAGS "-std=c++20 -Wall -Wextra -pedantic -Wredundant-decls -Wdisabled-optimization -Wctor-dtor-privacy -Wnon-virtual-dtor -Werror=old-style-cast -Wsign-promo -Werror=return-type -Wno-unused-parameter")
+set(CMAKE_CXX_FLAGS "-std=c++20 -Wall -Wextra -pedantic -Wredundant-decls -Wdisabled-optimization -Wctor-dtor-privacy -Wnon-virtual-dtor -Wsign-promo -Werror=return-type -Wno-unused-parameter")
+# set(CMAKE_CXX_FLAGS "-std=c++17 -Wall -Wextra -pedantic -Wredundant-decls -Wdisabled-optimization -Wctor-dtor-privacy -Wnon-virtual-dtor -Werror=old-style-cast -Wsign-promo -Werror=return-type -Wno-unused-parameter")
 set(CMAKE_CXX_FLAGS_DEBUG "-O3 -g")
 set(CMAKE_CXX_FLAGS_RELEASE "-O3")
 

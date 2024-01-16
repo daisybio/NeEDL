@@ -3,7 +3,7 @@
 //
 
 #include <CLI11.hpp>
-#include "../../ext/uWebSockets/src/App.h"
+#include <uwebsockets/App.h>
 #include "../../ext/rapidjson/document.h"
 
 #define HEADER_ONLY
