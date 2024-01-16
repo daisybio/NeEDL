@@ -33,11 +33,14 @@ ENV DEBIAN_FRONTEND=noninteractive
 
 # install build dependencies
 RUN apt-get update -y && \
-    apt-get install -y build-essential git cmake autoconf libtool pkg-config python3.10 python3.10-dev gcc g++ sqlite3 libsqlite3-dev python3.10-distutils unzip curl libevent-dev libboost-all-dev && \
-    curl https://dl.google.com/go/go1.21.1.linux-amd64.tar.gz | tar -xz -C /usr/local
+    apt-get install -y build-essential pkg-config git cmake autoconf gfortran ninja-build libtool pkg-config python3.10 python3.10-dev gcc g++ sqlite3 libsqlite3-dev python3.10-distutils unzip curl libevent-dev libboost-all-dev && \
+    rm -rf /var/lib/apt/lists/*
 
-ENV PATH /usr/local/go/bin:$PATH
 
+# install vcpkg dependencies
+COPY ./vcpkg.json ./vcpkg.json
+COPY ./install.py ./install.py
+RUN python3 install.py --vcpkg-setup-only
 
 # copy necessary NeEDL repo files
 COPY ext ./ext
@@ -52,7 +55,7 @@ COPY data/dbSNP/inc_pseudogenes /NeEDL/data/dbSNP/inc_pseudogenes
 COPY data/BIOGRID /NeEDL/data/BIOGRID
 
 # initialize everything needed for the build and build all targets
-RUN python3.10 install.py --clean --no-submodule-extraction --system-boost && \ 
+RUN python3.10 install.py --clean --skip-vcpkg-setup --system-boost && \ 
     python3.10 install.py --target NeEDL --system-boost && \
     python3.10 install.py --target calculate_scores --system-boost && \
     python3.10 install.py --target convert_to_binary --system-boost && \

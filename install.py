@@ -52,7 +52,7 @@ def build_targets(args, all_targets, dependencies):
 
     if (not os.path.isfile("build/Makefile")):
         print("-- Running CMake.")
-        commands = "cd build; rm -rf *; cmake .. -DCMAKE_BUILD_TYPE=" + ("Debug" if args.debug else "Release")
+        commands = f'cd build; rm -rf *; cmake .. -DCMAKE_BUILD_TYPE={"Debug" if args.debug else "Release"} -DCMAKE_TOOLCHAIN_FILE=vcpkg/scripts/buildsystems/vcpkg.cmake'
 
         if args.system_boost:
             commands += f' -DUSE_INCLUDED_BOOST=0'
@@ -104,18 +104,6 @@ def build_external_libraries(args, dependencies):
         commands = f'cd ext/igraph_0.9.8; rm -rf build; mkdir -p build; cd build; cmake .. -DIGRAPH_OPENMP_SUPPORT=on -DIGRAPH_ENABLE_LTO=on -DIGRAPH_ENABLE_TLS=on -DCMAKE_C_COMPILER="{dependencies["gcc"]}" -DCMAKE_CXX_COMPILER="{dependencies["g++"]}"; cmake --build .'
         subprocess.call(commands, shell=True)
         f = open("ext/igraph_0.9.8/.INSTALLED", "w")
-        f.close()
-
-    # uWebSockets
-    if os.path.isfile("ext/.uWebSockets_INSTALLED") and not args.clean:
-        print("-- uWebSocket library already built.")
-    else:
-        print("-- Building uWebSockets library")
-        if not args.no_submodule_extraction:
-            subprocess.call('git submodule update --init --recursive')
-        
-        subprocess.call('cd ext/uWebSockets/uSockets;make boringssl;cd boringssl;BORINGSSL=$PWD;cd ../lsquic;cmake -DBORINGSSL_DIR=$BORINGSSL .;make;cd ..;WITH_LTO=1 WITH_QUIC=1 WITH_BORINGSSL=1 make', shell=True)
-        f = open("ext/.uWebSockets_INSTALLED", "w")
         f.close()
 
 def extract_all_zips_in_folder(folder):
@@ -201,6 +189,13 @@ def find_dependencies(args):
         "g++": gxx
     }
 
+def setup_vcpkg(args):
+    if args.clean and not args.skip_vcpkg_setup and os.path.isdir("vcpkg"):
+        subprocess.call("rm -rf vcpkg", shell=True)
+    if not os.path.isdir("vcpkg"):
+        commands = "git clone https://github.com/Microsoft/vcpkg.git vcpkg && ./vcpkg/bootstrap-vcpkg.sh -disableMetrics && ./vcpkg/vcpkg install"
+        subprocess.call(commands, shell=True)
+
 
 print("\n**************************************************")
 print("                       NeEDL                      ")
@@ -218,10 +213,14 @@ parser.add_argument("--python3", help="path to the python3 executable that shoul
 parser.add_argument("--gcc", help="one can select the path to gcc manually if the automatically selected compiler is not correct.", default=None)
 parser.add_argument("--gxx", help="one can select the path to g++ manually if the automatically selected compiler is not correct.", default=None)
 parser.add_argument("--extract-datasets", help="Also extracts simulated datasets. These might be necessary for the unit tests.", action="store_true")
-parser.add_argument("--no-submodule-extraction", help="When set the script does not recursively download submodules. This is used for building the docker container.", action="store_true")
 parser.add_argument("--system-boost", help="Use the system boost installation instead of the one in this repository", action="store_true")
+parser.add_argument("--vcpkg-setup-only", help="Sets up vcpkg and exits.", action='store_true')
+parser.add_argument("--skip-vcpkg-setup", help="Skips setting up vcpkg.", action='store_true')
 args = parser.parse_args()
 
+setup_vcpkg(args)
+if args.vcpkg_setup_only:
+    quit()
 
 dependencies = find_dependencies(args)
 
