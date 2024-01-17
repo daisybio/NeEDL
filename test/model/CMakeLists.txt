@@ -63,25 +63,16 @@ if(APPLE)
 endif()
 
 # uWebSocekt stuff
-file(GLOB uSocketObjects
-        ${PROJECT_SOURCE_DIR}/ext/uWebSockets/uSockets/*.o
-)
 
 add_executable(realtime_scores src/realtime_scores.cpp)
 target_link_libraries(realtime_scores
         boost_filesystem
         igraph
-        z
-        m
-        ${uSocketObjects}
-        ${PROJECT_SOURCE_DIR}/ext/uWebSockets/uSockets/lsquic/src/liblsquic/liblsquic.a
-        ${PROJECT_SOURCE_DIR}/ext/uWebSockets/uSockets/boringssl/build/ssl/libssl.a
-        ${PROJECT_SOURCE_DIR}/ext/uWebSockets/uSockets/boringssl/build/crypto/libcrypto.a
+        ${LIBUSOCKETS_LIB}
+        ${ZLIB_LIBRARIES}
 )
 target_include_directories(realtime_scores
-        PUBLIC ${PROJECT_SOURCE_DIR}/ext/uWebSockets/src
-        PUBLIC ${PROJECT_SOURCE_DIR}/ext/uWebSockets/uSockets/src
-        PUBLIC ${PROJECT_SOURCE_DIR}/ext/uWebSockets/uSockets/boringssl/include
+        PRIVATE ${UWEBSOCKETS_INCLUDE_DIRS}
 )
 
 add_subdirectory(src)
