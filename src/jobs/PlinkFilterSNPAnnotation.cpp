@@ -51,21 +51,25 @@ namespace epi {
         }
         exclude_file.close();
 
-        Logger::logLine("Exclude those variants from the data");
+        if (exclude_annotations) {
+            Logger::logLine("Exclude those variants from the data");
+        } else {
+            Logger::logLine("Keep those variants from the data");
+        }
         run_plink_command(ext_path, {
                 "--threads",
                 std::to_string(num_threads),
                 "--bfile",
                 input_path,
                 exclude_annotations ? "--exclude" : "--extract",
-                output_path + ".notnetwork",
+                output_path + ".withanno",
                 "--noweb",
                 "--make-bed",
                 "--out",
                 output_path
         });
 
-        remove_plink_temp_files(output_path, { ".log", ".hh", ".notnetwork", ".nosex" });
+        remove_plink_temp_files(output_path, { ".log", ".hh", ".withanno", ".nosex" });
 
         logger.stop();
     }
