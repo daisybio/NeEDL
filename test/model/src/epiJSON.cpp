@@ -37,6 +37,7 @@
 #include "../../../src/jobs/PlinkConvertJsonToPlink.hpp"
 #include "../../../src/jobs/PlinkConvertPlinkBinToLINDENInput.hpp"
 #include "../../../src/jobs/PlinkShufflePhenotype.hpp"
+#include "../../../src/jobs/PlinkFilterSNPAnnotation.hpp"
 
 using namespace epi;
 
@@ -142,6 +143,12 @@ int main(int argc, char **argv) {
 
     bool all_filters = false;
     app.add_flag("--all-filters", all_filters, "Applies all available filters.");
+
+    std::vector<std::string> annotations_keep;
+    app.add_option("--keep-annotation", annotations_keep, "Can be set multiple times. Only keeps SNPs that have at least one of the given annotations in dbSNP.");
+
+    std::vector<std::string> annotations_exclude;
+    app.add_option("--exclude-annotation", annotations_exclude, "Can be set multiple times. Excludes all SNPs that have at least one of the given annotations in dbSNP.");
 
 
     // Parse the options.
@@ -279,10 +286,30 @@ int main(int argc, char **argv) {
         current_input_file = outfile;
     }
 
-    if (filter_snp_network) {
+    if (!annotations_exclude.empty() && !annotations_keep.empty()) {
+        throw epi::Error("--keep-annotation and --exclude-annotation cannot be used together.");
+    }
+    bool do_anno_filtering = !annotations_exclude.empty() || !annotations_keep.empty();
+
+    if (filter_snp_network || do_anno_filtering) {
         // create snp network
         seq.add(std::make_shared<epi::InternalBimLoader>(current_input_file + ".bim"));
         seq.add(std::make_shared<epi::DbSNPAnnotator>(data_directory));
+    }
+
+    if (do_anno_filtering) {
+        std::vector<std::string> annotations_for_filtering;
+        annotations_for_filtering.insert(annotations_for_filtering.end(), annotations_keep.begin(), annotations_keep.end());
+        annotations_for_filtering.insert(annotations_for_filtering.end(), annotations_exclude.begin(), annotations_exclude.end());
+
+        std::string outfile = output_directory + "filtered_annotations";
+        seq.add(std::make_shared<epi::PlinkFilterSNPAnnotation>(annotations_for_filtering, !annotations_exclude.empty(), current_input_file, outfile, ext_directory, num_threads));
+        seq.add(std::make_shared<epi::PlinkCollectDatasetStats>(outfile, phenotype, "filter_annotations"));
+        seq.add(std::make_shared<epi::PlinkRemoveTempFiles>(current_input_file, std::vector<std::string>{".bim", ".bed", ".fam" }));
+        current_input_file = outfile;
+    }
+
+    if (filter_snp_network) {
         seq.add(std::make_shared<epi::SameAnnotationConnector>());
         seq.add(std::make_shared<epi::BioGridConnector>(data_directory));
         seq.add(std::make_shared<epi::NetworkStatsPrinter>(false));
