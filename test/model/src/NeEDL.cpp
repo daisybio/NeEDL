@@ -126,17 +126,17 @@ int main(int argc, char** argv) {
     // multi-network local search
     std::vector<std::string> ms_model;
     app.add_option("--ms-model", ms_model,
-                   "The model used as the score function in the final local search. Options are: BAYESIAN, VARIANCE, PENETRANCE, REGRESSION")->required();
+                   "The model used as the score function in the (multi-network) local search. Options are: BAYESIAN, VARIANCE, PENETRANCE, REGRESSION")->required();
 
     std::vector<unsigned long> ms_max_rounds;
     app.add_option("--ms-max-rounds", ms_max_rounds,
                    "The size of maximal internal rounds of local search. DEFAULT: 300.");
 
     std::vector<unsigned long> ms_min_set_size;
-    app.add_option("--ms-min-set", ms_min_set_size, "The size of minimal disease SNPs in set for the final local search. DEFAULT: 2.");
+    app.add_option("--ms-min-set", ms_min_set_size, "The size of minimal disease SNPs in set for the (multi-network) local search. DEFAULT: 2.");
 
     std::vector<unsigned long> ms_max_set_size;
-    app.add_option("--ms-max-set", ms_max_set_size, "The size of maximal disease SNPs in set for the final local search. DEFAULT: 10.");
+    app.add_option("--ms-max-set", ms_max_set_size, "The size of maximal disease SNPs in set for the (multi-network) local search. DEFAULT: 10.");
 
     std::vector<std::string> ms_per_seed_time_limit_str;
     app.add_option("--ms-per-seed-time-limit", ms_per_seed_time_limit_str,
@@ -148,7 +148,7 @@ int main(int argc, char** argv) {
 
     std::vector<std::string> ms_annealing_type;
     app.add_option("--ms-annealing-type", ms_annealing_type,
-                   "Used annealing type for the final local search: RANDOM_ANNEALING, HYPERBOLIC_TAN_ANNEALING, SIMULATED_ANNEALING. DEFAULT: SIMULATED_ANNEALING.");
+                   "Used annealing type for the (multi-network) local search: RANDOM_ANNEALING, HYPERBOLIC_TAN_ANNEALING, SIMULATED_ANNEALING. DEFAULT: SIMULATED_ANNEALING.");
 
     std::vector<double> ms_cooling_factor;
     app.add_option("--ms-cooling-factor", ms_cooling_factor, "Cooling factor for SIMULATED_ANNEALING. DEFAULT: 1.0");
@@ -189,24 +189,24 @@ int main(int argc, char** argv) {
 
     std::vector<long> ms_rc_start_seeds;
     app.add_option("--ms-rc-start-seeds", ms_rc_start_seeds,
-                   "Number of start seeds when using seeding routine RANDOM_CONNECTED for the final local search. DEFAULT: 300.")->check(
+                   "Number of start seeds when using seeding routine RANDOM_CONNECTED for the (multi-network) local search. DEFAULT: 300.")->check(
             CLI::Validator(check_integer_greater_1, "GREATER1"));
 
     std::vector<std::string> ms_qc_mode;
     app.add_option("--ms-qc-mode", ms_qc_mode,
-                   "Mode for quantum computing seeding of the final local search. Options are: SIMULATED_ANNEALING, QUANTUM_ANNEALING, QAOA. DEFAULT: SIMULATED_ANNEALING");
+                   "Mode for quantum computing seeding of the (multi-network) local search. Options are: SIMULATED_ANNEALING, QUANTUM_ANNEALING, QAOA. DEFAULT: SIMULATED_ANNEALING");
 
     std::vector<double> ms_cw_quantile;
-    app.add_option("--ms-cw-quantile", ms_cw_quantile, "Selects how many of the best start seeds are selected for COMMUNITY_WISE or QUANTUM_COMPUTING for the final local search. DEFAULT: 0.25");
+    app.add_option("--ms-cw-quantile", ms_cw_quantile, "Selects how many of the best start seeds are selected for COMMUNITY_WISE or QUANTUM_COMPUTING for the (multi-network) local search. DEFAULT: 0.25");
 
     std::vector<unsigned long> ms_cw_max_cluster_size;
-    app.add_option("--ms-cw-max-cluster-size", ms_cw_max_cluster_size, "Maximum cluster size that is allowed for the seeding COMMUNITY_WISE or QUANTUM_COMPUTING for the final local search. DEFAULT: 1000");
+    app.add_option("--ms-cw-max-cluster-size", ms_cw_max_cluster_size, "Maximum cluster size that is allowed for the seeding COMMUNITY_WISE or QUANTUM_COMPUTING for the (multi-network) local search. DEFAULT: 1000");
 
     std::vector<unsigned long> ms_cw_num_sets_per_cluster;
-    app.add_option("--ms-cw-num-sets-per-cluster", ms_cw_num_sets_per_cluster, "How many start seeds candidates are cosnidered for every cluster for the seeding COMMUNITY_WISE or QUANTUM_COMPUTING for the final local search. DEFAULT: 5");
+    app.add_option("--ms-cw-num-sets-per-cluster", ms_cw_num_sets_per_cluster, "How many start seeds candidates are cosnidered for every cluster for the seeding COMMUNITY_WISE or QUANTUM_COMPUTING for the (multi-network) local search. DEFAULT: 5");
 
     std::vector<unsigned long> ms_cw_num_snps_per_set;
-    app.add_option("--ms-cw-num-snps-per-set", ms_cw_num_snps_per_set, "How many SNPs each start seed should contain if it was not generated with quantum computing for the seeding COMMUNITY_WISE or QUANTUM_COMPUTING for the final local search. DEFAULT: 2");
+    app.add_option("--ms-cw-num-snps-per-set", ms_cw_num_snps_per_set, "How many SNPs each start seed should contain if it was not generated with quantum computing for the seeding COMMUNITY_WISE or QUANTUM_COMPUTING for the (multi-network) local search. DEFAULT: 2");
 
     std::vector<unsigned long> ms_qc_min_cluster_size;
     app.add_option("--ms-qc-min-cluster-size", ms_qc_min_cluster_size,"Quantum computing is only used to find seeds for large enough clusters. Seeds for smaller clusters are picked randomly. This parameter defines the threshold at what size to pick quantum computing. DEFAULT 100");
