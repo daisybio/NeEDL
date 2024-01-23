@@ -265,7 +265,7 @@ def run_quantum_annealer(token, h, J, num_reads, solver_idx,
     client.close()
     trace.save()
 
-    if best_fw_energy > best_fw_energy:
+    if best_fw_energy > best_rev_energy:
         return best_fw_sample if type(best_fw_sample) == 'list' else best_fw_sample.tolist()
     else:
         return best_rev_sample if type(best_rev_sample) == 'list' else best_rev_sample.tolist()

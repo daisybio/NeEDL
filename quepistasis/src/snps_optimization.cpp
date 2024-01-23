@@ -396,6 +396,25 @@ std::vector<std::vector<int>> snps_qubo_matrix::get_snp_set_list_from_solution_v
     return snp_set_list;
 }
 
+std::vector<std::vector<int>> snps_qubo_matrix::solve_cpu_parallel_tempering(
+    int num_chains, int num_steps, const char* save_path) {
+
+    // Convert QUBO into Ising formulation
+    std::tuple<std::vector<double>, std::vector<int>, std::vector<int>, std::vector<double>, double> ising = get_ising();
+    std::vector<double> h = std::get<0>(ising);
+    std::vector<int> coupler_start = std::get<1>(ising);
+    std::vector<int> coupler_end = std::get<2>(ising); 
+    std::vector<double> J = std::get<3>(ising);
+    double offset = std::get<4>(ising);
+
+    // Call python
+    std::vector<int> best_solution = PythonWrapper::get_instance().run_parallel_tempering(
+        h, J, coupler_start, coupler_end, num_chains, num_steps, save_path);
+
+    std::vector<std::vector<int>> snp_set_list = get_snp_set_list_from_solution_vector(best_solution, n_cliques, n_snps);
+
+    return snp_set_list;
+}
 
 std::vector<std::vector<int>> snps_qubo_matrix::solve_dwave_quantum_annealing(
     const char* token,

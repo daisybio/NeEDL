@@ -26,9 +26,19 @@ class PythonWrapper {
     PyObject *pModuleQAOA = nullptr;
 
     /**
+     * Object representing the module used to interact with the Parallel Tempering procedure
+     */
+    PyObject *pModuleParallelTempering = nullptr;
+
+    /**
      * Object representing the function to call "run_quantum_annealer" function in Python
      */
     PyObject *pFuncQuantumAnnealer = nullptr;
+
+    /**
+     * Object representing the function to call "run_parallel_tempering" function in Python
+     */
+    PyObject *pFuncParallelTempering = nullptr;
 
     /**
      * Object representing the function to call "run_quantum_annealer" function in Python
@@ -144,6 +154,24 @@ public:
         int num_reads, int solver_idx, double fw_annealing_ramp_time, double fw_annealing_pause_time, 
         double rev_annealing_ramp_time, double rev_annealing_pause_time, double rev_annealing_s_target, 
         const char* save_path);
+
+    
+    /**
+     * @brief Run the quantum annealer method in Python
+     * @param h: Ising formulation h coefficients (which in Python results in the object np.nparray[float] of shape (N,))
+     * @param j: Ising formulation J coefficients (which - together with start and end params - in Python results in the object dict[tuple(int,int) -> float])
+     * @param start: vector Ising formulation J starting index
+     * @param end: vector Ising formulation J starting index
+     * @param num_chains Number of parallel walkers
+     * @param num_steps Number of operations per walker
+     * @param save_path: Path where to save the file including the first part of the file name
+     * @return solution to the Ising problem or the empty list in case of errors.
+     */
+    std::vector<int> run_parallel_tempering(
+        std::vector<double> h, std::vector<double> J, std::vector<int> start, std::vector<int> end,
+        int num_chains, int num_steps, const char* save_path);
+
+
 
     /**
      * @brief Run the optimizers available of Azure QIO
