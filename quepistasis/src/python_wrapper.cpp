@@ -34,6 +34,10 @@ int PythonWrapper::init() {
     this->pModuleQAOA = get_module("azure_device");
     if(this->pModuleQAOA == NULL) { return -1; }
 
+    std::cout << "Load parallel tempering module" << std::endl << std::flush;
+    this->pModuleParallelTempering = get_module("parallel_tempering");
+    if(this->pModuleParallelTempering == NULL) { return -1; }
+
     std::cout << "Load QA function" << std::endl << std::flush;
     this->pFuncQuantumAnnealer = get_function("run_quantum_annealer", pModuleQuantumAnnealer);
     if(this->pFuncQuantumAnnealer == NULL) { return -1; }
@@ -46,6 +50,10 @@ int PythonWrapper::init() {
     this->pFuncQAOA = get_function("run_qaoa", pModuleQAOA);
     if(this->pFuncQAOA == NULL) { return -1; }
 
+    std::cout << "Load parallel tempering function" << std::endl << std::flush;
+    this->pFuncParallelTempering = get_function("run_parallel_tempering", pModuleParallelTempering);
+    if(this->pFuncParallelTempering == NULL) { return -1; }
+
     std::cout << "Loaded" << std::endl << std::flush;
 
     return 0;
@@ -55,9 +63,11 @@ void PythonWrapper::close() {
     Py_DECREF(this->pFuncQAOA);
     Py_DECREF(this->pFuncAzureOptimizer);
     Py_DECREF(this->pFuncQuantumAnnealer);
+    Py_DECREF(this->pFuncParallelTempering);
     Py_DECREF(this->pModuleQAOA);
     Py_DECREF(this->pModuleAzureOptimizer);
     Py_DECREF(this->pModuleQuantumAnnealer);
+    Py_DECREF(this->pModuleParallelTempering);
     std::cout << "Finalizing..." << std::endl << std::flush;
     if(Py_FinalizeEx() != 0) { // Python >= 3.6
         PyErr_Print();
@@ -301,6 +311,53 @@ std::vector<int> PythonWrapper::run_azure_optimizers(
     // for(PyObject* pObj : garbage) {
     //     Py_XDECREF(pObj);
     // }
+
+    return result;
+}
+
+std::vector<int> PythonWrapper::run_parallel_tempering(
+        std::vector<double> h, std::vector<double> J, std::vector<int> start, std::vector<int> end,
+        int num_chains, int num_steps, const char* save_path) {
+    
+    std::vector<PyObject*> garbage;
+
+    // create parameters
+    PyObject* pH = this->create_h(h, garbage);
+    PyObject* pJ = this->create_j(J, start, end, garbage);
+    PyObject* pNumChains = PyLong_FromLong(num_chains);
+    PyObject* pNumSteps = PyLong_FromLong(num_steps);
+    PyObject* pSavePath = PyUnicode_FromString(save_path);
+
+    PyObject *pArgs = PyTuple_New(5);
+    PyTuple_SetItem(pArgs, 0, pH);
+    PyTuple_SetItem(pArgs, 1, pJ);
+    PyTuple_SetItem(pArgs, 2, pNumChains);
+    PyTuple_SetItem(pArgs, 3, pNumSteps);
+    PyTuple_SetItem(pArgs, 4, pSavePath);
+
+    // call Python
+    PyObject *pResult = this->call_function(this->pFuncParallelTempering, pArgs);
+
+    // convert Python result in C format
+    std::vector<int> result = this->unpack_result(pResult);
+
+    // clean parameters and results object
+    // for(PyObject* pObj : garbage) {
+    //     Py_DECREF(pObj);
+    // }
+    // Py_DECREF(pToken);
+    // Py_DECREF(pH);
+    // Py_DECREF(pJ);
+    // Py_DECREF(pNumReads);
+    // Py_DECREF(pSolverIdx);
+    // Py_DECREF(pFwAnnealingRampTime);
+    // Py_DECREF(pFwAnnealingPauseTime);
+    // Py_DECREF(pRevAnnealingRampTime);
+    // Py_DECREF(pRevAnnealingPauseTime);
+    // Py_DECREF(pRevAnnealingSTarget);
+    // Py_DECREF(pSavePath);
+    // Py_DECREF(pArgs);
+    // Py_DECREF(pResult);
 
     return result;
 }

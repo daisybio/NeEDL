@@ -179,6 +179,16 @@ public:
 
     /**
      * @brief Solve the current QUBO matrix with quantum annealing (call Python then D-Wave devices). In case of errors the return value is the empty vector.
+     * @param num_chains Number of parallel walkers
+     * @param num_steps Number of operations per walker
+     * @param save_path Path where to save the file including the first part of the file name
+     * @return A vector of 'n_cliques' elements, each element represents a suggested SNPs set OR the empty vector in case of errors. 
+     */
+    std::vector<std::vector<int>> solve_cpu_parallel_tempering(int num_chains, int num_steps, const char* save_path);
+
+
+    /**
+     * @brief Solve the current QUBO matrix with quantum annealing (call Python then D-Wave devices). In case of errors the return value is the empty vector.
      * @param token: D-Wave platform token
      * @param num_reads Number of times the annealing process is repeated with a different, random initial state
      * @param solver_idx Use 4 to use latest D-Wave machine 'Advantage-6.1'
