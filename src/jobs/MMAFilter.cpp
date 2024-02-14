@@ -4,6 +4,7 @@
 
 #include "MMAFilter.hpp"
 #include "../util/TimeLogger.hpp"
+#include "../util/helper_functions.hpp"
 
 namespace epi {
     MMAFilter::MMAFilter(double filter_cutoff, bool use_BH_correction) {
@@ -30,6 +31,9 @@ namespace epi {
             // correct p values
             Logger::logLine("Correct MMA p-values with Benjamini-Hochberg");
 
+            benjamini_hochberg_correction(mma_scores);
+
+            /*
             // clone vector with mma values
             std::vector<std::pair<double, size_t>> mma_values_copy;
             for(size_t i = 0; i < mma_scores.size(); i++) {
@@ -59,6 +63,7 @@ namespace epi {
                 // std::cout << maximum_marginal_association_for_snps_[x.second] << " -> " << x.first << std::endl;
                 mma_scores[x.second] = x.first;
             }
+             */
         }
 
         // store mma_scores and mark as removed if threshold is not reached

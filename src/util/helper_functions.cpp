@@ -153,4 +153,37 @@ namespace epi {
         return res_minutes;
     }
 
+    void benjamini_hochberg_correction(std::vector<double> &pvalues) {
+        if (pvalues.empty()) return;
+
+        // convert to pvalue-index pairs
+        std::vector<std::pair<double, size_t>> pval_index_pairs;
+        for(size_t i = 0; i < pvalues.size(); i++) {
+            pval_index_pairs.push_back({ pvalues[i], i });
+        }
+
+        // sort pairs in ascending order by p value
+        std::sort(pval_index_pairs.begin(), pval_index_pairs.end(), [] (std::pair<double, size_t> a, std::pair<double, size_t> b) { return a.first < b.first; });
+
+        // correct p-value
+        for (size_t i = 0; i < pval_index_pairs.size(); i++) {
+            pval_index_pairs[i].first *= double(pval_index_pairs.size()) / double(i + 1);
+        }
+
+        // check that lower p-value cannot lead to higher corrected one comparing the others
+        double min = pval_index_pairs.back().first;
+        for (long i = pval_index_pairs.size() - 1; i >= 0; i--) {
+            if (pval_index_pairs[i].first > min) {
+                pval_index_pairs[i].first = min;
+            } else {
+                min = pval_index_pairs[i].first;
+            }
+        }
+
+        // sort back adjusted p-values
+        for (auto x : pval_index_pairs) {
+            pvalues[x.second] = x.first;
+        }
+    }
+
 } // epi

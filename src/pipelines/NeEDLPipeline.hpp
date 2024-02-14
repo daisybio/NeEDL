@@ -52,6 +52,7 @@ public:
 
     // snp annotation
     void add_snp_annotation_source_dbSNP();
+    void add_snp_annotation_source_eQTL(const std::vector<std::string>& tissue_selection, double pvalue_cutoff, bool bh_correction);
     void add_snp_annotation_source(const epi::SnpCsvAnnotator& annotation_source);
 
     // networks to search (eg. BIOGRID)
