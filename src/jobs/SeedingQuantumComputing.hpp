@@ -52,6 +52,8 @@ namespace epi {
                              int n_shots = 5,
                              int is_recursive_qaoa = 0);
 
+        void set_parallel_tempering_params(int num_chains = 1, int num_steps = 1);
+
         void run(std::shared_ptr<DataModel> data) override;
         rapidjson::Value getConfig(rapidjson::Document &doc) override;
     private:
@@ -68,7 +70,8 @@ namespace epi {
         enum {
             SIMULATED_ANNEALING = 0,
             QUANTUM_ANNEALING = 1,
-            QAOA = 2
+            QAOA = 2,
+            PARALLEL_TEMPERING = 3
         } QCMode = SIMULATED_ANNEALING;
         std::array<std::string, 3> QCMode_names = { "SIMULATED_ANNEALING", "QUANTUM_ANNEALING", "QAOA" };
 
@@ -99,6 +102,10 @@ namespace epi {
         int qc_qaoa_reps;
         int qc_qaoa_n_shots;
         int qc_qaoa_is_recursive_qaoa;
+
+        // qc - parallel tempering
+        int qc_pt_num_chains;
+        int qc_pt_num_steps;
 
 
 

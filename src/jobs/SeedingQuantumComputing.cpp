@@ -98,6 +98,15 @@ namespace epi {
         qc_qaoa_is_recursive_qaoa = is_recursive_qaoa;
     }
 
+    void SeedingQuantumComputing::set_parallel_tempering_params(int num_chains, int num_steps) {
+        if (QCMode != PARALLEL_TEMPERING) {
+            throw epi::Error("Setting attributes for PARALLEL_TEMPERING only allowed if selected mode is PARALLEL_TEMPERING");
+        }
+
+        qc_pt_num_chains = num_chains;
+        qc_pt_num_steps = num_steps;
+    }
+
     void SeedingQuantumComputing::run(std::shared_ptr<DataModel> data) {
         TimeLogger logger("seeding with method QUANTUM_COMPUTING");
         // create a clustering with respect to maximal cluster size for QC
@@ -228,6 +237,9 @@ namespace epi {
                                                     qc_qaoa_is_recursive_qaoa,
                                                     temp_file.c_str());
                     break;
+                case PARALLEL_TEMPERING:
+                    snps_set_list = qubo.solve_cpu_parallel_tempering(qc_pt_num_chains, qc_pt_num_steps, temp_file.c_str());
+                    break;
             }
 
             for (auto &set: snps_set_list) {
@@ -249,6 +261,8 @@ namespace epi {
 
         return result_sets;
     }
+
+
 
     rapidjson::Value SeedingQuantumComputing::getConfig(rapidjson::Document &doc) {
         auto obj= SeedingCommunityWise::getConfig(doc);
@@ -287,9 +301,14 @@ namespace epi {
             obj.AddMember("reps", rapidjson::Value().SetInt(qc_qaoa_reps), doc.GetAllocator());
             obj.AddMember("n_shots", rapidjson::Value().SetInt(qc_qaoa_n_shots), doc.GetAllocator());
             obj.AddMember("is_recursive_qaoa", rapidjson::Value().SetInt(qc_qaoa_is_recursive_qaoa), doc.GetAllocator());
+        } else if (QCMode == PARALLEL_TEMPERING) {
+            obj.AddMember("chains", rapidjson::Value().SetInt(qc_pt_num_chains), doc.GetAllocator());
+            obj.AddMember("steps", rapidjson::Value().SetInt(qc_pt_num_steps), doc.GetAllocator());
         }
         return obj;
     }
+
+
 
 
 } // epi
