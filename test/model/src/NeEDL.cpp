@@ -114,6 +114,15 @@ int main(int argc, char** argv) {
     std::vector<std::string> snp_annotation_methods;
     app.add_option("--snp-annotate", snp_annotation_methods, "Declare annotation sources with this option. Option can be used multiple times to add multiple sources. The file must be a csv file with one column for the snp names (as in the input file) and one column for the annotations. Both columns can be multi-columns that contain multiple entries per row separated with a separating character. If a column is not a multi-column, give -1 as separator. If both column descriptors can be casted to a number this is used as a null-based index of the column Otherwise, the two values are searched for in the header line. The format of this option is <path>|<has-header ? 'yes' : 'no'>|<snp-col>|<annotation-col>|[<csv-separator>]|[<snp-separator>]|[<annotation-separator>].");
 
+    bool use_eqtl_mapping = false;
+    app.add_flag("--snp-annotate-eQTL", use_eqtl_mapping, "This option annotates the SNPs with the help of the included eQTL database curated from the eQTL catalogue. This results in a gene annotation.");
+
+    std::vector<std::string> eqtl_tissues;
+    app.add_option("--eQTL-tissue", eqtl_tissues, "This parameter can only be used together with --snp-annotate-eQTL. With this parameter, one can restrict the use of eQTL data to certain tissues. Specify this parameter multiple times to select multiple tissues. If this parameter is not specified, all available tissues are used.");
+
+    double eqtl_pvalue_cutoff = 0.05;
+    app.add_option("--eQTL-pvalue-cutoff", eqtl_tissues, "This parameter can only be used together with --snp-annotate-eQTL. This cutoff value is used to filter the entries in eQTL catalogue. The pvalues of all selected tissues are corrected with Benjamini-Hochberg before applying this cutoff. DEFAUL: 0.05");
+
 
     // multi-network networks
     bool use_BIOGRID = false;
@@ -573,6 +582,7 @@ int main(int argc, char** argv) {
         if (!network_shuffle_method.empty()) pipeline.activate_network_shuffling(network_shuffle_method);
 
         if (use_dbSNP) pipeline.add_snp_annotation_source_dbSNP();
+        if (use_eqtl_mapping) pipeline.add_snp_annotation_source_eQTL(eqtl_tissues, eqtl_pvalue_cutoff, true);
         for (auto &method: snp_annotation_methods) {
             pipeline.add_snp_annotation_source(epi::SnpCsvAnnotator::parse_from_source_string(method));
         }

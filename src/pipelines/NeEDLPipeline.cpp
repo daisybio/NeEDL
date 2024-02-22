@@ -23,6 +23,7 @@
 #include "../jobs/MultiNetworkAggregator.hpp"
 #include "../jobs/SnpCsvAnnotator.hpp"
 #include "../jobs/ShinyAppLauncher.hpp"
+#include "../jobs/EQTLAnnotator.hpp"
 
 
 NeEDLPipeline::NeEDLPipeline(std::string input_path, std::string input_format, std::string input_phenotype,
@@ -112,6 +113,10 @@ void NeEDLPipeline::add_snp_annotation_source_dbSNP() {
     snpAnnotationPipeline.push_back(std::make_shared<epi::DbSNPAnnotator>(data_directory));
 }
 
+void NeEDLPipeline::add_snp_annotation_source_eQTL(const std::vector<std::string>& tissue_selection, double pvalue_cutoff, bool bh_correction) {
+    snpAnnotationPipeline.push_back(std::make_shared<epi::EQTLAnnotator>(tissue_selection, pvalue_cutoff, bh_correction, data_directory));
+}
+
 void NeEDLPipeline::add_snp_annotation_source(const epi::SnpCsvAnnotator& annotation_source) {
     snpAnnotationPipeline.push_back(std::make_shared<epi::SnpCsvAnnotator>(annotation_source));
 }
@@ -156,4 +161,6 @@ void NeEDLPipeline::activate_network_shuffling(std::string method) {
 void NeEDLPipeline::activate_MMA_filter(double cutoff, bool correct_BH) {
     mmaFilter = std::make_shared<epi::MMAFilter>(cutoff, correct_BH);
 }
+
+
 

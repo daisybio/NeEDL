@@ -89,17 +89,21 @@ namespace epi {
         CSVParser parser;
         parser.parse(path, csv_separator);
 
+        const auto filter_map = filter_entries(parser);
+
         std::vector<std::vector<std::string>> snp_splits (parser.num_rows()), annotation_splits(parser.num_rows());
         if (snp_separator != -1) {
-#pragma omp parallel for default(none) shared(has_header, snp_column, snp_separator, parser, snp_splits)
+#pragma omp parallel for default(none) shared(has_header, snp_column, snp_separator, parser, snp_splits, filter_map)
             for (size_t i = has_header ? 1 : 0; i < parser.num_rows(); i++) {
+                if (!filter_map[i]) continue;
                 snp_splits[i] = string_split(parser.cell(i, snp_column), snp_separator);
             }
         }
 
         if (annotation_separator != -1) {
-#pragma omp parallel for default(none) shared(has_header, annotation_column, annotation_separator, parser, annotation_splits)
+#pragma omp parallel for default(none) shared(has_header, annotation_column, annotation_separator, parser, annotation_splits, filter_map)
             for (size_t i = has_header ? 1 : 0; i < parser.num_rows(); i++) {
+                if (!filter_map[i]) continue;
                 annotation_splits[i] = string_split(parser.cell(i, annotation_column), annotation_separator);
             }
         }
@@ -108,6 +112,7 @@ namespace epi {
 
         std::vector<std::string> snps, annotations;
         for (size_t i = has_header ? 1 : 0; i < parser.num_rows(); i++) {
+            if (!filter_map[i]) continue;
             if (snp_separator == -1) {
                 snps.clear();
                 snps.push_back(parser.cell(i, snp_column));
@@ -231,6 +236,11 @@ namespace epi {
             throw epi::Error("Error in SNP annotation source: A csv without header was given but the columns are referenced by column name.");
             return epi::SnpCsvAnnotator("", 0, 0);
         }
+    }
+
+    std::vector<bool> SnpCsvAnnotator::filter_entries(const CSVParser &parser) {
+        // accept all
+        return std::vector<bool>(parser.num_rows(), true);
     }
 
 

@@ -65,6 +65,9 @@ test/model/res/*
 # unzipped GRNs
 /data/GRN/*.csv
 
+# unzipped eqtl_mappings
+data/eqtl_mapping/*.csv
+
 #dbSNP
 /data/dbSNP/no_pseudogenes/snps_restruc_full.csv
 /data/dbSNP/no_pseudogenes/snps_cleaned_part1.csv

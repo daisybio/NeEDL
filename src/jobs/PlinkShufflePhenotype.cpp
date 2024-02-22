@@ -4,6 +4,7 @@
 
 #include "PlinkShufflePhenotype.hpp"
 #include "../util/TimeLogger.hpp"
+#include <filesystem>
 
 namespace epi {
 

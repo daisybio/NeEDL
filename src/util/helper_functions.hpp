@@ -86,74 +86,8 @@ namespace epi {
         return str;
     }
 
-    /*
-    // from https://www.intel.com/content/www/us/en/developer/articles/technical/an-efficient-parallel-three-way-quicksort-using-intel-c-compiler-and-openmp-45-library.html
-    template<class RanIt>
-    void qsort3w(RanIt _First, RanIt _Last)
-    {
-        if (_First >= _Last) return;
+    void benjamini_hochberg_correction(std::vector<double> &pvalues);
 
-        std::size_t _Size = 0L;
-        if ((_Size = std::distance(_First, _Last)) > 0)
-        {
-            RanIt _LeftIt = _First, _RightIt = _Last;
-            bool is_swapped_left = false, is_swapped_right = false;
-            typename std::iterator_traits<RanIt>::value_type _Pivot = *_First;
-
-            RanIt _FwdIt = _First + 1;
-            while (_FwdIt <= _RightIt)
-            {
-                if (*_FwdIt < _Pivot)
-                {
-                    is_swapped_left = true;
-                    std::iter_swap(_LeftIt, _FwdIt);
-                    _LeftIt++; _FwdIt++;
-                }
-
-                else if (_Pivot < *_FwdIt) {
-                    is_swapped_right = true;
-                    std::iter_swap(_RightIt, _FwdIt);
-                    _RightIt--;
-                }
-
-                else _FwdIt++;
-            }
-
-            if (_Size >= 10000L)
-            {
-#pragma omp taskgroup
-                {
-#pragma omp task untied mergeable
-                    if ((std::distance(_First, _LeftIt) > 0) && (is_swapped_left))
-                        qsort3w(_First, _LeftIt - 1);
-
-#pragma omp task untied mergeable
-                    if ((std::distance(_RightIt, _Last) > 0) && (is_swapped_right))
-                        qsort3w(_RightIt + 1, _Last);
-                }
-            }
-
-            else
-            {
-#pragma omp task untied mergeable
-                {
-                    if ((std::distance(_First, _LeftIt) > 0) && is_swapped_left)
-                        qsort3w(_First, _LeftIt - 1);
-
-                    if ((std::distance(_RightIt, _Last) > 0) && is_swapped_right)
-                        qsort3w(_RightIt + 1, _Last);
-                }
-            }
-        }
-    }
-
-    template<class BidirIt>
-    void parallel_sort(BidirIt _First, BidirIt _Last)
-    {
-#pragma omp master
-            qsort3w(_First, _Last - 1);
-    }
-     */
 
     std::unordered_map<std::string, char> getEscapedCharMap ();
 

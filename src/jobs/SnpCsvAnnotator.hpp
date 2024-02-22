@@ -36,6 +36,8 @@ namespace epi {
     protected:
         explicit SnpCsvAnnotator(bool has_header = false, char csv_separator = ',', char snp_separator = -1, char annotation_separator = -1);
 
+        virtual std::vector<bool> filter_entries(const CSVParser &parser);
+
         void check_columns(size_t snp_col, size_t annotation_col);
         void check_columns(const std::string& snp_col, const std::string& annotation_col);
 
