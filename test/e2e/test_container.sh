@@ -52,6 +52,22 @@ python ./run/NeEDL.py \
     "--ms-model" "PENETRANCE_NLL"
 
 
+# check that eqtl_mapping works
+python ./run/NeEDL.py \
+    --docker-image-name "$1" \
+    --docker-no-pulling \
+    "--num-threads" "1" \
+    "--output-directory" "$out_dir" \
+    "--input-format" "JSON_EPIGEN" \
+    "--input-path" "$dummy_dataset" \
+    "--phenotype" "DICHOTOMOUS" \
+    "--snp-annotate-eQTL" \
+    "--network-BIOGRID" \
+    "--ms-seeding-routine" "RANDOM_CONNECTED" \
+    "--ms-rc-start-seeds" "5" \
+    "--ms-model" "PENETRANCE_NLL"
+
+
 # test that custom annotation files and custom networks work
 annotation_file=$(realpath ./data/e2e_tests/annotations.csv)
 network_file=$(realpath ./data/e2e_tests/network.csv)

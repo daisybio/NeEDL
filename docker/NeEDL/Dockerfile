@@ -53,6 +53,7 @@ COPY quepistasis ./quepistasis
 # copy files in /data
 COPY data/dbSNP/inc_pseudogenes /NeEDL/data/dbSNP/inc_pseudogenes
 COPY data/BIOGRID /NeEDL/data/BIOGRID
+COPY data/eqtl_mapping /NeEDL/data/eqtl_mapping
 
 # initialize everything needed for the build and build all targets
 RUN python3.10 install.py --clean --skip-vcpkg-setup --system-boost && \ 
@@ -81,6 +82,7 @@ RUN apt-get update -y && apt-get install -y python3.10 python3.10-dev sqlite3 g+
 COPY --from=build /NeEDL/test/model/bin/* /NeEDL/test/model/bin/
 COPY --from=build /NeEDL/data/dbSNP/inc_pseudogenes/snps_restruc_full_inc_pseudo.csv /NeEDL/data/dbSNP/inc_pseudogenes/snps_restruc_full_inc_pseudo.csv
 COPY --from=build /NeEDL/data/BIOGRID/BIOGRID-ORGANISM-Homo_sapiens-3.5.182.tab2.txt /NeEDL/data/BIOGRID/BIOGRID-ORGANISM-Homo_sapiens-current.tab2.txt
+COPY --from=build /NeEDL/data/eqtl_mapping/eqtl_mapping.csv /NeEDL/data/eqtl_mapping/eqtl_mapping.csv
 COPY --from=build /NeEDL/ext/plink/plink_linux_x86_64_20230116/ /NeEDL/ext/plink/plink_linux_x86_64_20230116/
 
 # create symlinks for all created binaries

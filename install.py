@@ -142,6 +142,7 @@ def extract_resources(args):
         extract_all_zips_in_folder("data/dbSNP/inc_pseudogenes")
         extract_all_zips_in_folder("data/dbSNP/no_pseudogenes")
         extract_all_zips_in_folder("data/GRN")
+        extract_all_zips_in_folder("data/eqtl_mapping")
         extract_all_zips_in_folder("data/PositionBasedInputModule/snp_balanced_tree")
         extract_all_zips_in_folder("data/PositionBasedInputModule/snp_hashmaps")
         extract_all_zips_in_folder("data/PositionBasedInputModule/gene_balanced_tree")
