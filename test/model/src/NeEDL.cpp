@@ -304,6 +304,12 @@ int main(int argc, char** argv) {
     std::vector<int> ms_qc_qaoa_is_recursive_qaoa;
     app.add_option("--ms-qc-qaoa-is-recursive-qaoa", ms_qc_qaoa_is_recursive_qaoa, "Parameter for seeding QUANTUM_COMPUTING, mode QAOA, DEFAULT 0.");
 
+    std::vector<int> ms_qc_pt_num_chains;
+    app.add_option("--ms-qc-pt-num-chains", ms_qc_pt_num_chains, "Parameter for seeding QUANTUM_COMPUTING, mode PARALLEL_TEMPERING, DEFAULT 1.");
+
+    std::vector<int> ms_qc_pt_num_steps;
+    app.add_option("--ms-qc-pt-num-steps", ms_qc_pt_num_steps, "Parameter for seeding QUANTUM_COMPUTING, mode PARALLEL_TEMPERING, DEFAULT 1.");
+
     // final local search
     bool disable_final_search = false;
     app.add_flag("--disable-final-search", disable_final_search, "Disable the final search of the network. This flag can be used if only multiple networks are used but the results should not be aggregated.");
@@ -479,6 +485,12 @@ int main(int argc, char** argv) {
     int fs_qc_qaoa_is_recursive_qaoa = 0;
     app.add_option("--fs-qc-qaoa-is-recursive-qaoa", fs_qc_qaoa_is_recursive_qaoa, "Parameter for seeding QUANTUM_COMPUTING, mode QAOA, DEFAULT 0.");
 
+    int fs_qc_pt_num_chains = 1;
+    app.add_option("--fs-qc-pt-num-chains", fs_qc_pt_num_chains, "Parameter for seeding QUANTUM_COMPUTING, mode PARALLEL_TAMPERING, DEFAULT 1.");
+
+    int fs_qc_pt_num_steps = 1;
+    app.add_option("--fs-qc-pt-num-steps", fs_qc_pt_num_steps, "Parameter for seeding QUANTUM_COMPUTING, mode PARALLEL_TAMPERING, DEFAULT 1.");
+
 
     // Optional options.
     /*
@@ -641,6 +653,8 @@ int main(int argc, char** argv) {
         epi::expand_multi_param("--ms-qc-qaoa-reps", ms_qc_qaoa_reps, 5, num_networks, false);
         epi::expand_multi_param("--ms-qc-qaoa-n-shots", ms_qc_qaoa_n_shots, 5, num_networks, false);
         epi::expand_multi_param("--ms-qc-qaoa-is-recursive-qaoa", ms_qc_qaoa_is_recursive_qaoa, 0, num_networks, false);
+        epi::expand_multi_param("--ms-qc-pt-num-chains", ms_qc_pt_num_chains, 1, num_networks, false);
+        epi::expand_multi_param("--ms-qc-pt-num-steps", ms_qc_pt_num_steps, 1, num_networks, false);
 
 
         auto escapedCharMap = epi::getEscapedCharMap();
@@ -785,6 +799,8 @@ int main(int argc, char** argv) {
                             ms_qc_qaoa_n_shots[i],
                             ms_qc_qaoa_is_recursive_qaoa[i]
                     );
+                } else if (ms_qc_mode[i] == "PARALLEL_TEMPERING") {
+                    seeding.set_parallel_tempering_params(ms_qc_pt_num_chains[i], ms_qc_pt_num_steps[i]);
                 } else {
                     throw epi::Error("Unknown value für --ms-qc-mode");
                 }
@@ -894,6 +910,8 @@ int main(int argc, char** argv) {
                             fs_qc_qaoa_n_shots,
                             fs_qc_qaoa_is_recursive_qaoa
                     );
+                } else if (fs_qc_mode == "PARALLEL_TEMPERING") {
+                    seeding_qc.set_parallel_tempering_params(fs_qc_pt_num_chains, fs_qc_pt_num_steps);
                 } else {
                     throw epi::Error("Unknown value for --fs-qc-mode");
                 }
