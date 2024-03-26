@@ -16,17 +16,38 @@ print(arguments)
 
 # check if singularity should be used instead of docker
 use_singularity = False
+explicitly_selected_docker = False
 singularity_cmd = 'singularity'
+found_container_platform = False
 for i, arg in enumerate(arguments):
     if arg == '--singularity':
+        if found_container_platform:
+            print("ERROR: Specified container platform (docker/singularity/apptainer) multiple times")
+            exit(-1)
         use_singularity = True
         # remove argument from list as app cannot process it
         del arguments[i]
+        found_container_platform = True
     if arg == '--apptainer':
+        if found_container_platform:
+            print("ERROR: Specified container platform (docker/singularity/apptainer) multiple times")
+            exit(-1)
         use_singularity = True
         singularity_cmd = 'apptainer'
         # remove argument from list as app cannot process it
         del arguments[i]
+        found_container_platform = True
+    if arg == '--docker':
+        if found_container_platform:
+            print("ERROR: Specified container platform (docker/singularity/apptainer) multiple times")
+            exit(-1)
+        explicitly_selected_docker = True
+        del arguments[i]
+        found_container_platform = True
+
+
+if not explicitly_selected_docker:
+    print("WARNING: No container platform (docker/singularity/apptainer) was selected. Defaulting to docker.")
 
 
 # on selinux systems the Z flag might be necessary to mount the directories correctly to the docker container
@@ -40,7 +61,7 @@ for i, arg in enumerate(arguments):
 
 # define a different docker image name, needed for testing
 for i, arg in enumerate(arguments):
-    if arg == '--docker-image-name':
+    if arg == '--container-image-name':
         if len(arguments) > i + 1:
             image = arguments[i + 1]
 

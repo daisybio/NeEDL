@@ -2,7 +2,8 @@
 
 - [Tools provided in this repository](#tools-provided-in-this-repository)
 - [License and Citing](#license-and-citing)
-- [Usage Docker container](#usage-docker-container)
+- [Usage Docker/Apptainer/Singularity container](#usage-dockerapptainersingularity-container)
+    - [Docker-specific parameters](#docker-specific-parameters)
     - [Parameters for NeEDL](#parameters-for-needl)
         - [Quick Start / Example](#quick-start--example)
         - [Basic Setup](#basic-setup)
@@ -52,46 +53,64 @@
 
 # Tools provided in this repository
 - NeEDL: Tool for fast network-based epistasis detection using local search
-- epiJSON: Tool for converting various input and output formats which also can apply commonly used filtering steps. Needed to create the input files for NeEDL
-- calculate_scores: A tool that can be used to calculate score of all statistical models supported by NeEDL (see Blumenthal et al. for further details)
+- epiJSON: Tool for converting various input and output formats that apply commonly used filtering steps. Needed to create the input files for NeEDL
+- calculate_scores: A tool that can be used to calculate scores of all statistical models supported by NeEDL (see Blumenthal et al. for further details)
 
 # License and Citing
 
 The project is distributed under the [GNU General Public License](https://www.gnu.org/licenses/gpl-3.0.en.html).
 
-# Usage (Docker container)
+# Usage (Docker/Apptainer/Singularity container)
 
-**The easiest way to use our toolset is via our docker container**. This repo is big and contains much more than a typical user likely needs. Thus, we strongly encourage you to try out the docker container first, which comes with up-to-date versions of all of our tools in a smaller size.
+**The easiest way to use our toolset is via our dockerhub image**. This repo is big and contains much more than a typical user likely needs. Thus, we strongly encourage the user to try out the dockerhub image first, which comes with up-to-date versions of all of our tools in a smaller size.
 
-In order to use our docker container, it is required to have docker installed. The user also needs permission to create and run docker containers (p.r.n., ask your system administrator). Additionally, a Python 3 installation and the command-line tool `curl` are necessary. To make all tools in this repository available in your current terminal session, please first source our installer script. This step needs to be done each time a new terminal session is started. It will only create some lightweight aliases, the actual download will take place only if you actually use one of the tools.
+The image can be used via one of the three platforms: **docker**, **apptainer**, or **singularity**. If you did not use any of the three platforms beforehand, we suggest you to go with apptainer. Generally, apptainer and singularity require less user permissions on the device to properly work than docker. Regardless of the selected tool, a **Python 3** installation and the command-line tool **curl** are required.
+
+To make all tools in this repository available in your current terminal session, please first source our installer script by executing the code below. This step needs to be done each time a new terminal session is started and is independent of the container platform you want to use. It will only create some lightweight aliases, the actual download will take place only if you actually use one of the tools. If you plan to use our applications regularly, please consider adding the lines below to your `.bashrc` to make our tools permanently available in every new terminal session.
 ```bash
 # install all tools in this repository for the current terminal session
 if command -v shopt > /dev/null 2>&1 ; then shopt -s expand_aliases; fi
 needl_install_sh="$(curl -s https://raw.githubusercontent.com/biomedbigdata/NeEDL/main/run/bash_install.sh)" && eval "$needl_install_sh"
 ```
 
-After that, you can use our tools in the following way:
+After sourcing the installer script, you can use our tools in the following way. Please add one of the flags `--docker`, `--singularity`, or `--apptainer` depending on the platform you wan to use to run the image.
 ```bash
 # run NeEDL
-NeEDL <parameters...>
+NeEDL --docker <parameters...>
+NeEDL --singularity <parameters...>
+NeEDL --apptainer <parameters...>
 ```
 ```bash
 # run epiJSON
-epiJSON <parameters...>
+epiJSON --docker <parameters...>
+epiJSON --singularity <parameters...>
+epiJSON --apptainer <parameters...>
 ```
 ```bash
 # run calculate_scores
-calculate_scores <parameters...>
+calculate_scores --docker <parameters...>
+calculate_scores --singularity <parameters...>
+calculate_scores --apptainer <parameters...>
 ```
 
+*All parameters that can be used with the tools are explained below.*
 
-All parameters that can be used with the tools are explained below.
-
-Example command to check that everything works:
+Example command to check that everything works (please select the correct line for the platform you want to use):
 ```bash
-NeEDL --help
+NeEDL --docker --help
+NeEDL --singularity --help
+NeEDL --apptainer --help
 ```
 This sould print out a long list of command line options if everything worked correctly.
+
+## Docker-specific parameters
+For using our tools with the container platform docker, we added two additional parameters.
+
+The parameter `--docker-no-pulling` can be set to avoid that the `docker pull` command is executed. This only works if a version of our image was already pulled beforehand. Use this command with caution as we might update our scripts and container image from time to time and this will only prevent the image not the installer script from being updated which might result in incompatibilities in the long run. If you use this flag, please make sure to update the container image manually from time to time.
+
+The parameter `--docker-selinux` mounts all resources with the `rw,Z` flag. This functionality can resolve issues on systems where selinux is installed. Please be extremly cautious with this flag as it can render your system inoperable if used incorrectly. Please refer to the docker documentation for more details: https://docs.docker.com/storage/bind-mounts/#configure-the-selinux-label.
+
+
 
 
 ## Parameters for NeEDL
