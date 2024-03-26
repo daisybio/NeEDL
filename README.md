@@ -166,9 +166,15 @@ For this default case which most users probably want to use one has to set the f
 # annotate SNPs with gene labels from dbSNP
 --snp-annotate-dbSNP
 
+# annotate SNPs with gene labels based on the eQTL catalogue
+--snp-annotate-eQTL
+
 # connect SNPs that are labeled with genes which interact according to BioGRID
 --network-BIOGRID
 ```
+
+When using `--snp-annotate-eQTL`, NeEDL also supports additional parameters. By specifying `--eQTL-tissue <tissue-name>` one or multiple times, one can select a subset of mappings from certain tissues. Without specifying this flag, NeEDL will use mappings from all available tissues.  
+Further, the parameter `--eQTL-pvalue-cutoff <pval>` allows to select a significance level for filtering the interactions reported in the eQTL catalogue. The default is `0.05`. The reported P-values in the eQTL catalogue will always be corrected with the Benjamini-Hochberg method.
 
 NeEDL is very versatile and can be used with custom data as well. You can select your data for labeling and interactions:
 
