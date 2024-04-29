@@ -20,10 +20,16 @@ echo "Working directory: $(pwd)"
 # ---- tests
 
 # check if binaries exist and are executable
-python ./run/NeEDL.py --docker-image-name "$1" --docker-no-pulling --help
-python ./run/epiJSON.py --docker-image-name "$1" --docker-no-pulling  --help
-python ./run/calculate_scores.py --docker-image-name "$1" --docker-no-pulling  --help
-python ./run/convert_to_binary.py --docker-image-name "$1" --docker-no-pulling  --help
+python ./run/NeEDL.py --container-image-name "$1" --docker-no-pulling --help
+python ./run/epiJSON.py --container-image-name "$1" --docker-no-pulling  --help
+python ./run/calculate_scores.py --container-image-name "$1" --docker-no-pulling  --help
+python ./run/convert_to_binary.py --container-image-name "$1" --docker-no-pulling  --help
+
+# check if it also works if we explicitly specify docker as container platform
+python ./run/NeEDL.py --docker --container-image-name "$1" --docker-no-pulling --help
+python ./run/epiJSON.py --docker --container-image-name "$1" --docker-no-pulling  --help
+python ./run/calculate_scores.py --docker --container-image-name "$1" --docker-no-pulling  --help
+python ./run/convert_to_binary.py --docker --container-image-name "$1" --docker-no-pulling  --help
 
 # realtime_scores is a special case --> no python launcher script exists for it
 # run containers as current user
@@ -38,7 +44,7 @@ dummy_dataset=$(realpath ./data/e2e_tests/dummy_dataset.json)
 
 # test NeEDL quick start example with dummy dataset
 python ./run/NeEDL.py \
-    --docker-image-name "$1" \
+    --container-image-name "$1" \
     --docker-no-pulling \
     "--num-threads" "1" \
     "--output-directory" "$out_dir" \
@@ -54,7 +60,7 @@ python ./run/NeEDL.py \
 
 # check that eqtl_mapping works
 python ./run/NeEDL.py \
-    --docker-image-name "$1" \
+    --container-image-name "$1" \
     --docker-no-pulling \
     "--num-threads" "1" \
     "--output-directory" "$out_dir" \
@@ -75,7 +81,7 @@ network_file=$(realpath ./data/e2e_tests/network.csv)
 # currently this creates an empty network --> checks only if annotation and network file is processed correctly
 # Maybe replace with something that actually creates a network from the custom data?
 python ./run/NeEDL.py \
-    --docker-image-name "$1" \
+    --container-image-name "$1" \
     --docker-no-pulling \
     "--num-threads" "1" \
     "--output-directory" "$out_dir" \
