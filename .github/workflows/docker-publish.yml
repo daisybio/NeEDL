@@ -34,7 +34,7 @@ jobs:
       - name: Setup Docker buildx
         uses: docker/setup-buildx-action@v3
 
-      - name: Build test image
+      - name: Build test image amd64
         uses: docker/build-push-action@v6
         with:
           context: .
@@ -43,7 +43,7 @@ jobs:
           load: true
           cache-from: type=gha
           cache-to: type=gha,mode=max
-          platforms: linux/amd64,linux/arm64
+          platforms: linux/amd64
           
       - name: Test amd64
         run: |
@@ -54,6 +54,17 @@ jobs:
               --platform linux/amd64 \
               ubuntu-latest \
              ./test/e2e/test_container.sh ${{ env.IMAGE_NAME }}:${{ env.TEST_TAG }}
+
+      - name: Build test image arm64
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          file: docker/NeEDL/Dockerfile
+          tags: ${{ env.IMAGE_NAME }}:${{ env.TEST_TAG }}
+          load: true
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+          platforms: linux/arm64
 
       - name: Test arm64
         run: |
