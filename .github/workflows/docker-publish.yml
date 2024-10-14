@@ -52,7 +52,7 @@ jobs:
               -v $(pwd):/${{ github.workspace }} \
               -w ${{ github.workspace }} \
               --platform linux/amd64 \
-              ubuntu:latest \
+              ubuntu/python:latest \
              ./test/e2e/test_container.sh ${{ env.IMAGE_NAME }}:${{ env.TEST_TAG }}
 
       - name: Build test image arm64
@@ -73,7 +73,7 @@ jobs:
               -v $(pwd):/${{ github.workspace }} \
               -w ${{ github.workspace }} \
               --platform linux/arm64 \
-              ubuntu:latest \
+              ubuntu/python:latest \
              ./test/e2e/test_container.sh ${{ env.IMAGE_NAME }}:${{ env.TEST_TAG }}
 
       - name: Log in to Docker Hub
