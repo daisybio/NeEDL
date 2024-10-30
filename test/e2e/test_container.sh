@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # This scripts tests the functionality of the docker container
-# Please provide the docerk image name as first parameter to this script.
+# Please provide the docker image name as first parameter to this script.
 
 
 # ---- setup
@@ -16,17 +16,24 @@ out_dir=$(realpath ./test_out)
 echo "Temp output directory: $out_dir"
 echo "Working directory: $(pwd)"
 
+if [ -z "$2" ]; then
+    echo "Using native platform."
+    py_platform_str=""
+else
+    echo "Using platform: $2"
+    py_platform_str="--docker-platform $2"
+fi
 
 # ---- tests
 
 # check if binaries exist and are executable
-python ./run/NeEDL.py --container-image-name "$1" --docker-no-pulling --help
+python ./run/NeEDL.py --container-image-name "$1" --docker-no-pulling $py_platform_str --help
 python ./run/epiJSON.py --container-image-name "$1" --docker-no-pulling  --help
 python ./run/calculate_scores.py --container-image-name "$1" --docker-no-pulling  --help
 python ./run/convert_to_binary.py --container-image-name "$1" --docker-no-pulling  --help
 
 # check if it also works if we explicitly specify docker as container platform
-python ./run/NeEDL.py --docker --container-image-name "$1" --docker-no-pulling --help
+python ./run/NeEDL.py --docker --container-image-name "$1" --docker-no-pulling $py_platform_str --help
 python ./run/epiJSON.py --docker --container-image-name "$1" --docker-no-pulling  --help
 python ./run/calculate_scores.py --docker --container-image-name "$1" --docker-no-pulling  --help
 python ./run/convert_to_binary.py --docker --container-image-name "$1" --docker-no-pulling  --help
@@ -46,6 +53,7 @@ dummy_dataset=$(realpath ./data/e2e_tests/dummy_dataset.json)
 python ./run/NeEDL.py \
     --container-image-name "$1" \
     --docker-no-pulling \
+    $py_platform_str \
     "--num-threads" "1" \
     "--output-directory" "$out_dir" \
     "--input-format" "JSON_EPIGEN" \
@@ -62,6 +70,7 @@ python ./run/NeEDL.py \
 python ./run/NeEDL.py \
     --container-image-name "$1" \
     --docker-no-pulling \
+    $py_platform_str \
     "--num-threads" "1" \
     "--output-directory" "$out_dir" \
     "--input-format" "JSON_EPIGEN" \
@@ -83,6 +92,7 @@ network_file=$(realpath ./data/e2e_tests/network.csv)
 python ./run/NeEDL.py \
     --container-image-name "$1" \
     --docker-no-pulling \
+    $py_platform_str \
     "--num-threads" "1" \
     "--output-directory" "$out_dir" \
     "--input-format" "JSON_EPIGEN" \
