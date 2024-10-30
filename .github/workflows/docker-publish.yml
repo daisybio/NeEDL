@@ -48,7 +48,7 @@ jobs:
       - name: Test amd64
         run: ./test/e2e/test_container.sh ${{ env.IMAGE_NAME }}:${{ env.TEST_TAG }} linuux/amd64
 
-      - name: Build test image amd64
+      - name: Build test image arm64
         uses: docker/build-push-action@v6
         with:
           context: .
