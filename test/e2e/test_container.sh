@@ -107,6 +107,7 @@ python ./run/NeEDL.py \
 
 # epiJSON convert json --> all formats
 epijson_test_dir_1=$out_dir/"epiJSON_test_1"
+mkdir -p $epijson_test_dir_1
 python ./run/epiJSON.py \
     --container-image-name "$1" \
     --docker-no-pulling \
