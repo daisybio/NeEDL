@@ -59,7 +59,7 @@ jobs:
           cache-to: type=gha,mode=max
           platforms: linux/arm64
       
-      - name: Test armd64
+      - name: Test arm64
         run: ./test/e2e/test_container.sh ${{ env.IMAGE_NAME }}:${{ env.TEST_TAG }} linux/arm64
 
       - name: Log in to Docker Hub
