@@ -28,15 +28,15 @@ fi
 
 # check if binaries exist and are executable
 python ./run/NeEDL.py --container-image-name "$1" --docker-no-pulling $py_platform_str --help
-python ./run/epiJSON.py --container-image-name "$1" --docker-no-pulling  --help
-python ./run/calculate_scores.py --container-image-name "$1" --docker-no-pulling  --help
-python ./run/convert_to_binary.py --container-image-name "$1" --docker-no-pulling  --help
+python ./run/epiJSON.py --container-image-name "$1" --docker-no-pulling $py_platform_str --help
+python ./run/calculate_scores.py --container-image-name "$1" --docker-no-pulling $py_platform_str --help
+python ./run/convert_to_binary.py --container-image-name "$1" --docker-no-pulling $py_platform_str --help
 
 # check if it also works if we explicitly specify docker as container platform
 python ./run/NeEDL.py --docker --container-image-name "$1" --docker-no-pulling $py_platform_str --help
-python ./run/epiJSON.py --docker --container-image-name "$1" --docker-no-pulling  --help
-python ./run/calculate_scores.py --docker --container-image-name "$1" --docker-no-pulling  --help
-python ./run/convert_to_binary.py --docker --container-image-name "$1" --docker-no-pulling  --help
+python ./run/epiJSON.py --docker --container-image-name "$1" --docker-no-pulling $py_platform_str --help
+python ./run/calculate_scores.py --docker --container-image-name "$1" --docker-no-pulling $py_platform_str --help
+python ./run/convert_to_binary.py --docker --container-image-name "$1" --docker-no-pulling $py_platform_str --help
 
 # realtime_scores is a special case --> no python launcher script exists for it
 # run containers as current user
