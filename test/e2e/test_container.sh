@@ -24,19 +24,21 @@ else
     py_platform_str="--docker-platform $2"
 fi
 
+additional_arguments=$3
+
 # ---- tests
 
 # check if binaries exist and are executable
-python ./run/NeEDL.py --container-image-name "$1" --docker-no-pulling $py_platform_str --help
-python ./run/epiJSON.py --container-image-name "$1" --docker-no-pulling $py_platform_str --help
-python ./run/calculate_scores.py --container-image-name "$1" --docker-no-pulling $py_platform_str --help
-python ./run/convert_to_binary.py --container-image-name "$1" --docker-no-pulling $py_platform_str --help
+python ./run/NeEDL.py --container-image-name "$1" --docker-no-pulling $py_platform_str $additional_arguments --help
+python ./run/epiJSON.py --container-image-name "$1" --docker-no-pulling $py_platform_str $additional_arguments --help
+python ./run/calculate_scores.py --container-image-name "$1" --docker-no-pulling $py_platform_str $additional_arguments --help
+python ./run/convert_to_binary.py --container-image-name "$1" --docker-no-pulling $py_platform_str $additional_arguments --help
 
 # check if it also works if we explicitly specify docker as container platform
-python ./run/NeEDL.py --docker --container-image-name "$1" --docker-no-pulling $py_platform_str --help
-python ./run/epiJSON.py --docker --container-image-name "$1" --docker-no-pulling $py_platform_str --help
-python ./run/calculate_scores.py --docker --container-image-name "$1" --docker-no-pulling $py_platform_str --help
-python ./run/convert_to_binary.py --docker --container-image-name "$1" --docker-no-pulling $py_platform_str --help
+python ./run/NeEDL.py --docker --container-image-name "$1" --docker-no-pulling $py_platform_str $additional_arguments --help
+python ./run/epiJSON.py --docker --container-image-name "$1" --docker-no-pulling $py_platform_str $additional_arguments --help
+python ./run/calculate_scores.py --docker --container-image-name "$1" --docker-no-pulling $py_platform_str $additional_arguments --help
+python ./run/convert_to_binary.py --docker --container-image-name "$1" --docker-no-pulling $py_platform_str $additional_arguments --help
 
 # realtime_scores is a special case --> no python launcher script exists for it
 # run containers as current user
@@ -54,6 +56,7 @@ python ./run/NeEDL.py \
     --container-image-name "$1" \
     --docker-no-pulling \
     $py_platform_str \
+    $additional_arguments \
     "--num-threads" "1" \
     "--output-directory" "$out_dir" \
     "--input-format" "JSON_EPIGEN" \
@@ -71,6 +74,7 @@ python ./run/NeEDL.py \
     --container-image-name "$1" \
     --docker-no-pulling \
     $py_platform_str \
+    $additional_arguments \
     "--num-threads" "1" \
     "--output-directory" "$out_dir" \
     "--input-format" "JSON_EPIGEN" \
@@ -93,6 +97,7 @@ python ./run/NeEDL.py \
     --container-image-name "$1" \
     --docker-no-pulling \
     $py_platform_str \
+    $additional_arguments \
     "--num-threads" "1" \
     "--output-directory" "$out_dir" \
     "--input-format" "JSON_EPIGEN" \
@@ -112,6 +117,7 @@ python ./run/epiJSON.py \
     --container-image-name "$1" \
     --docker-no-pulling \
     $py_platform_str \
+    $additional_arguments \
     "--num-threads" "1" \
     "--output-directory" "$epijson_test_dir_1" \
     "--input-format" "JSON" \
@@ -131,7 +137,9 @@ cmp $epijson_test_dir_1/dataset.map $dummy_dataset.map
 cmp $epijson_test_dir_1/dataset.ped $dummy_dataset.ped
 cmp $epijson_test_dir_1/dataset.tfam $dummy_dataset.tfam
 cmp $epijson_test_dir_1/dataset.tped $dummy_dataset.tped
-cmp $epijson_test_dir_1/dataset.vcf $dummy_dataset.vcf
+
+# Do not test VCF file as it contains the date of creation within the file.
+# cmp $epijson_test_dir_1/dataset.vcf $dummy_dataset.vcf
 
 
 # TODO: add more tests here
