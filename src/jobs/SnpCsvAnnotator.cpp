@@ -92,64 +92,67 @@ namespace epi {
         const auto filter_map = filter_entries(parser);
 
         std::vector<std::vector<std::string>> snp_splits (parser.num_rows()), annotation_splits(parser.num_rows());
-        if (snp_separator != -1) {
 #pragma omp parallel for default(none) shared(has_header, snp_column, snp_separator, parser, snp_splits, filter_map)
-            for (size_t i = has_header ? 1 : 0; i < parser.num_rows(); i++) {
-                if (!filter_map[i]) continue;
-                snp_splits[i] = string_split(parser.cell(i, snp_column), snp_separator);
+        for (size_t i = has_header ? 1 : 0; i < parser.num_rows(); i++) {
+            if (!filter_map[i]) continue;
+            const auto & line = parser.cell(i, snp_column);
+            if (snp_separator != -1) {
+                snp_splits[i] = string_split(line, snp_separator);
+            } else {
+                snp_splits[i] = {};
+                snp_splits[i].push_back(line);
             }
         }
 
-        if (annotation_separator != -1) {
 #pragma omp parallel for default(none) shared(has_header, annotation_column, annotation_separator, parser, annotation_splits, filter_map)
-            for (size_t i = has_header ? 1 : 0; i < parser.num_rows(); i++) {
-                if (!filter_map[i]) continue;
-                annotation_splits[i] = string_split(parser.cell(i, annotation_column), annotation_separator);
+        for (size_t i = has_header ? 1 : 0; i < parser.num_rows(); i++) {
+            if (!filter_map[i]) continue;
+            const auto & line = parser.cell(i, annotation_column);
+            if (annotation_separator != -1) {
+                annotation_splits[i] = string_split(line, annotation_separator);
+            } else {
+                annotation_splits[i] = {};
+                annotation_splits[i].push_back(line);
             }
         }
 
-        // size_t anno_max = 0, anno_sum = 0, anno_count = 0;
 
         std::vector<std::string> snps, annotations;
         for (size_t i = has_header ? 1 : 0; i < parser.num_rows(); i++) {
             if (!filter_map[i]) continue;
-            if (snp_separator == -1) {
-                snps.clear();
-                snps.push_back(parser.cell(i, snp_column));
-            } else {
-                // string_split(snps, parser.cell(i, snp_column), snp_separator);
-                snps = snp_splits[i];
-            }
-            if (annotation_separator == -1) {
-                annotations.clear();
-                annotations.push_back(parser.cell(i, annotation_column));
-            } else {
-                // string_split(annotations, parser.cell(i, annotation_column), annotation_separator);
-                annotations = annotation_splits[i];
-            }
+            snps = snp_splits[i];
+            annotations = annotation_splits[i];
 
             for (auto &snp: snps) {
                 if (data->snpStorage->contains_name(snp)) {
                     auto snp_t = data->snpStorage->by_name(snp);
 
                     for (auto &anno: annotations){
-                        /*
-                        anno_max = std::max(anno_max, anno.size());
-                        anno_sum += anno.size();
-                        anno_count ++;
-                         */
                         all_annotations.emplace_back(snp_t, anno);
                     }
                 }
             }
         }
 
-        // std::cout << anno_max << ", " << anno_count << ", " << anno_sum << std::endl;
-
         // apply mappings
         data->snpStorage->add_SNP_annotations(all_annotations);
 
+        const auto & annotations_map = data->snpStorage->get_annotations_map();
+        size_t num_annotation_strings = annotations_map.size();
+        size_t num_annotations = 0;
+        std::unordered_set<SNP> annotated_snps{};
+        for (const auto & anno : annotations_map) {
+            annotated_snps.insert(anno.second.begin(), anno.second.end());
+            num_annotations += anno.second.size();
+        }
+
+        size_t num_annotated_snps = annotated_snps.size();
+
         logger.stop();
+        Logger::logLine("SNP Annotation: ");
+        Logger::logLine("   SNP-annotation pairs:          " + std::to_string(num_annotations));
+        Logger::logLine("   distinct annotation strings:   " + std::to_string(num_annotation_strings));
+        Logger::logLine("   distinct SNPs with annotation: " + std::to_string(num_annotated_snps));
     }
 
     rapidjson::Value SnpCsvAnnotator::getConfig(rapidjson::Document &doc) {

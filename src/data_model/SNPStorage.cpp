@@ -41,14 +41,21 @@ namespace epi {
 
     void SNPStorage::add_SNP_annotations(const std::vector<std::pair<SNP_t, std::string>>& annotations) {
         for (auto & anno : annotations) {
-            snp_data[anno.first.value].annotations.push_back(anno.second);
+            auto & anno_vec = snp_data[anno.first.value].annotations;
+            if (std::find(anno_vec.begin(), anno_vec.end(),anno.second) == anno_vec.end()) {
+                anno_vec.push_back(anno.second);
+            }
+
             auto map_item = annotations_map.find(anno.second);
             if (map_item == annotations_map.end()) {
                 std::vector<size_t> v;
                 v.push_back(anno.first.value);
                 annotations_map.insert({anno.second, v });
             } else {
-                map_item->second.push_back(anno.first.value);
+                if (std::find(map_item->second.begin(), map_item->second.end(), anno.first.value) == map_item->second.end()) {
+                    // only add if not in the list yet
+                    map_item->second.push_back(anno.first.value);
+                }
             }
         }
     }
@@ -67,7 +74,7 @@ namespace epi {
         }
     }
 
-    std::unordered_map<std::string, std::vector<size_t>> SNPStorage::get_annotations_map() {
+    const std::unordered_map<std::string, std::vector<size_t>>& SNPStorage::get_annotations_map() {
         return annotations_map;
     }
 

@@ -29,6 +29,7 @@
     #endif
 #endif
 
+#include <cstdint>
 #include <vector>
 
 double get_flip_energy(

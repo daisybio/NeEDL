@@ -18,7 +18,7 @@ namespace epi {
 
             // determine the number of annotations
             std::unordered_set<std::string> annotations;
-            auto anno_map = data->snpStorage->get_annotations_map();
+            const auto &anno_map = data->snpStorage->get_annotations_map();
             for (auto &snp : data->snpNetwork->get_network_snps()) {
                 auto annos = data->snpStorage->snp_get_annotations(snp);
                 annotations.insert(annos.begin(), annos.end());

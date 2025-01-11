@@ -191,7 +191,10 @@ def find_dependencies(args):
     }
 
 def setup_vcpkg(args):
-    if args.clean and not args.skip_vcpkg_setup and os.path.isdir("vcpkg"):
+    if args.skip_vcpkg_setup:
+        return
+
+    if args.clean and os.path.isdir("vcpkg"):
         subprocess.call("rm -rf vcpkg", shell=True)
     if not os.path.isdir("vcpkg"):
         commands = "git clone https://github.com/Microsoft/vcpkg.git vcpkg && ./vcpkg/bootstrap-vcpkg.sh -disableMetrics && ./vcpkg/vcpkg install"

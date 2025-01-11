@@ -80,7 +80,7 @@ namespace epi {
         bool contains_name(const std::string& name);
 
         void add_SNP_annotations(const std::vector<std::pair<SNP_t, std::string>>& annotations);
-        std::unordered_map<std::string, std::vector<size_t>> get_annotations_map();
+        const std::unordered_map<std::string, std::vector<size_t>>& get_annotations_map();
         std::vector<std::string> snp_get_annotations(const SNP_t& snp);
 
         void snp_set_variable_attribute(const SNP_t& snp, const std::string& key, const std::string& value);
