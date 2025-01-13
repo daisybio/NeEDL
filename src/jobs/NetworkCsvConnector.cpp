@@ -92,18 +92,42 @@ namespace epi {
         parser.parse(path, csv_separator);
 
         std::vector<std::vector<std::string>> col1_splits (parser.num_rows()), col2_splits(parser.num_rows());
-        if (col1_separator != -1) {
 #pragma omp parallel for default(none) shared(has_header, column1, col1_separator, parser, col1_splits)
-            for (size_t i = has_header ? 1 : 0; i < parser.num_rows(); i++) {
-                col1_splits[i] = string_split(parser.cell(i, column1), col1_separator);
+        for (size_t i = has_header ? 1 : 0; i < parser.num_rows(); i++) {
+            const auto &line = parser.cell(i, column1);
+            if (col1_separator != -1) {
+                col1_splits[i] = string_split(line, col1_separator);
+            } else {
+                col1_splits[i] = {};
+                col1_splits[i].push_back(line);
             }
         }
 
-        if (col2_separator != -1) {
 #pragma omp parallel for default(none) shared(has_header, column2, col2_separator, parser, col2_splits)
-            for (size_t i = has_header ? 1 : 0; i < parser.num_rows(); i++) {
-                col2_splits[i] = string_split(parser.cell(i, column2), col2_separator);
+        for (size_t i = has_header ? 1 : 0; i < parser.num_rows(); i++) {
+            const auto &line = parser.cell(i, column2);
+            if (col2_separator != -1) {
+                col2_splits[i] = string_split(line, col2_separator);
+            } else {
+                col2_splits[i] = {};
+                col2_splits[i].push_back(line);
             }
+        }
+
+        // this loop is only for logging purposes: How many annotations of our SNPs can be found in the network file
+        {
+            std::unordered_set<std::string> network_annotations{};
+            const auto &snp_annotations = data->snpStorage->get_annotations_map();
+            for (const auto splits: {std::cref(col1_splits), std::cref(col2_splits)}) {
+                for (const auto &col: splits.get()) {
+                    for (const auto &anno: col) {
+                        if (snp_annotations.contains(anno)) {
+                            network_annotations.insert(anno);
+                        }
+                    }
+                }
+            }
+            Logger::logLine("Distinct annotations that overlap between network file and annotated SNPs: " + std::to_string(network_annotations.size()));
         }
 
         size_t num_threads = omp_get_max_threads();
@@ -115,20 +139,8 @@ namespace epi {
 #pragma omp parallel for default(none) shared(col1, col2, parser, col1_splits, col2_splits, data, nodes, edges)
         for (size_t i = has_header ? 1 : 0; i < parser.num_rows(); i++) {
             size_t thr = omp_get_thread_num();
-            if (col1_separator == -1) {
-                col1[thr].clear();
-                col1[thr].push_back(parser.cell(i, column1));
-            } else {
-                // string_split(snps, parser.cell(i, snp_column), snp_separator);
-                col1[thr] = col1_splits[i];
-            }
-            if (col2_separator == -1) {
-                col2[thr].clear();
-                col2[thr].push_back(parser.cell(i, column2));
-            } else {
-                // string_split(annotations, parser.cell(i, annotation_column), annotation_separator);
-                col2[thr] = col2_splits[i];
-            }
+            col1[thr] = col1_splits[i];
+            col2[thr] = col2_splits[i];
 
             for (auto & gene_symbol_1 : col1[thr]) {
                 for (auto & gene_symbol_2 : col2[thr]) {

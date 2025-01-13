@@ -369,7 +369,7 @@ namespace epi {
             if (rc) {
                 throw epi::Error("SQLITE-error when preparing has_annotation insert statement");
             }
-            auto all_annotations = data->snpStorage->get_annotations_map();
+            const auto &all_annotations = data->snpStorage->get_annotations_map();
 
             size_t anno_id = 0;
             for (auto &anno : network_node_annotations) {
@@ -377,7 +377,9 @@ namespace epi {
                 sqlite3_bind_text(insert_annos_stmt_sqlite, 2, anno.c_str(), anno.size(), SQLITE_STATIC);
                 sqlite3_step(insert_annos_stmt_sqlite);
 
-                for (auto & node : all_annotations[anno]) {
+                const auto all_annotations_anno = all_annotations.find(anno);
+
+                for (auto & node : all_annotations_anno->second) {
                     sqlite3_bind_int(has_anno_stmt_sqlite, 1, node);
                     sqlite3_bind_int(has_anno_stmt_sqlite, 2, anno_id);
                     sqlite3_step(has_anno_stmt_sqlite);

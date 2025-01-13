@@ -17,7 +17,7 @@ namespace epi {
         std::unordered_set<SNP_t, SNP_t::SNPHash> nodes;
         std::vector<SNPEdge> edges;
 
-        auto annotations_map = data->snpStorage->get_annotations_map();
+        const auto &annotations_map = data->snpStorage->get_annotations_map();
         for (auto & anno : annotations_map) {
             std::vector<SNP_t> nodes_repr;
             for (auto & node : anno.second) {
