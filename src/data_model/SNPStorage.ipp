@@ -170,7 +170,7 @@ namespace epi {
                 break;
             case options::EpistasisScore::REGRESSION_NLL_GAIN:
                 if (regression_model_scores[current_thread] != score) {
-                    regression_models[current_thread]->set_options("--score NLL-GAIN --max-itrs 50000");
+                    regression_models[current_thread]->set_options("--score NLL-GAIN");
                     regression_model_scores[current_thread] = score;
                 }
                 break;
