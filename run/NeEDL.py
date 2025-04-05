@@ -75,6 +75,13 @@ for i, arg in enumerate(arguments):
         docker_pull = False
         del arguments[i]
 
+# set different platform
+docker_platform = None
+for i, arg in enumerate(arguments):
+    if arg == '--docker-platform':
+        docker_platform = arguments[i + 1]
+        del arguments[i + 1]
+        del arguments[i]
 
 
 # map output path
@@ -163,6 +170,8 @@ else:
     if output_directory is not None:
         external_command += f'-v "{output_directory}:/mnt/out:rw{docker_selinux_flag}" '
 
+    if docker_platform is not None:
+        external_command += f'--platform {docker_platform} '
 
 argument_string = ' '.join(map(lambda a: f'"{a}"', map(lambda b: b.replace('"', '\\"'), arguments)))
 external_command += f"{image} {command} --data-directory /NeEDL/data/ {argument_string}"
